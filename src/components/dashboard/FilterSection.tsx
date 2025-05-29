@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { FilterIcon, XIcon } from 'lucide-react';
+import DateFilter from './DateFilter';
 
 interface FilterSectionProps {
   selectedCity: string;
@@ -13,6 +14,7 @@ interface FilterSectionProps {
   onCityChange: (city: string) => void;
   onRiverChange: (river: string) => void;
   onPointsChange: (points: string[]) => void;
+  onDateChange: (startDate: Date | undefined, endDate: Date | undefined) => void;
 }
 
 const FilterSection = ({
@@ -22,6 +24,7 @@ const FilterSection = ({
   onCityChange,
   onRiverChange,
   onPointsChange,
+  onDateChange,
 }: FilterSectionProps) => {
   const [isFiltersOpen, setIsFiltersOpen] = useState(true);
 
@@ -34,6 +37,7 @@ const FilterSection = ({
     onCityChange('');
     onRiverChange('');
     onPointsChange([]);
+    onDateChange(undefined, undefined);
   };
 
   const handlePointToggle = (point: string) => {
@@ -73,8 +77,11 @@ const FilterSection = ({
       </CardHeader>
       
       {isFiltersOpen && (
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <CardContent className="space-y-6">
+          {/* Filtro de Data */}
+          <DateFilter onDateChange={onDateChange} />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700">
                 Cidade

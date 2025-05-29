@@ -6,6 +6,7 @@ import { DropletIcon, TrendingUpIcon, MapIcon, FileTextIcon, ArrowRightIcon } fr
 import { Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import NewsSection from '@/components/NewsSection';
 
 const Index = () => {
   return (
@@ -95,6 +96,9 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* News Section */}
+      <NewsSection />
 
       {/* CTA Section */}
       <section className="py-20 px-4 bg-teal-600 text-white">

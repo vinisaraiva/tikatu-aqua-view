@@ -12,6 +12,13 @@ const Dashboard = () => {
   const [selectedCity, setSelectedCity] = useState('');
   const [selectedRiver, setSelectedRiver] = useState('');
   const [selectedPoints, setSelectedPoints] = useState<string[]>([]);
+  const [startDate, setStartDate] = useState<Date | undefined>();
+  const [endDate, setEndDate] = useState<Date | undefined>();
+
+  const handleDateChange = (start: Date | undefined, end: Date | undefined) => {
+    setStartDate(start);
+    setEndDate(end);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -35,6 +42,7 @@ const Dashboard = () => {
           onCityChange={setSelectedCity}
           onRiverChange={setSelectedRiver}
           onPointsChange={setSelectedPoints}
+          onDateChange={handleDateChange}
         />
 
         {/* Main Content */}
