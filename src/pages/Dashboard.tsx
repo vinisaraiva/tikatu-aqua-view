@@ -1,6 +1,5 @@
 
 import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -12,7 +11,7 @@ import ReportSection from '@/components/dashboard/ReportSection';
 const Dashboard = () => {
   const [selectedCity, setSelectedCity] = useState('');
   const [selectedRiver, setSelectedRiver] = useState('');
-  const [selectedPoint, setSelectedPoint] = useState('');
+  const [selectedPoints, setSelectedPoints] = useState<string[]>([]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -32,10 +31,10 @@ const Dashboard = () => {
         <FilterSection
           selectedCity={selectedCity}
           selectedRiver={selectedRiver}
-          selectedPoint={selectedPoint}
+          selectedPoints={selectedPoints}
           onCityChange={setSelectedCity}
           onRiverChange={setSelectedRiver}
-          onPointChange={setSelectedPoint}
+          onPointsChange={setSelectedPoints}
         />
 
         {/* Main Content */}
@@ -50,7 +49,7 @@ const Dashboard = () => {
             <RecentReadings 
               city={selectedCity}
               river={selectedRiver}
-              point={selectedPoint}
+              points={selectedPoints}
             />
           </TabsContent>
 
@@ -58,7 +57,7 @@ const Dashboard = () => {
             <AnomaliesChart 
               city={selectedCity}
               river={selectedRiver}
-              point={selectedPoint}
+              point={selectedPoints[0] || ''}
             />
           </TabsContent>
 
@@ -66,7 +65,7 @@ const Dashboard = () => {
             <ReportSection 
               city={selectedCity}
               river={selectedRiver}
-              point={selectedPoint}
+              points={selectedPoints}
             />
           </TabsContent>
         </Tabs>

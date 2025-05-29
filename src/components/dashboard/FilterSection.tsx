@@ -3,39 +3,47 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { FilterIcon, XIcon } from 'lucide-react';
 
 interface FilterSectionProps {
   selectedCity: string;
   selectedRiver: string;
-  selectedPoint: string;
+  selectedPoints: string[];
   onCityChange: (city: string) => void;
   onRiverChange: (river: string) => void;
-  onPointChange: (point: string) => void;
+  onPointsChange: (points: string[]) => void;
 }
 
 const FilterSection = ({
   selectedCity,
   selectedRiver,
-  selectedPoint,
+  selectedPoints,
   onCityChange,
   onRiverChange,
-  onPointChange,
+  onPointsChange,
 }: FilterSectionProps) => {
   const [isFiltersOpen, setIsFiltersOpen] = useState(true);
 
   // Mock data for demonstration
   const cities = ['São Paulo', 'Rio de Janeiro', 'Belo Horizonte', 'Salvador'];
   const rivers = selectedCity ? ['Rio Tietê', 'Rio Pinheiros', 'Rio Tamanduateí'] : [];
-  const points = selectedRiver ? ['Ponto 001', 'Ponto 002', 'Ponto 003'] : [];
+  const points = selectedRiver ? ['Ponto 001', 'Ponto 002', 'Ponto 003', 'Ponto 004', 'Ponto 005'] : [];
 
   const clearFilters = () => {
     onCityChange('');
     onRiverChange('');
-    onPointChange('');
+    onPointsChange([]);
   };
 
-  const hasFilters = selectedCity || selectedRiver || selectedPoint;
+  const handlePointToggle = (point: string) => {
+    const updatedPoints = selectedPoints.includes(point)
+      ? selectedPoints.filter(p => p !== point)
+      : [...selectedPoints, point];
+    onPointsChange(updatedPoints);
+  };
+
+  const hasFilters = selectedCity || selectedRiver || selectedPoints.length > 0;
 
   return (
     <Card className="mb-6">
@@ -66,7 +74,7 @@ const FilterSection = ({
       
       {isFiltersOpen && (
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700">
                 Cidade
@@ -106,29 +114,37 @@ const FilterSection = ({
                 </SelectContent>
               </Select>
             </div>
+          </div>
 
+          {selectedRiver && (
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700">
-                Ponto de Coleta
+                Pontos de Coleta (selecione um ou mais)
               </label>
-              <Select 
-                value={selectedPoint} 
-                onValueChange={onPointChange}
-                disabled={!selectedRiver}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione um ponto" />
-                </SelectTrigger>
-                <SelectContent>
-                  {points.map((point) => (
-                    <SelectItem key={point} value={point}>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 p-4 border rounded-lg bg-gray-50">
+                {points.map((point) => (
+                  <div key={point} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={point}
+                      checked={selectedPoints.includes(point)}
+                      onCheckedChange={() => handlePointToggle(point)}
+                    />
+                    <label
+                      htmlFor={point}
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                    >
                       {point}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                    </label>
+                  </div>
+                ))}
+              </div>
+              {selectedPoints.length > 0 && (
+                <p className="text-sm text-gray-600">
+                  {selectedPoints.length} ponto(s) selecionado(s): {selectedPoints.join(', ')}
+                </p>
+              )}
             </div>
-          </div>
+          )}
         </CardContent>
       )}
     </Card>
