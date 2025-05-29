@@ -32,82 +32,96 @@ const CollectionPointsMap = ({ selectedPoints, city, river }: CollectionPointsMa
         )}
       </CardHeader>
       <CardContent>
-        <div className="h-80 bg-gradient-to-br from-blue-50 to-teal-50 rounded-lg flex flex-col items-center justify-center border-2 border-dashed border-gray-300 relative overflow-hidden">
-          {/* Background map pattern */}
-          <div className="absolute inset-0 opacity-10">
-            <svg width="100%" height="100%" viewBox="0 0 400 300">
-              {/* Rivers */}
-              <path d="M50 150 Q200 100 350 180" stroke="#3b82f6" strokeWidth="3" fill="none" />
-              <path d="M100 200 Q250 160 300 220" stroke="#3b82f6" strokeWidth="2" fill="none" />
+        <div className="h-80 bg-gradient-to-br from-blue-100 to-green-100 rounded-lg flex flex-col items-center justify-center border relative overflow-hidden">
+          {/* Improved visual map representation */}
+          <div className="absolute inset-0">
+            <svg width="100%" height="100%" viewBox="0 0 400 320" className="absolute inset-0">
+              {/* Background grid */}
+              <defs>
+                <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                  <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e5e7eb" strokeWidth="1" opacity="0.3"/>
+                </pattern>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#grid)" />
               
-              {/* City blocks */}
-              <rect x="80" y="80" width="40" height="30" fill="#6b7280" opacity="0.3" />
-              <rect x="150" y="120" width="50" height="40" fill="#6b7280" opacity="0.3" />
-              <rect x="220" y="90" width="35" height="35" fill="#6b7280" opacity="0.3" />
-              <rect x="280" y="140" width="45" height="25" fill="#6b7280" opacity="0.3" />
+              {/* Rivers */}
+              <path d="M50 160 Q200 120 350 180" stroke="#2563eb" strokeWidth="4" fill="none" opacity="0.6" />
+              <path d="M100 200 Q250 160 320 220" stroke="#2563eb" strokeWidth="3" fill="none" opacity="0.4" />
+              
+              {/* City areas */}
+              <rect x="80" y="80" width="40" height="30" fill="#6b7280" opacity="0.2" rx="2" />
+              <rect x="150" y="120" width="50" height="40" fill="#6b7280" opacity="0.2" rx="2" />
+              <rect x="220" y="90" width="35" height="35" fill="#6b7280" opacity="0.2" rx="2" />
+              <rect x="280" y="140" width="45" height="25" fill="#6b7280" opacity="0.2" rx="2" />
+              
+              {/* Collection points on map */}
+              {selectedPoints.map((point, index) => {
+                const coords = mockCoordinates[point];
+                if (!coords) return null;
+                
+                // Convert coordinates to map position
+                const x = 50 + (index * 60) + Math.random() * 40;
+                const y = 100 + (index * 30) + Math.random() * 60;
+                
+                return (
+                  <g key={point}>
+                    <circle
+                      cx={x}
+                      cy={y}
+                      r="8"
+                      fill={`hsl(${index * 45}, 70%, 50%)`}
+                      stroke="white"
+                      strokeWidth="2"
+                      opacity="0.9"
+                    />
+                    <text
+                      x={x}
+                      y={y - 15}
+                      textAnchor="middle"
+                      className="text-xs font-medium fill-gray-700"
+                    >
+                      {point}
+                    </text>
+                  </g>
+                );
+              })}
             </svg>
           </div>
 
-          <div className="text-center z-10 relative">
-            <div className="bg-white rounded-full p-4 mb-4 shadow-lg">
-              <MapIcon className="h-12 w-12 mx-auto text-teal-600" />
+          <div className="text-center z-10 relative bg-white/80 backdrop-blur-sm rounded-lg p-4 shadow-sm">
+            <div className="bg-teal-100 rounded-full p-3 mb-3 inline-block">
+              <MapIcon className="h-8 w-8 text-teal-600" />
             </div>
-            <p className="text-gray-700 font-medium mb-2">Mapa Interativo</p>
+            <p className="text-gray-700 font-medium mb-2">Localização dos Pontos</p>
             <p className="text-sm text-gray-500 mb-4">
               {selectedPoints.length > 0 
-                ? `Exibindo ${selectedPoints.length} ponto(s) de coleta`
-                : 'Selecione pontos de coleta para visualizar no mapa'
+                ? `${selectedPoints.length} ponto(s) selecionado(s)`
+                : 'Selecione pontos de coleta para visualizar'
               }
             </p>
             
             {selectedPoints.length > 0 && (
-              <div className="space-y-2 max-h-32 overflow-y-auto">
-                {selectedPoints.map((point, index) => {
+              <div className="space-y-1 max-h-20 overflow-y-auto">
+                {selectedPoints.slice(0, 3).map((point, index) => {
                   const coords = mockCoordinates[point];
                   return (
-                    <div key={point} className="flex items-center justify-between text-xs bg-white/80 backdrop-blur p-2 rounded border shadow-sm">
-                      <div className="flex items-center gap-2">
-                        <div 
-                          className="w-3 h-3 rounded-full" 
-                          style={{ backgroundColor: `hsl(${index * 45}, 70%, 50%)` }}
-                        />
-                        <span className="font-medium">{point}</span>
-                      </div>
+                    <div key={point} className="flex items-center justify-center text-xs">
+                      <div 
+                        className="w-2 h-2 rounded-full mr-2" 
+                        style={{ backgroundColor: `hsl(${index * 45}, 70%, 50%)` }}
+                      />
+                      <span className="font-medium">{point}</span>
                       {coords && (
-                        <span className="text-gray-500">
-                          ({coords.lat.toFixed(4)}, {coords.lng.toFixed(4)})
+                        <span className="text-gray-500 ml-2">
+                          ({coords.lat.toFixed(3)}, {coords.lng.toFixed(3)})
                         </span>
                       )}
                     </div>
                   );
                 })}
-              </div>
-            )}
-
-            {/* Collection points on map */}
-            {selectedPoints.length > 0 && (
-              <div className="absolute inset-0 pointer-events-none">
-                {selectedPoints.map((point, index) => {
-                  const coords = mockCoordinates[point];
-                  if (!coords) return null;
-                  
-                  // Convert coordinates to percentage position
-                  const x = ((coords.lng + 46.65) / 0.05) * 100;
-                  const y = ((coords.lat + 23.56) / 0.02) * 100;
-                  
-                  return (
-                    <div
-                      key={point}
-                      className="absolute w-4 h-4 rounded-full border-2 border-white shadow-lg"
-                      style={{
-                        backgroundColor: `hsl(${index * 45}, 70%, 50%)`,
-                        left: `${Math.max(5, Math.min(95, x))}%`,
-                        top: `${Math.max(5, Math.min(95, 100 - y))}%`,
-                        transform: 'translate(-50%, -50%)',
-                      }}
-                    />
-                  );
-                })}
+                {selectedPoints.length > 3 && (
+                  <p className="text-xs text-gray-500">+{selectedPoints.length - 3} pontos</p>
+                )}
               </div>
             )}
           </div>

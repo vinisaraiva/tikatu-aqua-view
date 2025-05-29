@@ -2,6 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { NewspaperIcon, ArrowRightIcon, CalendarIcon } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const NewsSection = () => {
   const news = [
@@ -67,36 +68,38 @@ const NewsSection = () => {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {news.map((article) => (
-            <Card key={article.id} className="group hover:shadow-lg transition-shadow cursor-pointer">
-              <div className="aspect-video bg-gradient-to-br from-teal-100 to-blue-100 rounded-t-lg relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-teal-500/20 to-blue-500/20" />
-                <div className="absolute bottom-2 left-2">
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(article.category)}`}>
-                    {article.category}
-                  </span>
+            <Link key={article.id} to={`/news/${article.id}`}>
+              <Card className="group hover:shadow-lg transition-shadow cursor-pointer h-full">
+                <div className="aspect-video bg-gradient-to-br from-teal-100 to-blue-100 rounded-t-lg relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-br from-teal-500/20 to-blue-500/20" />
+                  <div className="absolute bottom-2 left-2">
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(article.category)}`}>
+                      {article.category}
+                    </span>
+                  </div>
                 </div>
-              </div>
-              
-              <CardHeader className="pb-3">
-                <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
-                  <CalendarIcon className="h-4 w-4" />
-                  {new Date(article.date).toLocaleDateString('pt-BR')}
-                </div>
-                <CardTitle className="text-lg leading-tight group-hover:text-teal-600 transition-colors">
-                  {article.title}
-                </CardTitle>
-              </CardHeader>
-              
-              <CardContent>
-                <p className="text-gray-600 text-sm mb-4 line-clamp-3">
-                  {article.summary}
-                </p>
-                <Button variant="ghost" size="sm" className="p-0 h-auto text-teal-600 hover:text-teal-700">
-                  Leia mais
-                  <ArrowRightIcon className="ml-1 h-4 w-4" />
-                </Button>
-              </CardContent>
-            </Card>
+                
+                <CardHeader className="pb-3">
+                  <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
+                    <CalendarIcon className="h-4 w-4" />
+                    {new Date(article.date).toLocaleDateString('pt-BR')}
+                  </div>
+                  <CardTitle className="text-lg leading-tight group-hover:text-teal-600 transition-colors">
+                    {article.title}
+                  </CardTitle>
+                </CardHeader>
+                
+                <CardContent className="flex-1 flex flex-col">
+                  <p className="text-gray-600 text-sm mb-4 line-clamp-3 flex-1">
+                    {article.summary}
+                  </p>
+                  <Button variant="ghost" size="sm" className="p-0 h-auto text-teal-600 hover:text-teal-700 self-start">
+                    Leia mais
+                    <ArrowRightIcon className="ml-1 h-4 w-4" />
+                  </Button>
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
 
