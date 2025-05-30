@@ -9,25 +9,37 @@ interface ReportSectionProps {
   city: string;
   river: string;
   points: string[];
+  startDate?: Date;
+  endDate?: Date;
 }
 
-const ReportSection = ({ city, river, points }: ReportSectionProps) => {
+const ReportSection = ({ city, river, points, startDate, endDate }: ReportSectionProps) => {
   const [shouldGenerateReport, setShouldGenerateReport] = useState(false);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
 
   // Mock report data
-  const generateMockReport = (selectedPoints: string[]) => {
+  const generateMockReport = (selectedPoints: string[], start?: Date, end?: Date) => {
+    const formatDate = (date: Date) => date.toLocaleDateString('pt-BR');
+    const formatDateTime = (date: Date) => date.toLocaleString('pt-BR');
+    
+    let periodText = 'Últimas 24 horas';
+    if (start && end && start !== end) {
+      periodText = `${formatDate(start)} até ${formatDate(end)}`;
+    } else if (start) {
+      periodText = formatDate(start);
+    }
+
     return `
 ## Relatório de Qualidade da Água
 
 **Local:** ${city} → ${river}
 **Pontos Analisados:** ${selectedPoints.join(', ')}
-**Data:** ${new Date().toLocaleDateString('pt-BR')}
-**Período de Análise:** Últimas 24 horas
+**Data de Geração:** ${formatDateTime(new Date())}
+**Período de Análise:** ${periodText}
 
 ### Resumo Executivo
 
-A análise dos dados de qualidade da água coletados nos ${selectedPoints.length} ponto(s) de monitoramento indica variações significativas nos parâmetros físico-químicos durante o período avaliado.
+A análise dos dados de qualidade da água coletados nos ${selectedPoints.length} ponto(s) de monitoramento no período de ${periodText} indica variações significativas nos parâmetros físico-químicos durante o período avaliado.
 
 ### Pontos de Coleta Analisados
 
@@ -35,6 +47,7 @@ ${selectedPoints.map((point, index) => `
 **${point}:**
 - Coordenadas: -23.${5505 + index * 10}, -46.${6333 + index * 10}
 - Status geral: ${index % 3 === 0 ? 'Normal' : index % 3 === 1 ? 'Atenção' : 'Crítico'}
+- Período analisado: ${periodText}
 `).join('')}
 
 ### Parâmetros Analisados
@@ -43,19 +56,19 @@ ${selectedPoints.map((point, index) => `
 - Valor médio: 7.1
 - Variação: 6.8 - 7.3
 - Status: Dentro dos padrões CONAMA
-- Observações: Valores estáveis durante o período
+- Observações: Valores estáveis durante o período ${periodText}
 
 **Oxigênio Dissolvido:**
 - Valor médio: 5.5 mg/L
 - Variação: 4.9 - 6.5 mg/L
 - Status: Atenção - valores próximos ao limite
-- Observações: Redução significativa durante o período da tarde
+- Observações: Redução significativa observada no período
 
 **Turbidez:**
 - Valor médio: 12.8 NTU
 - Variação: 8.2 - 18.7 NTU
 - Status: Crítico - valores acima do recomendado
-- Observações: Picos de turbidez identificados às 16:00h
+- Observações: Picos de turbidez identificados durante o período analisado
 
 **Temperatura:**
 - Valor médio: 23.4°C
@@ -63,36 +76,42 @@ ${selectedPoints.map((point, index) => `
 - Status: Normal
 - Observações: Variação típica para o período
 
-### Anomalias Detectadas
+### Anomalias Detectadas (Período: ${periodText})
 
-1. **Turbidez elevada:** Detectados 3 pontos anômalos entre 12:00 e 20:00h
-2. **Oxigênio dissolvido baixo:** Valores críticos registrados às 16:00h
+1. **Turbidez elevada:** Detectados 3 pontos anômalos durante o período
+2. **Oxigênio dissolvido baixo:** Valores críticos registrados
 3. **Variações entre pontos:** Diferenças significativas observadas entre os pontos monitorados
 
 ### Recomendações
 
-1. Investigar causas do aumento da turbidez no período vespertino
+1. Investigar causas do aumento da turbidez no período analisado
 2. Monitorar continuamente os níveis de oxigênio dissolvido
 3. Considerar análises adicionais para identificar possíveis fontes de poluição
 4. Implementar monitoramento diferenciado para pontos críticos
+5. Expandir período de análise para identificar tendências sazonais
 
 ### Conclusão
 
-O monitoramento nos ${selectedPoints.length} pontos indica a necessidade de atenção especial aos parâmetros de turbidez e oxigênio dissolvido. Recomenda-se acompanhamento contínuo e investigação das causas dos desvios identificados, especialmente considerando as variações entre os diferentes pontos de coleta.
+O monitoramento nos ${selectedPoints.length} pontos durante o período de ${periodText} indica a necessidade de atenção especial aos parâmetros de turbidez e oxigênio dissolvido. Recomenda-se acompanhamento contínuo e investigação das causas dos desvios identificados, especialmente considerando as variações entre os diferentes pontos de coleta e o período específico analisado.
+
+---
+*Relatório gerado automaticamente em ${formatDateTime(new Date())}*
     `;
   };
 
   const { data: report, isLoading, error } = useQuery({
-    queryKey: ['report', city, river, points],
+    queryKey: ['report', city, river, points, startDate?.toISOString(), endDate?.toISOString()],
     queryFn: async () => {
+      console.log('Generating report with dates:', { startDate, endDate });
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 2000));
-      return generateMockReport(points);
+      return generateMockReport(points, startDate, endDate);
     },
     enabled: shouldGenerateReport && !!(city && river && points.length > 0),
   });
 
   const handleGenerateReport = () => {
+    console.log('Generating report for period:', { startDate, endDate });
     setShouldGenerateReport(true);
   };
 
@@ -106,7 +125,9 @@ O monitoramento nos ${selectedPoints.length} pontos indica a necessidade de aten
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `relatorio-qualidade-agua-${city}-${river}-${points.join('-')}-${new Date().toISOString().split('T')[0]}.txt`;
+    
+    const dateStr = startDate ? startDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
+    a.download = `relatorio-qualidade-agua-${city}-${river}-${points.join('-')}-${dateStr}.txt`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -155,6 +176,16 @@ O monitoramento nos ${selectedPoints.length} pontos indica a necessidade de aten
             <CardTitle>Relatório de Qualidade da Água</CardTitle>
             <p className="text-sm text-gray-600 mt-1">
               {city} → {river} → {points.join(', ')}
+              {(startDate || endDate) && (
+                <span className="block mt-1 text-blue-600">
+                  Período: {startDate && endDate && startDate !== endDate 
+                    ? `${startDate.toLocaleDateString('pt-BR')} até ${endDate.toLocaleDateString('pt-BR')}`
+                    : startDate 
+                      ? startDate.toLocaleDateString('pt-BR')
+                      : 'Últimas 24 horas'
+                  }
+                </span>
+              )}
             </p>
           </div>
           <div className="flex gap-2 ml-4">
@@ -185,6 +216,16 @@ O monitoramento nos ${selectedPoints.length} pontos indica a necessidade de aten
           <div className="text-center py-8 text-gray-500">
             <FileTextIcon className="h-12 w-12 mx-auto mb-4 text-gray-400" />
             <p className="mb-4">Clique no botão "Gerar Relatório" para criar um relatório detalhado dos dados selecionados</p>
+            {(startDate || endDate) && (
+              <p className="mb-4 text-sm text-blue-600">
+                Será gerado para o período: {startDate && endDate && startDate !== endDate 
+                  ? `${startDate.toLocaleDateString('pt-BR')} até ${endDate.toLocaleDateString('pt-BR')}`
+                  : startDate 
+                    ? startDate.toLocaleDateString('pt-BR')
+                    : 'Últimas 24 horas'
+                }
+              </p>
+            )}
             <Button onClick={handleGenerateReport} size="lg">
               <PlayIcon className="h-4 w-4 mr-2" />
               Gerar Relatório Agora

@@ -99,6 +99,8 @@ const Dashboard = () => {
               city={selectedCity}
               river={selectedRiver}
               points={selectedPoints}
+              startDate={startDate}
+              endDate={endDate}
             />
           </TabsContent>
         </Tabs>
