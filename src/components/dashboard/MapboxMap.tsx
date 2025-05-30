@@ -21,6 +21,7 @@ interface MapboxMapProps {
 const MapboxMap = ({ selectedPoints, city, river }: MapboxMapProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
+  const [mapError, setMapError] = useState<string | null>(null);
 
   // Mock collection points with real coordinates (São Paulo area)
   const collectionPoints: CollectionPoint[] = [
@@ -38,23 +39,49 @@ const MapboxMap = ({ selectedPoints, city, river }: MapboxMapProps) => {
   useEffect(() => {
     if (!mapContainer.current) return;
 
-    // Set Mapbox access token
-    mapboxgl.accessToken = 'pk.eyJ1IjoidmluaXNhcmFpdmEiLCJhIjoiY20wb25ocG9hMGF1ZTJrbzlmZm5haWFlcyJ9.XnczMEcsq_NTNTOFeCxzxA';
+    try {
+      // Set Mapbox access token
+      mapboxgl.accessToken = 'pk.eyJ1IjoidmluaXNhcmFpdmEiLCJhIjoiY20wb25ocG9hMGF1ZTJrbzlmZm5haWFlcyJ9.XnczMEcsq_NTNTOFeCxzxA';
 
-    // Initialize map with outdoors style that shows rivers and natural features clearly
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/outdoors-v12',
-      center: [-46.6333, -23.5505], // São Paulo center
-      zoom: 12,
-    });
+      console.log('Initializing Mapbox with outdoors style...');
 
-    // Add navigation controls
-    map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+      // Initialize map with outdoors style that shows rivers and natural features clearly
+      map.current = new mapboxgl.Map({
+        container: mapContainer.current,
+        style: 'mapbox://styles/mapbox/outdoors-v12',
+        center: [-46.6333, -23.5505], // São Paulo center
+        zoom: 12,
+      });
+
+      // Add event listeners for debugging
+      map.current.on('load', () => {
+        console.log('Map loaded successfully with outdoors style');
+        setMapError(null);
+      });
+
+      map.current.on('error', (e) => {
+        console.error('Map error:', e);
+        setMapError('Erro ao carregar o mapa. Verifique sua conexão.');
+      });
+
+      map.current.on('styledata', () => {
+        console.log('Style data loaded');
+      });
+
+      // Add navigation controls
+      map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+
+    } catch (error) {
+      console.error('Error initializing map:', error);
+      setMapError('Erro ao inicializar o mapa.');
+    }
 
     // Cleanup function
     return () => {
-      map.current?.remove();
+      if (map.current) {
+        map.current.remove();
+        map.current = null;
+      }
     };
   }, []);
 
@@ -148,10 +175,16 @@ const MapboxMap = ({ selectedPoints, city, river }: MapboxMapProps) => {
         )}
       </CardHeader>
       <CardContent>
-        <div 
-          ref={mapContainer} 
-          className="w-full h-80 rounded-lg overflow-hidden border"
-        />
+        {mapError ? (
+          <div className="w-full h-80 rounded-lg border flex items-center justify-center bg-gray-100">
+            <p className="text-red-600">{mapError}</p>
+          </div>
+        ) : (
+          <div 
+            ref={mapContainer} 
+            className="w-full h-80 rounded-lg overflow-hidden border"
+          />
+        )}
         
         {selectedPoints.length > 0 && (
           <div className="mt-4">
