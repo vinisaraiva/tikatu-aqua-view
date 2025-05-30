@@ -1,52 +1,19 @@
 
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
+import { DropletsIcon, WavesIcon } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import FilterSection from '@/components/dashboard/FilterSection';
-import OverviewCards from '@/components/indices/OverviewCards';
-import IndicesMap from '@/components/indices/IndicesMap';
-import IqaTab from '@/components/indices/IqaTab';
-import IetTab from '@/components/indices/IetTab';
-import { Skeleton } from '@/components/ui/skeleton';
-
-interface IndicesData {
-  iqa: number;
-  iet: number;
-  history: { date: string; iqa: number; iet: number }[];
-  coords: { lat: number; lng: number };
-}
-
-const useIndices = (city: string, river: string, point: string) => {
-  return useQuery({
-    queryKey: ['indices', city, river, point],
-    queryFn: async (): Promise<IndicesData> => {
-      // Mock data for demonstration
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      return {
-        iqa: 78,
-        iet: 45,
-        history: Array.from({ length: 30 }, (_, i) => ({
-          date: new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-          iqa: Math.floor(Math.random() * 40) + 60,
-          iet: Math.floor(Math.random() * 30) + 30
-        })),
-        coords: { lat: -23.5505, lng: -46.6333 }
-      };
-    },
-    enabled: !!(city && river && point)
-  });
-};
+import IqaIndice from '@/components/indices/IqaIndice';
+import IetIndice from '@/components/indices/IetIndice';
 
 const Indices = () => {
   const [selectedCity, setSelectedCity] = useState('');
   const [selectedRiver, setSelectedRiver] = useState('');
   const [selectedPoints, setSelectedPoints] = useState<string[]>([]);
-
-  const { data, isLoading, error } = useIndices(selectedCity, selectedRiver, selectedPoints[0] || '');
+  const [activeIndex, setActiveIndex] = useState<'iqa' | 'iet' | null>(null);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -72,7 +39,7 @@ const Indices = () => {
             Índices de Qualidade da Água
           </h1>
           <p className="text-gray-600">
-            Monitore os índices IQA e IET em tempo real
+            Selecione um índice para monitoramento e análise detalhada
           </p>
         </div>
 
@@ -84,66 +51,70 @@ const Indices = () => {
           onCityChange={setSelectedCity}
           onRiverChange={setSelectedRiver}
           onPointsChange={setSelectedPoints}
-          onDateChange={() => {}} // Not needed for this page
+          onDateChange={() => {}}
           showDateFilter={false}
         />
 
-        {/* Loading State */}
-        {isLoading && (
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Skeleton className="h-32" />
-              <Skeleton className="h-32" />
+        {/* Index Selection Buttons */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <Button
+            variant={activeIndex === 'iqa' ? 'default' : 'outline'}
+            size="lg"
+            className="h-32 flex flex-col items-center justify-center space-y-2"
+            onClick={() => setActiveIndex('iqa')}
+          >
+            <DropletsIcon className="h-8 w-8" />
+            <div className="text-center">
+              <div className="text-lg font-semibold">IQA</div>
+              <div className="text-sm opacity-80">Índice de Qualidade da Água</div>
             </div>
-            <Skeleton className="h-80" />
-            <Skeleton className="h-96" />
-          </div>
+          </Button>
+
+          <Button
+            variant={activeIndex === 'iet' ? 'default' : 'outline'}
+            size="lg"
+            className="h-32 flex flex-col items-center justify-center space-y-2"
+            onClick={() => setActiveIndex('iet')}
+          >
+            <WavesIcon className="h-8 w-8" />
+            <div className="text-center">
+              <div className="text-lg font-semibold">IET</div>
+              <div className="text-sm opacity-80">Índice do Estado Trófico</div>
+            </div>
+          </Button>
+        </div>
+
+        {/* Index Content */}
+        {activeIndex === 'iqa' && (
+          <IqaIndice
+            selectedCity={selectedCity}
+            selectedRiver={selectedRiver}
+            selectedPoints={selectedPoints}
+          />
         )}
 
-        {/* Error State */}
-        {error && (
-          <div className="text-center py-12">
-            <p className="text-red-600 mb-4">Erro ao carregar dados dos índices</p>
-            <p className="text-gray-500">Verifique os filtros selecionados e tente novamente</p>
-          </div>
-        )}
-
-        {/* Content */}
-        {data && !isLoading && (
-          <div className="space-y-6">
-            {/* Overview Cards */}
-            <OverviewCards iqa={data.iqa} iet={data.iet} />
-
-            {/* Map */}
-            <IndicesMap 
-              coords={data.coords} 
-              pointName={selectedPoints[0] || ''} 
-            />
-
-            {/* Tabs */}
-            <Tabs defaultValue="iqa" className="space-y-6">
-              <TabsList className="grid w-full lg:w-auto grid-cols-2">
-                <TabsTrigger value="iqa">IQA</TabsTrigger>
-                <TabsTrigger value="iet">IET</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="iqa">
-                <IqaTab history={data.history} />
-              </TabsContent>
-
-              <TabsContent value="iet">
-                <IetTab history={data.history} />
-              </TabsContent>
-            </Tabs>
-          </div>
+        {activeIndex === 'iet' && (
+          <IetIndice
+            selectedCity={selectedCity}
+            selectedRiver={selectedRiver}
+            selectedPoints={selectedPoints}
+          />
         )}
 
         {/* No Selection State */}
-        {!selectedCity || !selectedRiver || selectedPoints.length === 0 ? (
+        {!activeIndex && (
           <div className="text-center py-12">
-            <p className="text-gray-500">Selecione uma cidade, rio e ponto de coleta para visualizar os índices</p>
+            <p className="text-gray-500 mb-4">Selecione um índice acima para começar o monitoramento</p>
+            <p className="text-sm text-gray-400">Cada índice possui metodologia e cálculos específicos</p>
           </div>
-        ) : null}
+        )}
+
+        {/* No Filters Selected */}
+        {activeIndex && (!selectedCity || !selectedRiver || selectedPoints.length === 0) && (
+          <div className="text-center py-12">
+            <p className="text-gray-500">Complete os filtros acima para visualizar os dados do {activeIndex.toUpperCase()}</p>
+          </div>
+        )}
       </main>
 
       <Footer />
