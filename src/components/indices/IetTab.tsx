@@ -103,7 +103,7 @@ const IetTab = ({ history }: IetTabProps) => {
             </div>
             <div className="text-center">
               <div className="w-4 h-4 bg-orange-500 rounded mx-auto mb-1"></div>
-              <div className="font-medium">> 60</div>
+              <div className="font-medium">&gt; 60</div>
               <div className="text-gray-600">Hipereutrófico</div>
             </div>
           </div>
