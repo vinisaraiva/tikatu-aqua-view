@@ -41,10 +41,10 @@ const MapboxMap = ({ selectedPoints, city, river }: MapboxMapProps) => {
     // Set Mapbox access token
     mapboxgl.accessToken = 'pk.eyJ1IjoidmluaXNhcmFpdmEiLCJhIjoiY20wb25ocG9hMGF1ZTJrbzlmZm5haWFlcyJ9.XnczMEcsq_NTNTOFeCxzxA';
 
-    // Initialize map
+    // Initialize map with satellite style that shows water bodies clearly
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/light-v11',
+      style: 'mapbox://styles/mapbox/satellite-streets-v12',
       center: [-46.6333, -23.5505], // São Paulo center
       zoom: 12,
     });
@@ -71,14 +71,29 @@ const MapboxMap = ({ selectedPoints, city, river }: MapboxMapProps) => {
       const markerElement = document.createElement('div');
       markerElement.className = 'custom-marker';
       markerElement.style.cssText = `
-        width: 20px;
-        height: 20px;
+        width: 24px;
+        height: 24px;
         border-radius: 50%;
-        background-color: hsl(${index * 45}, 70%, 50%);
-        border: 2px solid white;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        background-color: #06b6d4;
+        border: 3px solid white;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.4);
         cursor: pointer;
+        position: relative;
       `;
+
+      // Add a small inner circle for better visibility
+      const innerCircle = document.createElement('div');
+      innerCircle.style.cssText = `
+        width: 8px;
+        height: 8px;
+        background-color: white;
+        border-radius: 50%;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      `;
+      markerElement.appendChild(innerCircle);
 
       // Create popup for hover
       const popup = new mapboxgl.Popup({
@@ -86,10 +101,10 @@ const MapboxMap = ({ selectedPoints, city, river }: MapboxMapProps) => {
         closeButton: false,
         closeOnClick: false
       }).setHTML(`
-        <div style="padding: 8px; font-size: 12px;">
-          <strong>${point.name}</strong><br>
-          Lat: ${point.lat.toFixed(4)}<br>
-          Lng: ${point.lng.toFixed(4)}
+        <div style="padding: 12px; font-size: 14px; min-width: 200px;">
+          <strong style="color: #0f172a;">${point.name}</strong><br>
+          <span style="color: #64748b;">Latitude: ${point.lat.toFixed(4)}</span><br>
+          <span style="color: #64748b;">Longitude: ${point.lng.toFixed(4)}</span>
         </div>
       `);
 
@@ -145,8 +160,8 @@ const MapboxMap = ({ selectedPoints, city, river }: MapboxMapProps) => {
               {selectedPointsData.map((point, index) => (
                 <div key={point.id} className="flex items-center text-sm">
                   <div 
-                    className="w-3 h-3 rounded-full mr-2" 
-                    style={{ backgroundColor: `hsl(${index * 45}, 70%, 50%)` }}
+                    className="w-3 h-3 rounded-full mr-2 border border-white" 
+                    style={{ backgroundColor: '#06b6d4' }}
                   />
                   <span className="font-medium">{point.name}</span>
                 </div>
