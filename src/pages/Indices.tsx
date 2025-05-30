@@ -43,18 +43,6 @@ const Indices = () => {
           </p>
         </div>
 
-        {/* Filters */}
-        <FilterSection
-          selectedCity={selectedCity}
-          selectedRiver={selectedRiver}
-          selectedPoints={selectedPoints}
-          onCityChange={setSelectedCity}
-          onRiverChange={setSelectedRiver}
-          onPointsChange={setSelectedPoints}
-          onDateChange={() => {}}
-          showDateFilter={false}
-        />
-
         {/* Index Selection Buttons */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <Button
@@ -83,6 +71,20 @@ const Indices = () => {
             </div>
           </Button>
         </div>
+
+        {/* Filters - Only show if an index is selected */}
+        {activeIndex && (
+          <FilterSection
+            selectedCity={selectedCity}
+            selectedRiver={selectedRiver}
+            selectedPoints={selectedPoints}
+            onCityChange={setSelectedCity}
+            onRiverChange={setSelectedRiver}
+            onPointsChange={setSelectedPoints}
+            onDateChange={() => {}}
+            showDateFilter={false}
+          />
+        )}
 
         {/* Index Content */}
         {activeIndex === 'iqa' && (
