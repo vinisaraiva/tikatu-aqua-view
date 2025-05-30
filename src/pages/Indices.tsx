@@ -13,7 +13,15 @@ const Indices = () => {
   const [selectedCity, setSelectedCity] = useState('');
   const [selectedRiver, setSelectedRiver] = useState('');
   const [selectedPoints, setSelectedPoints] = useState<string[]>([]);
+  const [startDate, setStartDate] = useState<Date | undefined>();
+  const [endDate, setEndDate] = useState<Date | undefined>();
   const [activeIndex, setActiveIndex] = useState<'iqa' | 'iet' | null>(null);
+
+  const handleDateChange = (start: Date | undefined, end: Date | undefined) => {
+    console.log('Indices - Date filter changed:', { start, end });
+    setStartDate(start);
+    setEndDate(end);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -81,8 +89,8 @@ const Indices = () => {
             onCityChange={setSelectedCity}
             onRiverChange={setSelectedRiver}
             onPointsChange={setSelectedPoints}
-            onDateChange={() => {}}
-            showDateFilter={false}
+            onDateChange={handleDateChange}
+            showDateFilter={true}
           />
         )}
 
@@ -92,6 +100,8 @@ const Indices = () => {
             selectedCity={selectedCity}
             selectedRiver={selectedRiver}
             selectedPoints={selectedPoints}
+            startDate={startDate}
+            endDate={endDate}
           />
         )}
 
@@ -100,6 +110,8 @@ const Indices = () => {
             selectedCity={selectedCity}
             selectedRiver={selectedRiver}
             selectedPoints={selectedPoints}
+            startDate={startDate}
+            endDate={endDate}
           />
         )}
 

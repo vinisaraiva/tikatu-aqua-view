@@ -9,6 +9,8 @@ interface IqaIndiceProps {
   selectedCity: string;
   selectedRiver: string;
   selectedPoints: string[];
+  startDate?: Date;
+  endDate?: Date;
 }
 
 interface IqaPointData {
@@ -19,11 +21,13 @@ interface IqaPointData {
   coords: { lat: number; lng: number };
 }
 
-const useIqaData = (city: string, river: string, points: string[]) => {
+const useIqaData = (city: string, river: string, points: string[], startDate?: Date, endDate?: Date) => {
   return useQuery({
-    queryKey: ['iqa', city, river, points],
+    queryKey: ['iqa', city, river, points, startDate, endDate],
     queryFn: async (): Promise<IqaPointData[]> => {
       await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      console.log('IqaIndice - Fetching data with date filter:', { startDate, endDate });
       
       // Coordinates mapping by city and river
       const cityCoordinates = {
@@ -48,12 +52,31 @@ const useIqaData = (city: string, river: string, points: string[]) => {
 
       const baseCoords = cityCoordinates[city]?.[river] || { lat: -23.5505, lng: -46.6333 };
       
+      // Generate date range based on filters
+      let dateRange: Date[] = [];
+      if (startDate && endDate) {
+        // Generate dates between startDate and endDate
+        const currentDate = new Date(startDate);
+        while (currentDate <= endDate) {
+          dateRange.push(new Date(currentDate));
+          currentDate.setDate(currentDate.getDate() + 1);
+        }
+      } else if (startDate && !endDate) {
+        // Single date
+        dateRange = [startDate];
+      } else {
+        // Default: last 30 days
+        dateRange = Array.from({ length: 30 }, (_, i) => 
+          new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000)
+        );
+      }
+      
       return points.map((point, index) => ({
         pointId: point,
         pointName: point,
         iqa: Math.floor(Math.random() * 40) + 60, // 60-100 range
-        history: Array.from({ length: 30 }, (_, i) => ({
-          date: new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        history: dateRange.map(date => ({
+          date: date.toISOString().split('T')[0],
           iqa: Math.floor(Math.random() * 40) + 60
         })),
         coords: { 
@@ -66,8 +89,8 @@ const useIqaData = (city: string, river: string, points: string[]) => {
   });
 };
 
-const IqaIndice = ({ selectedCity, selectedRiver, selectedPoints }: IqaIndiceProps) => {
-  const { data, isLoading, error } = useIqaData(selectedCity, selectedRiver, selectedPoints);
+const IqaIndice = ({ selectedCity, selectedRiver, selectedPoints, startDate, endDate }: IqaIndiceProps) => {
+  const { data, isLoading, error } = useIqaData(selectedCity, selectedRiver, selectedPoints, startDate, endDate);
 
   const getIqaColor = (value: number) => {
     if (value >= 80) return 'border-green-400 bg-green-50';
@@ -100,6 +123,24 @@ const IqaIndice = ({ selectedCity, selectedRiver, selectedPoints }: IqaIndicePro
 
   return (
     <div className="space-y-6">
+      {/* Date Filter Info */}
+      {(startDate || endDate) && (
+        <Card className="border-blue-200 bg-blue-50">
+          <CardContent className="pt-4">
+            <div className="text-sm text-blue-800">
+              <strong>Período filtrado:</strong> 
+              {startDate && endDate && startDate.getTime() !== endDate.getTime() ? (
+                <> {startDate.toLocaleDateString('pt-BR')} até {endDate.toLocaleDateString('pt-BR')}</>
+              ) : startDate ? (
+                <> {startDate.toLocaleDateString('pt-BR')}</>
+              ) : (
+                ' Todos os dados disponíveis'
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* IQA Overview Cards */}
       {selectedPoints.length === 1 ? (
         <Card className={`border-2 ${getIqaColor(data[0].iqa)}`}>

@@ -9,6 +9,8 @@ interface IetIndiceProps {
   selectedCity: string;
   selectedRiver: string;
   selectedPoints: string[];
+  startDate?: Date;
+  endDate?: Date;
 }
 
 interface IetPointData {
@@ -19,11 +21,13 @@ interface IetPointData {
   coords: { lat: number; lng: number };
 }
 
-const useIetData = (city: string, river: string, points: string[]) => {
+const useIetData = (city: string, river: string, points: string[], startDate?: Date, endDate?: Date) => {
   return useQuery({
-    queryKey: ['iet', city, river, points],
+    queryKey: ['iet', city, river, points, startDate, endDate],
     queryFn: async (): Promise<IetPointData[]> => {
       await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      console.log('IetIndice - Fetching data with date filter:', { startDate, endDate });
       
       // Coordinates mapping by city and river
       const cityCoordinates = {
@@ -48,12 +52,31 @@ const useIetData = (city: string, river: string, points: string[]) => {
 
       const baseCoords = cityCoordinates[city]?.[river] || { lat: -23.5505, lng: -46.6333 };
       
+      // Generate date range based on filters
+      let dateRange: Date[] = [];
+      if (startDate && endDate) {
+        // Generate dates between startDate and endDate
+        const currentDate = new Date(startDate);
+        while (currentDate <= endDate) {
+          dateRange.push(new Date(currentDate));
+          currentDate.setDate(currentDate.getDate() + 1);
+        }
+      } else if (startDate && !endDate) {
+        // Single date
+        dateRange = [startDate];
+      } else {
+        // Default: last 30 days
+        dateRange = Array.from({ length: 30 }, (_, i) => 
+          new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000)
+        );
+      }
+      
       return points.map((point, index) => ({
         pointId: point,
         pointName: point,
         iet: Math.floor(Math.random() * 30) + 30, // 30-60 range
-        history: Array.from({ length: 30 }, (_, i) => ({
-          date: new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        history: dateRange.map(date => ({
+          date: date.toISOString().split('T')[0],
           iet: Math.floor(Math.random() * 30) + 30
         })),
         coords: { 
@@ -66,8 +89,8 @@ const useIetData = (city: string, river: string, points: string[]) => {
   });
 };
 
-const IetIndice = ({ selectedCity, selectedRiver, selectedPoints }: IetIndiceProps) => {
-  const { data, isLoading, error } = useIetData(selectedCity, selectedRiver, selectedPoints);
+const IetIndice = ({ selectedCity, selectedRiver, selectedPoints, startDate, endDate }: IetIndiceProps) => {
+  const { data, isLoading, error } = useIetData(selectedCity, selectedRiver, selectedPoints, startDate, endDate);
 
   const getIetColor = (value: number) => {
     if (value <= 20) return 'border-blue-400 bg-blue-50';
@@ -100,6 +123,24 @@ const IetIndice = ({ selectedCity, selectedRiver, selectedPoints }: IetIndicePro
 
   return (
     <div className="space-y-6">
+      {/* Date Filter Info */}
+      {(startDate || endDate) && (
+        <Card className="border-orange-200 bg-orange-50">
+          <CardContent className="pt-4">
+            <div className="text-sm text-orange-800">
+              <strong>Período filtrado:</strong> 
+              {startDate && endDate && startDate.getTime() !== endDate.getTime() ? (
+                <> {startDate.toLocaleDateString('pt-BR')} até {endDate.toLocaleDateString('pt-BR')}</>
+              ) : startDate ? (
+                <> {startDate.toLocaleDateString('pt-BR')}</>
+              ) : (
+                ' Todos os dados disponíveis'
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* IET Overview Cards */}
       {selectedPoints.length === 1 ? (
         <Card className={`border-2 ${getIetColor(data[0].iet)}`}>
