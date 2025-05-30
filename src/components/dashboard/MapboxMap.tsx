@@ -22,6 +22,7 @@ const MapboxMap = ({ selectedPoints, city, river }: MapboxMapProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [mapError, setMapError] = useState<string | null>(null);
+  const [key, setKey] = useState(0); // Force re-render
 
   // Mock collection points with real coordinates (São Paulo area)
   const collectionPoints: CollectionPoint[] = [
@@ -40,10 +41,19 @@ const MapboxMap = ({ selectedPoints, city, river }: MapboxMapProps) => {
     if (!mapContainer.current) return;
 
     try {
+      // Force cleanup of any existing map
+      if (map.current) {
+        map.current.remove();
+        map.current = null;
+      }
+
       // Set Mapbox access token
       mapboxgl.accessToken = 'pk.eyJ1IjoidmluaXNhcmFpdmEiLCJhIjoiY20wb25ocG9hMGF1ZTJrbzlmZm5haWFlcyJ9.XnczMEcsq_NTNTOFeCxzxA';
 
-      console.log('Initializing Mapbox with outdoors style...');
+      console.log('Force initializing Mapbox with outdoors style...');
+
+      // Clear the container
+      mapContainer.current.innerHTML = '';
 
       // Initialize map with outdoors style that shows rivers and natural features clearly
       map.current = new mapboxgl.Map({
@@ -51,6 +61,7 @@ const MapboxMap = ({ selectedPoints, city, river }: MapboxMapProps) => {
         style: 'mapbox://styles/mapbox/outdoors-v12',
         center: [-46.6333, -23.5505], // São Paulo center
         zoom: 12,
+        preserveDrawingBuffer: true
       });
 
       // Add event listeners for debugging
@@ -65,7 +76,7 @@ const MapboxMap = ({ selectedPoints, city, river }: MapboxMapProps) => {
       });
 
       map.current.on('styledata', () => {
-        console.log('Style data loaded');
+        console.log('Style data loaded - outdoors style active');
       });
 
       // Add navigation controls
@@ -83,6 +94,11 @@ const MapboxMap = ({ selectedPoints, city, river }: MapboxMapProps) => {
         map.current = null;
       }
     };
+  }, [key]); // Re-run when key changes
+
+  // Force map recreation on mount
+  useEffect(() => {
+    setKey(prev => prev + 1);
   }, []);
 
   useEffect(() => {
@@ -159,10 +175,10 @@ const MapboxMap = ({ selectedPoints, city, river }: MapboxMapProps) => {
       });
       map.current!.fitBounds(bounds, { padding: 50 });
     }
-  }, [selectedPoints]);
+  }, [selectedPoints, key]);
 
   return (
-    <Card>
+    <Card className="w-full">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <MapIcon className="h-5 w-5" />
@@ -181,6 +197,7 @@ const MapboxMap = ({ selectedPoints, city, river }: MapboxMapProps) => {
           </div>
         ) : (
           <div 
+            key={key}
             ref={mapContainer} 
             className="w-full h-80 rounded-lg overflow-hidden border"
           />

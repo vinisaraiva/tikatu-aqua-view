@@ -1,4 +1,3 @@
-
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -119,7 +118,7 @@ const RecentReadings = ({ city, river, points }: RecentReadingsProps) => {
           </CardContent>
         </Card>
         
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
           <ReadingsChart readings={[]} />
           <CollectionPointsMap selectedPoints={[]} city="" river="" />
         </div>
@@ -145,8 +144,8 @@ const RecentReadings = ({ city, river, points }: RecentReadingsProps) => {
 
   return (
     <div className="space-y-6">
-      {/* Gráfico e Mapa */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Gráfico e Mapa lado a lado */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {readings && <ReadingsChart readings={readings} />}
         <CollectionPointsMap selectedPoints={points} city={city} river={river} />
       </div>
