@@ -10,11 +10,13 @@ interface PointData {
 
 interface IetTabProps {
   pointsData: PointData[];
+  city?: string;
+  river?: string;
 }
 
 const colors = ['#f97316', '#ef4444', '#10b981', '#3b82f6', '#8b5cf6', '#06b6d4'];
 
-const IetTab = ({ pointsData }: IetTabProps) => {
+const IetTab = ({ pointsData, city, river }: IetTabProps) => {
   // Combine all history data for multi-line chart
   const combinedHistory = pointsData[0]?.history.map(item => {
     const dataPoint: any = { date: item.date };
@@ -51,11 +53,18 @@ const IetTab = ({ pointsData }: IetTabProps) => {
       <Card>
         <CardHeader>
           <CardTitle>Série Temporal do IET</CardTitle>
-          {pointsData.length > 1 && (
-            <p className="text-sm text-gray-600">
-              Comparação entre {pointsData.length} pontos de coleta
-            </p>
-          )}
+          <div className="space-y-1">
+            {pointsData.length > 1 && (
+              <p className="text-sm text-gray-600">
+                Comparação entre {pointsData.length} pontos de coleta
+              </p>
+            )}
+            {city && river && (
+              <p className="text-xs text-gray-500">
+                {city} - {river}
+              </p>
+            )}
+          </div>
         </CardHeader>
         <CardContent>
           <div className="h-80">
@@ -111,6 +120,11 @@ const IetTab = ({ pointsData }: IetTabProps) => {
         <Card>
           <CardHeader>
             <CardTitle>Comparação Mensal do IET</CardTitle>
+            {city && river && (
+              <p className="text-xs text-gray-500">
+                {city} - {river}
+              </p>
+            )}
           </CardHeader>
           <CardContent>
             <div className="h-64">

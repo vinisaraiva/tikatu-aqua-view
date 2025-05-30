@@ -11,25 +11,34 @@ interface PointData {
 
 interface IndicesMapProps {
   pointsData: PointData[];
+  city?: string;
+  river?: string;
 }
 
-const IndicesMap = ({ pointsData }: IndicesMapProps) => {
+const IndicesMap = ({ pointsData, city, river }: IndicesMapProps) => {
   return (
     <Card>
       <CardHeader>
         <CardTitle>Localização dos Pontos de Coleta</CardTitle>
         {pointsData.length > 0 && (
-          <p className="text-sm text-gray-600">
-            {pointsData.length} ponto{pointsData.length > 1 ? 's' : ''} selecionado{pointsData.length > 1 ? 's' : ''}
-          </p>
+          <div className="space-y-1">
+            <p className="text-sm text-gray-600">
+              {pointsData.length} ponto{pointsData.length > 1 ? 's' : ''} selecionado{pointsData.length > 1 ? 's' : ''}
+            </p>
+            {city && river && (
+              <p className="text-xs text-gray-500">
+                {city} - {river}
+              </p>
+            )}
+          </div>
         )}
       </CardHeader>
       <CardContent>
         <div className="h-80 rounded-lg overflow-hidden">
           <MapboxMap 
             selectedPoints={pointsData.map(p => p.id)}
-            city=""
-            river=""
+            city={city || ""}
+            river={river || ""}
           />
         </div>
         

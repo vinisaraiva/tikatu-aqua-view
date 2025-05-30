@@ -10,11 +10,13 @@ interface PointData {
 
 interface IqaTabProps {
   pointsData: PointData[];
+  city?: string;
+  river?: string;
 }
 
 const colors = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4'];
 
-const IqaTab = ({ pointsData }: IqaTabProps) => {
+const IqaTab = ({ pointsData, city, river }: IqaTabProps) => {
   // Combine all history data for multi-line chart
   const combinedHistory = pointsData[0]?.history.map(item => {
     const dataPoint: any = { date: item.date };
@@ -31,11 +33,18 @@ const IqaTab = ({ pointsData }: IqaTabProps) => {
       <Card>
         <CardHeader>
           <CardTitle>Série Temporal do IQA</CardTitle>
-          {pointsData.length > 1 && (
-            <p className="text-sm text-gray-600">
-              Comparação entre {pointsData.length} pontos de coleta
-            </p>
-          )}
+          <div className="space-y-1">
+            {pointsData.length > 1 && (
+              <p className="text-sm text-gray-600">
+                Comparação entre {pointsData.length} pontos de coleta
+              </p>
+            )}
+            {city && river && (
+              <p className="text-xs text-gray-500">
+                {city} - {river}
+              </p>
+            )}
+          </div>
         </CardHeader>
         <CardContent>
           <div className="h-80">
