@@ -22,7 +22,8 @@ const MapboxMap = ({ selectedPoints, city, river }: MapboxMapProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [mapError, setMapError] = useState<string | null>(null);
-  const [forceUpdate, setForceUpdate] = useState(0);
+  const [isMapLoaded, setIsMapLoaded] = useState(false);
+  const markersRef = useRef<mapboxgl.Marker[]>([]);
 
   // Mock collection points with real coordinates (São Paulo area)
   const collectionPoints: CollectionPoint[] = [
@@ -37,129 +38,145 @@ const MapboxMap = ({ selectedPoints, city, river }: MapboxMapProps) => {
     selectedPoints.includes(point.id)
   );
 
-  // Complete map destruction and recreation
-  const destroyMap = () => {
-    if (map.current) {
-      console.log('Destroying existing map...');
-      map.current.remove();
-      map.current = null;
-    }
-    if (mapContainer.current) {
-      mapContainer.current.innerHTML = '';
-    }
+  // Create droplet-style marker element
+  const createDropletMarker = () => {
+    const markerElement = document.createElement('div');
+    markerElement.className = 'droplet-marker';
+    markerElement.style.cssText = `
+      width: 30px;
+      height: 40px;
+      position: relative;
+      cursor: pointer;
+      transform: translate(-50%, -100%);
+    `;
+
+    // Create the droplet shape using CSS
+    const droplet = document.createElement('div');
+    droplet.style.cssText = `
+      width: 30px;
+      height: 30px;
+      background: linear-gradient(135deg, #06b6d4, #0891b2);
+      border-radius: 50% 50% 50% 0;
+      transform: rotate(-45deg);
+      position: absolute;
+      top: 8px;
+      left: 0;
+      box-shadow: 0 4px 12px rgba(6, 182, 212, 0.4);
+      border: 2px solid white;
+    `;
+
+    // Create inner highlight
+    const highlight = document.createElement('div');
+    highlight.style.cssText = `
+      width: 8px;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 50%;
+      position: absolute;
+      top: 6px;
+      left: 6px;
+    `;
+
+    droplet.appendChild(highlight);
+    markerElement.appendChild(droplet);
+
+    return markerElement;
   };
 
+  // Remove all existing markers
+  const clearMarkers = () => {
+    markersRef.current.forEach(marker => marker.remove());
+    markersRef.current = [];
+  };
+
+  // Initialize map
   useEffect(() => {
     if (!mapContainer.current) return;
 
-    // Force complete cleanup
-    destroyMap();
+    // Clean up existing map
+    if (map.current) {
+      map.current.remove();
+      map.current = null;
+    }
+    clearMarkers();
+    setIsMapLoaded(false);
 
-    // Small delay to ensure cleanup is complete
-    const timeout = setTimeout(() => {
-      try {
-        // Set Mapbox access token
-        mapboxgl.accessToken = 'pk.eyJ1IjoidmluaXNhcmFpdmEiLCJhIjoiY20wb25ocG9hMGF1ZTJrbzlmZm5haWFlcyJ9.XnczMEcsq_NTNTOFeCxzxA';
+    try {
+      // Set Mapbox access token
+      mapboxgl.accessToken = 'pk.eyJ1IjoidmluaXNhcmFpdmEiLCJhIjoiY20wb25ocG9hMGF1ZTJrbzlmZm5haWFlcyJ9.XnczMEcsq_NTNTOFeCxzxA';
 
-        console.log('Creating new map with ONLY outdoors style...');
+      console.log('Creating new map with outdoors style...');
 
-        // Initialize map with ONLY outdoors style
-        map.current = new mapboxgl.Map({
-          container: mapContainer.current!,
-          style: 'mapbox://styles/mapbox/outdoors-v12', // ONLY outdoors style
-          center: [-46.6333, -23.5505],
-          zoom: 12,
-          preserveDrawingBuffer: true,
-          antialias: true,
-          refreshExpiredTiles: false
-        });
+      // Create new map
+      map.current = new mapboxgl.Map({
+        container: mapContainer.current,
+        style: 'mapbox://styles/mapbox/outdoors-v12',
+        center: [-46.6333, -23.5505],
+        zoom: 12,
+        preserveDrawingBuffer: true,
+        antialias: true
+      });
 
-        // Event listeners
-        map.current.on('load', () => {
-          console.log('Map loaded with outdoors style ONLY');
-          setMapError(null);
-        });
+      // Add navigation controls
+      map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
-        map.current.on('error', (e) => {
-          console.error('Map error:', e);
-          setMapError('Erro ao carregar o mapa');
-        });
+      // Map load event
+      map.current.on('load', () => {
+        console.log('Map loaded successfully with outdoors style');
+        setIsMapLoaded(true);
+        setMapError(null);
+      });
 
-        map.current.on('styledata', () => {
-          console.log('Style data loaded - confirming outdoors style active');
-        });
+      // Error handling
+      map.current.on('error', (e) => {
+        console.error('Map error:', e);
+        setMapError('Erro ao carregar o mapa');
+      });
 
-        // Add navigation controls
-        map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
-
-      } catch (error) {
-        console.error('Error creating map:', error);
-        setMapError('Erro ao inicializar o mapa');
-      }
-    }, 100);
+    } catch (error) {
+      console.error('Error creating map:', error);
+      setMapError('Erro ao inicializar o mapa');
+    }
 
     return () => {
-      clearTimeout(timeout);
-      destroyMap();
+      clearMarkers();
+      if (map.current) {
+        map.current.remove();
+        map.current = null;
+      }
     };
-  }, [forceUpdate]);
-
-  // Force recreation on mount
-  useEffect(() => {
-    setForceUpdate(prev => prev + 1);
   }, []);
 
+  // Add markers when map is loaded and points are selected
   useEffect(() => {
-    if (!map.current || !map.current.isStyleLoaded()) return;
+    if (!map.current || !isMapLoaded || selectedPointsData.length === 0) return;
 
-    // Remove existing markers
-    const existingMarkers = document.querySelectorAll('.custom-marker');
-    existingMarkers.forEach(marker => marker.remove());
+    console.log('Adding markers for points:', selectedPointsData.map(p => p.id));
+
+    // Clear existing markers
+    clearMarkers();
 
     // Add markers for selected points
     selectedPointsData.forEach((point) => {
-      // Create custom marker element
-      const markerElement = document.createElement('div');
-      markerElement.className = 'custom-marker';
-      markerElement.style.cssText = `
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        background-color: #06b6d4;
-        border: 3px solid white;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-        cursor: pointer;
-        position: relative;
-      `;
-
-      // Add inner circle
-      const innerCircle = document.createElement('div');
-      innerCircle.style.cssText = `
-        width: 8px;
-        height: 8px;
-        background-color: white;
-        border-radius: 50%;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-      `;
-      markerElement.appendChild(innerCircle);
+      // Create droplet marker element
+      const markerElement = createDropletMarker();
 
       // Create popup
       const popup = new mapboxgl.Popup({
-        offset: 25,
+        offset: [0, -40],
         closeButton: false,
         closeOnClick: false
       }).setHTML(`
-        <div style="padding: 12px; font-size: 14px; min-width: 200px;">
-          <strong style="color: #0f172a;">${point.name}</strong><br>
-          <span style="color: #64748b;">Latitude: ${point.lat.toFixed(4)}</span><br>
-          <span style="color: #64748b;">Longitude: ${point.lng.toFixed(4)}</span>
+        <div style="padding: 12px; font-size: 14px; min-width: 200px; text-align: center;">
+          <strong style="color: #0f172a; display: block; margin-bottom: 8px;">${point.name}</strong>
+          <div style="color: #64748b; font-size: 12px;">
+            <div>Lat: ${point.lat.toFixed(4)}</div>
+            <div>Lng: ${point.lng.toFixed(4)}</div>
+          </div>
         </div>
       `);
 
-      // Create marker
+      // Create and add marker
       const marker = new mapboxgl.Marker(markerElement)
         .setLngLat([point.lng, point.lat])
         .setPopup(popup)
@@ -173,6 +190,9 @@ const MapboxMap = ({ selectedPoints, city, river }: MapboxMapProps) => {
       markerElement.addEventListener('mouseleave', () => {
         popup.remove();
       });
+
+      // Store marker reference
+      markersRef.current.push(marker);
     });
 
     // Fit bounds to show all points
@@ -181,9 +201,14 @@ const MapboxMap = ({ selectedPoints, city, river }: MapboxMapProps) => {
       selectedPointsData.forEach(point => {
         bounds.extend([point.lng, point.lat]);
       });
-      map.current!.fitBounds(bounds, { padding: 50 });
+      
+      // Add padding and ensure minimum zoom
+      map.current.fitBounds(bounds, { 
+        padding: 50,
+        maxZoom: 15
+      });
     }
-  }, [selectedPoints, forceUpdate]);
+  }, [selectedPoints, isMapLoaded]);
 
   return (
     <Card className="w-full">
@@ -205,7 +230,6 @@ const MapboxMap = ({ selectedPoints, city, river }: MapboxMapProps) => {
           </div>
         ) : (
           <div 
-            key={forceUpdate}
             ref={mapContainer} 
             className="w-full h-80 rounded-lg overflow-hidden border"
           />
@@ -218,8 +242,13 @@ const MapboxMap = ({ selectedPoints, city, river }: MapboxMapProps) => {
               {selectedPointsData.map((point) => (
                 <div key={point.id} className="flex items-center text-sm">
                   <div 
-                    className="w-3 h-3 rounded-full mr-2 border border-white" 
-                    style={{ backgroundColor: '#06b6d4' }}
+                    className="w-4 h-5 mr-2 relative flex-shrink-0"
+                    style={{
+                      background: 'linear-gradient(135deg, #06b6d4, #0891b2)',
+                      borderRadius: '50% 50% 50% 0',
+                      transform: 'rotate(-45deg)',
+                      border: '1px solid white'
+                    }}
                   />
                   <span className="font-medium">{point.name}</span>
                 </div>
