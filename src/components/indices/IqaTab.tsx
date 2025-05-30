@@ -2,22 +2,45 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-interface IqaTabProps {
+interface PointData {
+  pointId: string;
+  pointName: string;
   history: { date: string; iqa: number; iet: number }[];
 }
 
-const IqaTab = ({ history }: IqaTabProps) => {
+interface IqaTabProps {
+  pointsData: PointData[];
+}
+
+const colors = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4'];
+
+const IqaTab = ({ pointsData }: IqaTabProps) => {
+  // Combine all history data for multi-line chart
+  const combinedHistory = pointsData[0]?.history.map(item => {
+    const dataPoint: any = { date: item.date };
+    pointsData.forEach((point, index) => {
+      const pointHistory = point.history.find(h => h.date === item.date);
+      dataPoint[point.pointId] = pointHistory?.iqa || 0;
+    });
+    return dataPoint;
+  }) || [];
+
   return (
     <div className="space-y-6">
       {/* Time Series Chart */}
       <Card>
         <CardHeader>
           <CardTitle>Série Temporal do IQA</CardTitle>
+          {pointsData.length > 1 && (
+            <p className="text-sm text-gray-600">
+              Comparação entre {pointsData.length} pontos de coleta
+            </p>
+          )}
         </CardHeader>
         <CardContent>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={history}>
+              <LineChart data={combinedHistory}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis 
                   dataKey="date" 
@@ -26,18 +49,40 @@ const IqaTab = ({ history }: IqaTabProps) => {
                 <YAxis domain={[0, 100]} />
                 <Tooltip 
                   labelFormatter={(date) => new Date(date).toLocaleDateString('pt-BR')}
-                  formatter={(value) => [value, 'IQA']}
+                  formatter={(value, name) => {
+                    const pointName = pointsData.find(p => p.pointId === name)?.pointName || name;
+                    return [value, pointName];
+                  }}
                 />
-                <Line 
-                  type="monotone" 
-                  dataKey="iqa" 
-                  stroke="#3b82f6" 
-                  strokeWidth={2}
-                  dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }}
-                />
+                {pointsData.map((point, index) => (
+                  <Line 
+                    key={point.pointId}
+                    type="monotone" 
+                    dataKey={point.pointId} 
+                    stroke={colors[index % colors.length]} 
+                    strokeWidth={2}
+                    dot={{ fill: colors[index % colors.length], strokeWidth: 2, r: 4 }}
+                    name={point.pointName}
+                  />
+                ))}
               </LineChart>
             </ResponsiveContainer>
           </div>
+          
+          {/* Legend for multiple points */}
+          {pointsData.length > 1 && (
+            <div className="mt-4 flex flex-wrap gap-4 justify-center">
+              {pointsData.map((point, index) => (
+                <div key={point.pointId} className="flex items-center gap-2">
+                  <div 
+                    className="w-3 h-3 rounded-full" 
+                    style={{ backgroundColor: colors[index % colors.length] }}
+                  />
+                  <span className="text-sm font-medium">{point.pointName}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
 

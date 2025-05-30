@@ -2,22 +2,48 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 
-interface IetTabProps {
+interface PointData {
+  pointId: string;
+  pointName: string;
   history: { date: string; iqa: number; iet: number }[];
 }
 
-const IetTab = ({ history }: IetTabProps) => {
+interface IetTabProps {
+  pointsData: PointData[];
+}
+
+const colors = ['#f97316', '#ef4444', '#10b981', '#3b82f6', '#8b5cf6', '#06b6d4'];
+
+const IetTab = ({ pointsData }: IetTabProps) => {
+  // Combine all history data for multi-line chart
+  const combinedHistory = pointsData[0]?.history.map(item => {
+    const dataPoint: any = { date: item.date };
+    pointsData.forEach((point, index) => {
+      const pointHistory = point.history.find(h => h.date === item.date);
+      dataPoint[point.pointId] = pointHistory?.iet || 0;
+    });
+    return dataPoint;
+  }) || [];
+
   // Aggregate data by month for comparison chart
-  const monthlyData = history.reduce((acc, item) => {
-    const month = new Date(item.date).toLocaleDateString('pt-BR', { month: 'short' });
-    const existing = acc.find(d => d.month === month);
-    if (existing) {
-      existing.iet = (existing.iet + item.iet) / 2;
-    } else {
-      acc.push({ month, iet: item.iet });
-    }
-    return acc;
-  }, [] as { month: string; iet: number }[]);
+  const monthlyData = pointsData.map(point => {
+    const monthlyAvg = point.history.reduce((acc, item) => {
+      const month = new Date(item.date).toLocaleDateString('pt-BR', { month: 'short' });
+      const existing = acc.find(d => d.month === month);
+      if (existing) {
+        existing.iet = (existing.iet + item.iet) / 2;
+      } else {
+        acc.push({ month, iet: item.iet });
+      }
+      return acc;
+    }, [] as { month: string; iet: number }[]);
+    
+    return {
+      pointName: point.pointName,
+      pointId: point.pointId,
+      monthlyData: monthlyAvg
+    };
+  });
 
   return (
     <div className="space-y-6">
@@ -25,11 +51,16 @@ const IetTab = ({ history }: IetTabProps) => {
       <Card>
         <CardHeader>
           <CardTitle>Série Temporal do IET</CardTitle>
+          {pointsData.length > 1 && (
+            <p className="text-sm text-gray-600">
+              Comparação entre {pointsData.length} pontos de coleta
+            </p>
+          )}
         </CardHeader>
         <CardContent>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={history}>
+              <LineChart data={combinedHistory}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis 
                   dataKey="date" 
@@ -38,40 +69,64 @@ const IetTab = ({ history }: IetTabProps) => {
                 <YAxis domain={[0, 100]} />
                 <Tooltip 
                   labelFormatter={(date) => new Date(date).toLocaleDateString('pt-BR')}
-                  formatter={(value) => [value, 'IET']}
+                  formatter={(value, name) => {
+                    const pointName = pointsData.find(p => p.pointId === name)?.pointName || name;
+                    return [value, pointName];
+                  }}
                 />
-                <Line 
-                  type="monotone" 
-                  dataKey="iet" 
-                  stroke="#f97316" 
-                  strokeWidth={2}
-                  dot={{ fill: '#f97316', strokeWidth: 2, r: 4 }}
-                />
+                {pointsData.map((point, index) => (
+                  <Line 
+                    key={point.pointId}
+                    type="monotone" 
+                    dataKey={point.pointId} 
+                    stroke={colors[index % colors.length]} 
+                    strokeWidth={2}
+                    dot={{ fill: colors[index % colors.length], strokeWidth: 2, r: 4 }}
+                    name={point.pointName}
+                  />
+                ))}
               </LineChart>
             </ResponsiveContainer>
           </div>
+          
+          {/* Legend for multiple points */}
+          {pointsData.length > 1 && (
+            <div className="mt-4 flex flex-wrap gap-4 justify-center">
+              {pointsData.map((point, index) => (
+                <div key={point.pointId} className="flex items-center gap-2">
+                  <div 
+                    className="w-3 h-3 rounded-full" 
+                    style={{ backgroundColor: colors[index % colors.length] }}
+                  />
+                  <span className="text-sm font-medium">{point.pointName}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
 
-      {/* Monthly Comparison Chart */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Comparação Mensal do IET</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={monthlyData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis domain={[0, 100]} />
-                <Tooltip formatter={(value) => [value, 'IET Médio']} />
-                <Bar dataKey="iet" fill="#f97316" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Monthly Comparison Chart - Only show for single point */}
+      {pointsData.length === 1 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Comparação Mensal do IET</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={monthlyData[0]?.monthlyData || []}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" />
+                  <YAxis domain={[0, 100]} />
+                  <Tooltip formatter={(value) => [value, 'IET Médio']} />
+                  <Bar dataKey="iet" fill="#f97316" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Information Card */}
       <Card>

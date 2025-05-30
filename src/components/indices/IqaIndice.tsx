@@ -11,34 +11,41 @@ interface IqaIndiceProps {
   selectedPoints: string[];
 }
 
-interface IqaData {
+interface IqaPointData {
+  pointId: string;
+  pointName: string;
   iqa: number;
   history: { date: string; iqa: number }[];
   coords: { lat: number; lng: number };
 }
 
-const useIqaData = (city: string, river: string, point: string) => {
+const useIqaData = (city: string, river: string, points: string[]) => {
   return useQuery({
-    queryKey: ['iqa', city, river, point],
-    queryFn: async (): Promise<IqaData> => {
-      // Mock data específica para IQA
+    queryKey: ['iqa', city, river, points],
+    queryFn: async (): Promise<IqaPointData[]> => {
+      // Mock data específica para IQA com múltiplos pontos
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      return {
-        iqa: 78,
+      return points.map((point, index) => ({
+        pointId: point,
+        pointName: point,
+        iqa: Math.floor(Math.random() * 40) + 60, // 60-100 range
         history: Array.from({ length: 30 }, (_, i) => ({
           date: new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
           iqa: Math.floor(Math.random() * 40) + 60
         })),
-        coords: { lat: -23.5505, lng: -46.6333 }
-      };
+        coords: { 
+          lat: -23.5505 + (index * 0.01), 
+          lng: -46.6333 + (index * 0.01) 
+        }
+      }));
     },
-    enabled: !!(city && river && point)
+    enabled: !!(city && river && points.length > 0)
   });
 };
 
 const IqaIndice = ({ selectedCity, selectedRiver, selectedPoints }: IqaIndiceProps) => {
-  const { data, isLoading, error } = useIqaData(selectedCity, selectedRiver, selectedPoints[0] || '');
+  const { data, isLoading, error } = useIqaData(selectedCity, selectedRiver, selectedPoints);
 
   const getIqaColor = (value: number) => {
     if (value >= 80) return 'border-green-400 bg-green-50';
@@ -67,32 +74,57 @@ const IqaIndice = ({ selectedCity, selectedRiver, selectedPoints }: IqaIndicePro
     );
   }
 
-  if (!data) return null;
+  if (!data || data.length === 0) return null;
 
   return (
     <div className="space-y-6">
-      {/* IQA Overview Card */}
-      <Card className={`border-2 ${getIqaColor(data.iqa)}`}>
-        <CardHeader className="text-center">
-          <CardTitle className="text-lg font-medium text-gray-700">IQA Atual</CardTitle>
-          <div className="text-4xl font-bold text-gray-900">{data.iqa}</div>
-          <p className="text-sm text-gray-600">Índice de Qualidade da Água</p>
-        </CardHeader>
-        <CardContent className="text-center">
-          <p className="text-sm text-gray-600">
-            Baseado em parâmetros físico-químicos e biológicos
-          </p>
-        </CardContent>
-      </Card>
+      {/* IQA Overview Cards - Multiple points */}
+      {selectedPoints.length === 1 ? (
+        <Card className={`border-2 ${getIqaColor(data[0].iqa)}`}>
+          <CardHeader className="text-center">
+            <CardTitle className="text-lg font-medium text-gray-700">IQA Atual</CardTitle>
+            <div className="text-4xl font-bold text-gray-900">{data[0].iqa}</div>
+            <p className="text-sm text-gray-600">Índice de Qualidade da Água</p>
+            <p className="text-sm text-gray-500">{data[0].pointName}</p>
+          </CardHeader>
+          <CardContent className="text-center">
+            <p className="text-sm text-gray-600">
+              Baseado em parâmetros físico-químicos e biológicos
+            </p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {data.map((pointData) => (
+            <Card key={pointData.pointId} className={`border-2 ${getIqaColor(pointData.iqa)}`}>
+              <CardHeader className="text-center">
+                <CardTitle className="text-sm font-medium text-gray-700">{pointData.pointName}</CardTitle>
+                <div className="text-2xl font-bold text-gray-900">{pointData.iqa}</div>
+                <p className="text-xs text-gray-600">IQA</p>
+              </CardHeader>
+            </Card>
+          ))}
+        </div>
+      )}
 
       {/* Map */}
       <IndicesMap 
-        coords={data.coords} 
-        pointName={selectedPoints[0] || ''} 
+        pointsData={data.map(d => ({ 
+          id: d.pointId, 
+          name: d.pointName, 
+          coords: d.coords,
+          value: d.iqa 
+        }))} 
       />
 
       {/* IQA Analysis */}
-      <IqaTab history={data.history.map(h => ({ ...h, iet: 0 }))} />
+      <IqaTab 
+        pointsData={data.map(d => ({
+          pointId: d.pointId,
+          pointName: d.pointName,
+          history: d.history.map(h => ({ ...h, iet: 0 }))
+        }))} 
+      />
     </div>
   );
 };

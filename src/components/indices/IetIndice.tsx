@@ -11,34 +11,41 @@ interface IetIndiceProps {
   selectedPoints: string[];
 }
 
-interface IetData {
+interface IetPointData {
+  pointId: string;
+  pointName: string;
   iet: number;
   history: { date: string; iet: number }[];
   coords: { lat: number; lng: number };
 }
 
-const useIetData = (city: string, river: string, point: string) => {
+const useIetData = (city: string, river: string, points: string[]) => {
   return useQuery({
-    queryKey: ['iet', city, river, point],
-    queryFn: async (): Promise<IetData> => {
-      // Mock data específica para IET
+    queryKey: ['iet', city, river, points],
+    queryFn: async (): Promise<IetPointData[]> => {
+      // Mock data específica para IET com múltiplos pontos
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      return {
-        iet: 45,
+      return points.map((point, index) => ({
+        pointId: point,
+        pointName: point,
+        iet: Math.floor(Math.random() * 30) + 30, // 30-60 range
         history: Array.from({ length: 30 }, (_, i) => ({
           date: new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
           iet: Math.floor(Math.random() * 30) + 30
         })),
-        coords: { lat: -23.5505, lng: -46.6333 }
-      };
+        coords: { 
+          lat: -23.5505 + (index * 0.01), 
+          lng: -46.6333 + (index * 0.01) 
+        }
+      }));
     },
-    enabled: !!(city && river && point)
+    enabled: !!(city && river && points.length > 0)
   });
 };
 
 const IetIndice = ({ selectedCity, selectedRiver, selectedPoints }: IetIndiceProps) => {
-  const { data, isLoading, error } = useIetData(selectedCity, selectedRiver, selectedPoints[0] || '');
+  const { data, isLoading, error } = useIetData(selectedCity, selectedRiver, selectedPoints);
 
   const getIetColor = (value: number) => {
     if (value <= 20) return 'border-blue-400 bg-blue-50';
@@ -67,32 +74,57 @@ const IetIndice = ({ selectedCity, selectedRiver, selectedPoints }: IetIndicePro
     );
   }
 
-  if (!data) return null;
+  if (!data || data.length === 0) return null;
 
   return (
     <div className="space-y-6">
-      {/* IET Overview Card */}
-      <Card className={`border-2 ${getIetColor(data.iet)}`}>
-        <CardHeader className="text-center">
-          <CardTitle className="text-lg font-medium text-gray-700">IET Atual</CardTitle>
-          <div className="text-4xl font-bold text-gray-900">{data.iet}</div>
-          <p className="text-sm text-gray-600">Índice do Estado Trófico</p>
-        </CardHeader>
-        <CardContent className="text-center">
-          <p className="text-sm text-gray-600">
-            Avaliação do nível de eutrofização
-          </p>
-        </CardContent>
-      </Card>
+      {/* IET Overview Cards - Multiple points */}
+      {selectedPoints.length === 1 ? (
+        <Card className={`border-2 ${getIetColor(data[0].iet)}`}>
+          <CardHeader className="text-center">
+            <CardTitle className="text-lg font-medium text-gray-700">IET Atual</CardTitle>
+            <div className="text-4xl font-bold text-gray-900">{data[0].iet}</div>
+            <p className="text-sm text-gray-600">Índice do Estado Trófico</p>
+            <p className="text-sm text-gray-500">{data[0].pointName}</p>
+          </CardHeader>
+          <CardContent className="text-center">
+            <p className="text-sm text-gray-600">
+              Avaliação do nível de eutrofização
+            </p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {data.map((pointData) => (
+            <Card key={pointData.pointId} className={`border-2 ${getIetColor(pointData.iet)}`}>
+              <CardHeader className="text-center">
+                <CardTitle className="text-sm font-medium text-gray-700">{pointData.pointName}</CardTitle>
+                <div className="text-2xl font-bold text-gray-900">{pointData.iet}</div>
+                <p className="text-xs text-gray-600">IET</p>
+              </CardHeader>
+            </Card>
+          ))}
+        </div>
+      )}
 
       {/* Map */}
       <IndicesMap 
-        coords={data.coords} 
-        pointName={selectedPoints[0] || ''} 
+        pointsData={data.map(d => ({ 
+          id: d.pointId, 
+          name: d.pointName, 
+          coords: d.coords,
+          value: d.iet 
+        }))} 
       />
 
       {/* IET Analysis */}
-      <IetTab history={data.history.map(h => ({ ...h, iqa: 0 }))} />
+      <IetTab 
+        pointsData={data.map(d => ({
+          pointId: d.pointId,
+          pointName: d.pointName,
+          history: d.history.map(h => ({ ...h, iqa: 0 }))
+        }))} 
+      />
     </div>
   );
 };
