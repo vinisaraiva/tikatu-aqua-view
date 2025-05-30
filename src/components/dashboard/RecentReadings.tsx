@@ -21,11 +21,13 @@ interface RecentReadingsProps {
   city: string;
   river: string;
   points: string[];
+  startDate?: Date;
+  endDate?: Date;
 }
 
-const RecentReadings = ({ city, river, points }: RecentReadingsProps) => {
-  // Generate mock data for multiple points
-  const generateMockReadings = (selectedPoints: string[]): Reading[] => {
+const RecentReadings = ({ city, river, points, startDate, endDate }: RecentReadingsProps) => {
+  // Generate mock data for multiple points with date filtering
+  const generateMockReadings = (selectedPoints: string[], filterStartDate?: Date, filterEndDate?: Date): Reading[] => {
     const parameters = [
       { name: 'pH', unit: '', range: [6.5, 8.5] },
       { name: 'Oxigênio Dissolvido', unit: 'mg/L', range: [4, 8] },
@@ -35,37 +37,65 @@ const RecentReadings = ({ city, river, points }: RecentReadingsProps) => {
 
     const readings: Reading[] = [];
     
-    selectedPoints.forEach((point, pointIndex) => {
-      parameters.forEach((param, paramIndex) => {
-        const baseValue = param.range[0] + (param.range[1] - param.range[0]) * Math.random();
-        const value = Math.round(baseValue * 10) / 10;
+    // Generate multiple readings per point if date range is specified
+    const generateDatesInRange = () => {
+      const dates = [];
+      if (filterStartDate && filterEndDate) {
+        const start = new Date(filterStartDate);
+        const end = new Date(filterEndDate);
+        const diffTime = Math.abs(end.getTime() - start.getTime());
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         
-        // Determine status based on parameter and value
-        let conamaStatus: 'normal' | 'attention' | 'critical' = 'normal';
-        let hasAnomaly = false;
-        
-        if (param.name === 'pH') {
-          if (value < 6.0 || value > 9.0) conamaStatus = 'critical';
-          else if (value < 6.5 || value > 8.5) conamaStatus = 'attention';
-        } else if (param.name === 'Oxigênio Dissolvido') {
-          if (value < 4) conamaStatus = 'critical';
-          else if (value < 5) conamaStatus = 'attention';
-        } else if (param.name === 'Turbidez') {
-          if (value > 15) conamaStatus = 'critical';
-          else if (value > 10) conamaStatus = 'attention';
+        for (let i = 0; i <= Math.min(diffDays, 10); i++) {
+          const date = new Date(start);
+          date.setDate(start.getDate() + i);
+          dates.push(date.toISOString().replace('T', ' ').substring(0, 19));
         }
-        
-        if (conamaStatus !== 'normal') hasAnomaly = true;
-        
-        readings.push({
-          id: `${pointIndex}-${paramIndex}`,
-          parameter: param.name,
-          value,
-          unit: param.unit,
-          datetime: '2024-05-29 14:30:00',
-          conamaStatus,
-          hasAnomaly,
-          point,
+      } else if (filterStartDate && !filterEndDate) {
+        // Single date
+        dates.push(filterStartDate.toISOString().replace('T', ' ').substring(0, 19));
+      } else {
+        // Default to today
+        dates.push('2024-05-29 14:30:00');
+      }
+      return dates;
+    };
+
+    const dates = generateDatesInRange();
+    
+    selectedPoints.forEach((point, pointIndex) => {
+      dates.forEach((datetime, dateIndex) => {
+        parameters.forEach((param, paramIndex) => {
+          const baseValue = param.range[0] + (param.range[1] - param.range[0]) * Math.random();
+          const value = Math.round(baseValue * 10) / 10;
+          
+          // Determine status based on parameter and value
+          let conamaStatus: 'normal' | 'attention' | 'critical' = 'normal';
+          let hasAnomaly = false;
+          
+          if (param.name === 'pH') {
+            if (value < 6.0 || value > 9.0) conamaStatus = 'critical';
+            else if (value < 6.5 || value > 8.5) conamaStatus = 'attention';
+          } else if (param.name === 'Oxigênio Dissolvido') {
+            if (value < 4) conamaStatus = 'critical';
+            else if (value < 5) conamaStatus = 'attention';
+          } else if (param.name === 'Turbidez') {
+            if (value > 15) conamaStatus = 'critical';
+            else if (value > 10) conamaStatus = 'attention';
+          }
+          
+          if (conamaStatus !== 'normal') hasAnomaly = true;
+          
+          readings.push({
+            id: `${pointIndex}-${dateIndex}-${paramIndex}`,
+            parameter: param.name,
+            value,
+            unit: param.unit,
+            datetime,
+            conamaStatus,
+            hasAnomaly,
+            point,
+          });
         });
       });
     });
@@ -74,11 +104,11 @@ const RecentReadings = ({ city, river, points }: RecentReadingsProps) => {
   };
 
   const { data: readings, isLoading, error } = useQuery({
-    queryKey: ['monitoring', city, river, points],
+    queryKey: ['monitoring', city, river, points, startDate?.toISOString(), endDate?.toISOString()],
     queryFn: async () => {
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 1000));
-      return generateMockReadings(points);
+      return generateMockReadings(points, startDate, endDate);
     },
     enabled: !!(city && river && points.length > 0),
   });
@@ -101,6 +131,15 @@ const RecentReadings = ({ city, river, points }: RecentReadingsProps) => {
       return <XCircleIcon className="h-4 w-4 text-red-500" />;
     }
     return <CheckCircleIcon className="h-4 w-4 text-green-500" />;
+  };
+
+  const getDateRangeText = () => {
+    if (startDate && endDate) {
+      return `${startDate.toLocaleDateString('pt-BR')} - ${endDate.toLocaleDateString('pt-BR')}`;
+    } else if (startDate) {
+      return startDate.toLocaleDateString('pt-BR');
+    }
+    return 'Dados recentes';
   };
 
   if (!city || !river || points.length === 0) {
@@ -155,7 +194,7 @@ const RecentReadings = ({ city, river, points }: RecentReadingsProps) => {
         <CardHeader>
           <CardTitle>Leituras Recentes</CardTitle>
           <p className="text-sm text-gray-600">
-            {city} → {river} → {points.join(', ')}
+            {city} → {river} → {points.join(', ')} | {getDateRangeText()}
           </p>
         </CardHeader>
         <CardContent>
