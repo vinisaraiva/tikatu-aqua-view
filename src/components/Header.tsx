@@ -27,6 +27,9 @@ const Header = () => {
             <Link to="/dashboard" className="text-gray-700 hover:text-teal-600 transition-colors">
               Dashboard
             </Link>
+            <Link to="/indices" className="text-gray-700 hover:text-teal-600 transition-colors">
+              Índices
+            </Link>
             <Link to="/about" className="text-gray-700 hover:text-teal-600 transition-colors">
               Sobre
             </Link>
@@ -60,6 +63,13 @@ const Header = () => {
                 onClick={() => setIsMenuOpen(false)}
               >
                 Dashboard
+              </Link>
+              <Link 
+                to="/indices" 
+                className="text-gray-700 hover:text-teal-600 py-2 transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Índices
               </Link>
               <Link 
                 to="/about" 
