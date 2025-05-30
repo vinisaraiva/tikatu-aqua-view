@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { CalendarIcon } from 'lucide-react';
@@ -17,24 +17,38 @@ const DateFilter = ({ onDateChange }: DateFilterProps) => {
   const [endDate, setEndDate] = useState<Date | undefined>();
   const [isRange, setIsRange] = useState(false);
 
-  const handleStartDateChange = (date: Date | undefined) => {
-    setStartDate(date);
+  // Debug: Log when dates change
+  useEffect(() => {
+    console.log('DateFilter - Dates changed:', { startDate, endDate, isRange });
     if (!isRange) {
-      onDateChange(date, date);
+      onDateChange(startDate, startDate);
     } else {
-      onDateChange(date, endDate);
+      onDateChange(startDate, endDate);
     }
+  }, [startDate, endDate, isRange, onDateChange]);
+
+  const handleStartDateChange = (date: Date | undefined) => {
+    console.log('DateFilter - Start date selected:', date);
+    setStartDate(date);
   };
 
   const handleEndDateChange = (date: Date | undefined) => {
+    console.log('DateFilter - End date selected:', date);
     setEndDate(date);
-    onDateChange(startDate, date);
+  };
+
+  const handleRangeToggle = (rangeMode: boolean) => {
+    console.log('DateFilter - Range mode changed:', rangeMode);
+    setIsRange(rangeMode);
+    if (!rangeMode) {
+      setEndDate(undefined);
+    }
   };
 
   const clearDates = () => {
+    console.log('DateFilter - Clearing dates');
     setStartDate(undefined);
     setEndDate(undefined);
-    onDateChange(undefined, undefined);
   };
 
   return (
@@ -49,7 +63,7 @@ const DateFilter = ({ onDateChange }: DateFilterProps) => {
               type="radio"
               name="dateType"
               checked={!isRange}
-              onChange={() => setIsRange(false)}
+              onChange={() => handleRangeToggle(false)}
             />
             Data única
           </label>
@@ -58,7 +72,7 @@ const DateFilter = ({ onDateChange }: DateFilterProps) => {
               type="radio"
               name="dateType"
               checked={isRange}
-              onChange={() => setIsRange(true)}
+              onChange={() => handleRangeToggle(true)}
             />
             Intervalo
           </label>
@@ -133,6 +147,15 @@ const DateFilter = ({ onDateChange }: DateFilterProps) => {
           </div>
         )}
       </div>
+
+      {/* Debug info */}
+      {(startDate || endDate) && (
+        <div className="text-xs text-gray-500 p-2 bg-gray-50 rounded">
+          Debug: Start: {startDate?.toLocaleDateString('pt-BR') || 'N/A'}, 
+          End: {endDate?.toLocaleDateString('pt-BR') || 'N/A'}, 
+          Range: {isRange ? 'Yes' : 'No'}
+        </div>
+      )}
     </div>
   );
 };

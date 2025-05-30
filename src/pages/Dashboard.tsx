@@ -16,9 +16,19 @@ const Dashboard = () => {
   const [endDate, setEndDate] = useState<Date | undefined>();
 
   const handleDateChange = (start: Date | undefined, end: Date | undefined) => {
+    console.log('Dashboard - Date change received:', { start, end });
     setStartDate(start);
     setEndDate(end);
   };
+
+  // Debug: Log current state
+  console.log('Dashboard - Current state:', {
+    selectedCity,
+    selectedRiver,
+    selectedPoints,
+    startDate: startDate?.toISOString(),
+    endDate: endDate?.toISOString()
+  });
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -33,6 +43,17 @@ const Dashboard = () => {
             Visualize dados de qualidade da água em tempo real
           </p>
         </div>
+
+        {/* Debug info */}
+        {(startDate || endDate) && (
+          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-sm text-blue-800">
+              <strong>Filtros ativos:</strong> 
+              {startDate && ` Data inicial: ${startDate.toLocaleDateString('pt-BR')}`}
+              {endDate && startDate !== endDate && ` | Data final: ${endDate.toLocaleDateString('pt-BR')}`}
+            </p>
+          </div>
+        )}
 
         {/* Filters */}
         <FilterSection
