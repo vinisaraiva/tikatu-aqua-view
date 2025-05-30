@@ -41,10 +41,10 @@ const MapboxMap = ({ selectedPoints, city, river }: MapboxMapProps) => {
     // Set Mapbox access token
     mapboxgl.accessToken = 'pk.eyJ1IjoidmluaXNhcmFpdmEiLCJhIjoiY20wb25ocG9hMGF1ZTJrbzlmZm5haWFlcyJ9.XnczMEcsq_NTNTOFeCxzxA';
 
-    // Initialize map with satellite style that shows water bodies clearly
+    // Initialize map with outdoors style that shows rivers and natural features clearly
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/satellite-streets-v12',
+      style: 'mapbox://styles/mapbox/outdoors-v12',
       center: [-46.6333, -23.5505], // São Paulo center
       zoom: 12,
     });
