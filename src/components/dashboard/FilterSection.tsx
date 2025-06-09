@@ -47,7 +47,7 @@ const FilterSection = ({
   const { data: points = [], isLoading: pointsLoading } = usePoints(selectedRiverData?.id);
   const { data: parameters = [], isLoading: parametersLoading } = useParameters();
 
-  console.log('FilterSection Debug - FIXED:', {
+  console.log('FilterSection Debug - ANTI-DUPLICATE:', {
     selectedCity,
     selectedRiver,
     selectedCityId: selectedCityData?.id,
@@ -55,21 +55,27 @@ const FilterSection = ({
     pointsCount: points.length,
     pointsLoading,
     availablePoints: points.map(p => ({ id: p.id, name: p.name, river_id: p.river_id })),
-    selectedPoints
+    selectedPoints,
+    selectedPointsUnique: [...new Set(selectedPoints)]
   });
 
   const handlePointChange = (pointName: string, checked: boolean) => {
-    console.log('FilterSection - Point change:', { pointName, checked, currentSelected: selectedPoints });
+    console.log('FilterSection - Point change START:', { pointName, checked, currentSelected: selectedPoints });
+    
+    // Garantir que selectedPoints seja sempre único antes de qualquer operação
+    const currentUniquePoints = [...new Set(selectedPoints)];
     
     if (checked) {
       // Verificar se o ponto já está selecionado para evitar duplicatas
-      if (!selectedPoints.includes(pointName)) {
-        const newPoints = [...selectedPoints, pointName];
+      if (!currentUniquePoints.includes(pointName)) {
+        const newPoints = [...currentUniquePoints, pointName];
         console.log('FilterSection - Adding point, new list:', newPoints);
         onPointsChange(newPoints);
+      } else {
+        console.log('FilterSection - Point already selected, ignoring:', pointName);
       }
     } else {
-      const newPoints = selectedPoints.filter(p => p !== pointName);
+      const newPoints = currentUniquePoints.filter(p => p !== pointName);
       console.log('FilterSection - Removing point, new list:', newPoints);
       onPointsChange(newPoints);
     }
@@ -90,8 +96,10 @@ const FilterSection = ({
 
   const handleSelectAllPoints = () => {
     const allPointNames = points.map(point => point.name);
-    console.log('FilterSection - Selecting all points:', allPointNames);
-    onPointsChange(allPointNames);
+    // Garantir que não há duplicatas ao selecionar todos
+    const uniquePointNames = [...new Set(allPointNames)];
+    console.log('FilterSection - Selecting all points:', uniquePointNames);
+    onPointsChange(uniquePointNames);
   };
 
   const handleClearParameters = () => {
@@ -175,7 +183,7 @@ const FilterSection = ({
                 
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">
-                    {selectedPoints.length} de {points.length} selecionados
+                    {[...new Set(selectedPoints)].length} de {points.length} selecionados
                   </span>
                   <div className="flex gap-2">
                     <Button
@@ -203,21 +211,24 @@ const FilterSection = ({
                   <p className="text-sm text-gray-500">Nenhum ponto encontrado para este rio.</p>
                 ) : (
                   <div className="space-y-2 max-h-40 overflow-y-auto border rounded-md p-3 bg-gray-50">
-                    {points.map((point) => (
-                      <div key={point.id} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={`point-${point.id}`}
-                          checked={selectedPoints.includes(point.name)}
-                          onCheckedChange={(checked) => handlePointChange(point.name, checked as boolean)}
-                        />
-                        <label
-                          htmlFor={`point-${point.id}`}
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                        >
-                          {point.name}
-                        </label>
-                      </div>
-                    ))}
+                    {points.map((point) => {
+                      const isChecked = [...new Set(selectedPoints)].includes(point.name);
+                      return (
+                        <div key={point.id} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={`point-${point.id}`}
+                            checked={isChecked}
+                            onCheckedChange={(checked) => handlePointChange(point.name, checked as boolean)}
+                          />
+                          <label
+                            htmlFor={`point-${point.id}`}
+                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                          >
+                            {point.name}
+                          </label>
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>
