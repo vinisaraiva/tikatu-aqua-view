@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -6,7 +5,7 @@ import { AlertCircleIcon, CheckCircleIcon, XCircleIcon, LoaderIcon } from 'lucid
 import ReadingsChart from './ReadingsChart';
 import CollectionPointsMap from './CollectionPointsMap';
 import { useReadings, useReadingValues } from '@/hooks/useReadingsData';
-import { usePoints } from '@/hooks/useGeographicData';
+import { useCities, useRivers, usePoints } from '@/hooks/useGeographicData';
 
 interface Reading {
   id: string;
@@ -29,8 +28,14 @@ interface RecentReadingsProps {
 }
 
 const RecentReadings = ({ city, river, points, parameters, startDate, endDate }: RecentReadingsProps) => {
-  // Get point IDs from selected point names
-  const { data: allPoints = [] } = usePoints();
+  // CORREÇÃO: Buscar dados da cidade e rio para obter os IDs corretos
+  const { data: cities = [] } = useCities();
+  const selectedCityData = cities.find(c => c.name === city);
+  const { data: rivers = [] } = useRivers(selectedCityData?.id);
+  const selectedRiverData = rivers.find(r => r.name === river);
+  
+  // CORREÇÃO: Usar o ID do rio para buscar pontos específicos desse rio
+  const { data: allPoints = [] } = usePoints(selectedRiverData?.id);
   const selectedPointsData = allPoints.filter(point => points.includes(point.name));
   const pointIds = selectedPointsData.map(point => point.id);
 
