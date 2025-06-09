@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -37,6 +36,7 @@ const FilterSection = ({
 }: FilterSectionProps) => {
   const [showDateFilter, setShowDateFilter] = useState(false);
   const [showParametersFilterCollapsed, setShowParametersFilterCollapsed] = useState(false);
+  const [previousRiver, setPreviousRiver] = useState(selectedRiver);
 
   // Fetch real data from Supabase
   const { data: cities = [], isLoading: citiesLoading } = useCities();
@@ -47,6 +47,19 @@ const FilterSection = ({
   // CORREÇÃO: Usar o ID do rio selecionado para filtrar apenas os pontos desse rio
   const { data: points = [], isLoading: pointsLoading } = usePoints(selectedRiverData?.id);
   const { data: parameters = [], isLoading: parametersLoading } = useParameters();
+
+  // Limpar pontos e parâmetros quando o rio mudar
+  useEffect(() => {
+    if (selectedRiver !== previousRiver && previousRiver !== '') {
+      console.log('FilterSection - Rio mudou, limpando filtros:', { 
+        previousRiver, 
+        newRiver: selectedRiver 
+      });
+      onPointsChange([]);
+      onParametersChange([]);
+    }
+    setPreviousRiver(selectedRiver);
+  }, [selectedRiver, previousRiver, onPointsChange, onParametersChange]);
 
   console.log('FilterSection Debug - VERIFICAÇÃO COMPLETA:', {
     selectedCity,

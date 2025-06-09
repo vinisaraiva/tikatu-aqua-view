@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 import { DropletsIcon, WavesIcon } from 'lucide-react';
@@ -17,10 +17,26 @@ const Indices = () => {
   const [endDate, setEndDate] = useState<Date | undefined>();
   const [activeIndex, setActiveIndex] = useState<'iqa' | 'iet' | null>(null);
 
+  // Limpar pontos e parâmetros quando a cidade mudar
+  useEffect(() => {
+    if (selectedCity && selectedRiver) {
+      console.log('Indices - Cidade mudou, limpando rio e filtros');
+      setSelectedRiver('');
+      setSelectedPoints([]);
+      setSelectedParameters([]);
+    }
+  }, [selectedCity]);
+
   const handleDateChange = (start: Date | undefined, end: Date | undefined) => {
     console.log('Indices - Date filter changed:', { start, end });
     setStartDate(start);
     setEndDate(end);
+  };
+
+  const handleRiverChange = (river: string) => {
+    console.log('Indices - Rio mudou:', river);
+    setSelectedRiver(river);
+    // Os pontos e parâmetros serão limpos automaticamente pelo FilterSection
   };
 
   return (
@@ -88,7 +104,7 @@ const Indices = () => {
             selectedPoints={selectedPoints}
             selectedParameters={selectedParameters}
             onCityChange={setSelectedCity}
-            onRiverChange={setSelectedRiver}
+            onRiverChange={handleRiverChange}
             onPointsChange={setSelectedPoints}
             onParametersChange={setSelectedParameters}
             onDateChange={handleDateChange}
