@@ -86,178 +86,205 @@ const FilterSection = ({
   };
 
   return (
-    <Card className="mb-6">
-      <CardHeader>
-        <CardTitle>Filtros</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {/* City Selection */}
-        <div>
-          <label className="text-sm font-medium mb-2 block">Cidade</label>
-          <Select value={selectedCity} onValueChange={onCityChange} disabled={citiesLoading}>
-            <SelectTrigger>
-              <SelectValue placeholder={citiesLoading ? "Carregando cidades..." : "Selecione uma cidade"} />
-            </SelectTrigger>
-            <SelectContent>
-              {cities.map((city) => (
-                <SelectItem key={city.id} value={city.name}>
-                  {city.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* River Selection */}
-        {selectedCity && (
+    <div className="mb-6 space-y-6">
+      {/* Main Filters Card */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Filtros Principais</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* City Selection */}
           <div>
-            <label className="text-sm font-medium mb-2 block">Rio</label>
-            <Select value={selectedRiver} onValueChange={onRiverChange} disabled={riversLoading}>
+            <label className="text-sm font-medium mb-2 block">Cidade</label>
+            <Select value={selectedCity} onValueChange={onCityChange} disabled={citiesLoading}>
               <SelectTrigger>
-                <SelectValue placeholder={riversLoading ? "Carregando rios..." : "Selecione um rio"} />
+                <SelectValue placeholder={citiesLoading ? "Carregando cidades..." : "Selecione uma cidade"} />
               </SelectTrigger>
               <SelectContent>
-                {rivers.map((river) => (
-                  <SelectItem key={river.id} value={river.name}>
-                    {river.name}
+                {cities.map((city) => (
+                  <SelectItem key={city.id} value={city.name}>
+                    {city.name}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
-        )}
 
-        {/* Points Filter - Show when river is selected */}
-        {selectedRiver && (
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <label className="text-sm font-medium">Pontos de Coleta</label>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleSelectAllPoints}
-                  disabled={pointsLoading || points.length === 0}
-                >
-                  Todos
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleClearPoints}
-                  disabled={selectedPoints.length === 0}
-                >
-                  Limpar
-                </Button>
-              </div>
+          {/* River Selection */}
+          {selectedCity && (
+            <div>
+              <label className="text-sm font-medium mb-2 block">Rio</label>
+              <Select value={selectedRiver} onValueChange={onRiverChange} disabled={riversLoading}>
+                <SelectTrigger>
+                  <SelectValue placeholder={riversLoading ? "Carregando rios..." : "Selecione um rio"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {rivers.map((river) => (
+                    <SelectItem key={river.id} value={river.name}>
+                      {river.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-            
-            {pointsLoading ? (
-              <p className="text-sm text-gray-500">Carregando pontos...</p>
-            ) : points.length === 0 ? (
-              <p className="text-sm text-gray-500">Nenhum ponto encontrado para este rio.</p>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-32 overflow-y-auto">
-                {points.map((point) => (
-                  <div key={point.id} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={point.name}
-                      checked={selectedPoints.includes(point.name)}
-                      onCheckedChange={(checked) => handlePointChange(point.name, checked as boolean)}
-                    />
-                    <label
-                      htmlFor={point.name}
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                    >
-                      {point.name}
-                    </label>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+          )}
 
-        {/* Parameters Filter - Collapsible */}
-        <Collapsible open={showParametersFilter} onOpenChange={setShowParametersFilter}>
-          <div className="flex items-center justify-between">
-            <label className="text-sm font-medium">Parâmetros</label>
-            <CollapsibleTrigger asChild>
-              <Button variant="outline" size="sm">
-                <Filter className="h-4 w-4 mr-2" />
-                {showParametersFilter ? 'Ocultar Filtros' : 'Filtrar Parâmetros'}
-              </Button>
-            </CollapsibleTrigger>
-          </div>
-          
-          <CollapsibleContent className="space-y-4 mt-4">
+          {/* Date Filter - Collapsible */}
+          <Collapsible open={showDateFilter} onOpenChange={setShowDateFilter}>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Selecionar parâmetros:</span>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleSelectAllParameters}
-                  disabled={parametersLoading || parameters.length === 0}
-                >
-                  Todos
+              <label className="text-sm font-medium">Período</label>
+              <CollapsibleTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <CalendarIcon className="h-4 w-4 mr-2" />
+                  {showDateFilter ? 'Ocultar Filtro' : 'Filtrar por Data'}
                 </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleClearParameters}
-                  disabled={selectedParameters.length === 0}
-                >
-                  Limpar
-                </Button>
-              </div>
+              </CollapsibleTrigger>
             </div>
             
-            {parametersLoading ? (
-              <p className="text-sm text-gray-500">Carregando parâmetros...</p>
-            ) : parameters.length === 0 ? (
-              <p className="text-sm text-gray-500">Nenhum parâmetro encontrado.</p>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 max-h-40 overflow-y-auto">
-                {parameters.map((parameter) => (
-                  <div key={parameter.id} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={parameter.code}
-                      checked={selectedParameters.includes(parameter.code)}
-                      onCheckedChange={(checked) => handleParameterChange(parameter.code, checked as boolean)}
-                    />
-                    <label
-                      htmlFor={parameter.code}
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                      title={parameter.description}
-                    >
-                      {parameter.code}
-                    </label>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CollapsibleContent>
-        </Collapsible>
+            <CollapsibleContent className="mt-4">
+              <DateFilter onDateChange={onDateChange} />
+            </CollapsibleContent>
+          </Collapsible>
+        </CardContent>
+      </Card>
 
-        {/* Date Filter - Collapsible */}
-        <Collapsible open={showDateFilter} onOpenChange={setShowDateFilter}>
-          <div className="flex items-center justify-between">
-            <label className="text-sm font-medium">Período</label>
-            <CollapsibleTrigger asChild>
-              <Button variant="outline" size="sm">
-                <CalendarIcon className="h-4 w-4 mr-2" />
-                {showDateFilter ? 'Ocultar Filtro' : 'Filtrar por Data'}
-              </Button>
-            </CollapsibleTrigger>
-          </div>
-          
-          <CollapsibleContent className="mt-4">
-            <DateFilter onDateChange={onDateChange} />
-          </CollapsibleContent>
-        </Collapsible>
-      </CardContent>
-    </Card>
+      {/* Points and Parameters Filter Cards - Side by Side */}
+      {selectedRiver && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Points Filter Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <MapPin className="h-5 w-5" />
+                Pontos de Coleta
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-sm text-gray-600">
+                  {selectedPoints.length} de {points.length} selecionados
+                </span>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleSelectAllPoints}
+                    disabled={pointsLoading || points.length === 0}
+                  >
+                    Todos
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleClearPoints}
+                    disabled={selectedPoints.length === 0}
+                  >
+                    Limpar
+                  </Button>
+                </div>
+              </div>
+              
+              {pointsLoading ? (
+                <p className="text-sm text-gray-500">Carregando pontos...</p>
+              ) : points.length === 0 ? (
+                <p className="text-sm text-gray-500">Nenhum ponto encontrado para este rio.</p>
+              ) : (
+                <div className="space-y-2 max-h-40 overflow-y-auto">
+                  {points.map((point) => (
+                    <div key={point.id} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={point.name}
+                        checked={selectedPoints.includes(point.name)}
+                        onCheckedChange={(checked) => handlePointChange(point.name, checked as boolean)}
+                      />
+                      <label
+                        htmlFor={point.name}
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                      >
+                        {point.name}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Parameters Filter Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Filter className="h-5 w-5" />
+                Parâmetros
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Collapsible open={showParametersFilter} onOpenChange={setShowParametersFilter}>
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-sm text-gray-600">
+                    {showParametersFilter ? `${selectedParameters.length} de ${parameters.length} selecionados` : 'Filtros avançados'}
+                  </span>
+                  <CollapsibleTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      {showParametersFilter ? 'Ocultar' : 'Mostrar'}
+                    </Button>
+                  </CollapsibleTrigger>
+                </div>
+                
+                <CollapsibleContent className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Selecionar parâmetros:</span>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleSelectAllParameters}
+                        disabled={parametersLoading || parameters.length === 0}
+                      >
+                        Todos
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleClearParameters}
+                        disabled={selectedParameters.length === 0}
+                      >
+                        Limpar
+                      </Button>
+                    </div>
+                  </div>
+                  
+                  {parametersLoading ? (
+                    <p className="text-sm text-gray-500">Carregando parâmetros...</p>
+                  ) : parameters.length === 0 ? (
+                    <p className="text-sm text-gray-500">Nenhum parâmetro encontrado.</p>
+                  ) : (
+                    <div className="space-y-2 max-h-40 overflow-y-auto">
+                      {parameters.map((parameter) => (
+                        <div key={parameter.id} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={parameter.code}
+                            checked={selectedParameters.includes(parameter.code)}
+                            onCheckedChange={(checked) => handleParameterChange(parameter.code, checked as boolean)}
+                          />
+                          <label
+                            htmlFor={parameter.code}
+                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                            title={parameter.description}
+                          >
+                            {parameter.code}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CollapsibleContent>
+              </Collapsible>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+    </div>
   );
 };
 
