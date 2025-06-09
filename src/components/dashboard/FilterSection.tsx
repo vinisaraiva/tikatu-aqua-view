@@ -42,6 +42,15 @@ const FilterSection = ({
   const { data: points = [], isLoading: pointsLoading } = usePoints(selectedRiverData?.id);
   const { data: parameters = [], isLoading: parametersLoading } = useParameters();
 
+  console.log('FilterSection Debug:', {
+    selectedCity,
+    selectedRiver,
+    selectedRiverData,
+    pointsCount: points.length,
+    pointsLoading,
+    showPointsFilter: !!selectedRiver
+  });
+
   const handlePointChange = (pointName: string, checked: boolean) => {
     if (checked) {
       onPointsChange([...selectedPoints, pointName]);
@@ -116,7 +125,7 @@ const FilterSection = ({
           </div>
         )}
 
-        {/* Points Selection */}
+        {/* Points Selection - Show when river is selected */}
         {selectedRiver && (
           <div>
             <div className="flex items-center justify-between mb-2">
