@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,13 +20,6 @@ const Index = () => {
         }}
       >
         <div className="max-w-6xl mx-auto text-center relative z-10">
-          <div className="mb-8">
-            <img 
-              src="/lovable-uploads/d62bdfd0-6fc8-4075-ac93-580e7557f424.png" 
-              alt="Tikatu Logo" 
-              className="h-20 mx-auto mb-6 drop-shadow-lg"
-            />
-          </div>
           <h1 className="text-5xl font-bold text-white mb-6 drop-shadow-lg">
             Monitoramento da Qualidade da Água
           </h1>
