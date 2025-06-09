@@ -9,7 +9,274 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      alerts: {
+        Row: {
+          alert_type: string
+          condition_type: string
+          created_at: string
+          id: number
+          is_active: boolean
+          parameter_id: number | null
+          point_id: number
+          threshold_value: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          alert_type: string
+          condition_type: string
+          created_at?: string
+          id?: number
+          is_active?: boolean
+          parameter_id?: number | null
+          point_id: number
+          threshold_value?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          alert_type?: string
+          condition_type?: string
+          created_at?: string
+          id?: number
+          is_active?: boolean
+          parameter_id?: number | null
+          point_id?: number
+          threshold_value?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alerts_parameter_id_fkey"
+            columns: ["parameter_id"]
+            isOneToOne: false
+            referencedRelation: "parameters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "alerts_point_id_fkey"
+            columns: ["point_id"]
+            isOneToOne: false
+            referencedRelation: "points"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "alerts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cities: {
+        Row: {
+          created_at: string
+          id: number
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          name?: string
+        }
+        Relationships: []
+      }
+      parameters: {
+        Row: {
+          code: string
+          conama_max: number | null
+          conama_min: number | null
+          created_at: string
+          description: string
+          id: number
+          unit: string
+        }
+        Insert: {
+          code: string
+          conama_max?: number | null
+          conama_min?: number | null
+          created_at?: string
+          description: string
+          id?: number
+          unit: string
+        }
+        Update: {
+          code?: string
+          conama_max?: number | null
+          conama_min?: number | null
+          created_at?: string
+          description?: string
+          id?: number
+          unit?: string
+        }
+        Relationships: []
+      }
+      points: {
+        Row: {
+          created_at: string
+          id: number
+          latitude: number
+          longitude: number
+          name: string
+          river_id: number
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          latitude: number
+          longitude: number
+          name: string
+          river_id: number
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          latitude?: number
+          longitude?: number
+          name?: string
+          river_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "points_river_id_fkey"
+            columns: ["river_id"]
+            isOneToOne: false
+            referencedRelation: "rivers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          full_name: string
+          id: string
+          role: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          full_name: string
+          id: string
+          role?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          full_name?: string
+          id?: string
+          role?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      reading_values: {
+        Row: {
+          created_at: string
+          parameter_id: number
+          reading_id: number
+          value: number
+        }
+        Insert: {
+          created_at?: string
+          parameter_id: number
+          reading_id: number
+          value: number
+        }
+        Update: {
+          created_at?: string
+          parameter_id?: number
+          reading_id?: number
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reading_values_parameter_id_fkey"
+            columns: ["parameter_id"]
+            isOneToOne: false
+            referencedRelation: "parameters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reading_values_reading_id_fkey"
+            columns: ["reading_id"]
+            isOneToOne: false
+            referencedRelation: "readings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      readings: {
+        Row: {
+          created_at: string
+          id: number
+          iet_score: number | null
+          iqa_score: number | null
+          measured_at: string
+          point_id: number
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          iet_score?: number | null
+          iqa_score?: number | null
+          measured_at?: string
+          point_id: number
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          iet_score?: number | null
+          iqa_score?: number | null
+          measured_at?: string
+          point_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "readings_point_id_fkey"
+            columns: ["point_id"]
+            isOneToOne: false
+            referencedRelation: "points"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rivers: {
+        Row: {
+          city_id: number
+          created_at: string
+          id: number
+          name: string
+        }
+        Insert: {
+          city_id: number
+          created_at?: string
+          id?: number
+          name: string
+        }
+        Update: {
+          city_id?: number
+          created_at?: string
+          id?: number
+          name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rivers_city_id_fkey"
+            columns: ["city_id"]
+            isOneToOne: false
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

@@ -1,7 +1,8 @@
 
-import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { usePoints } from '@/hooks/useGeographicData';
+import { useReadings } from '@/hooks/useReadingsData';
 import IndicesMap from './IndicesMap';
 import IetTab from './IetTab';
 
@@ -13,84 +14,16 @@ interface IetIndiceProps {
   endDate?: Date;
 }
 
-interface IetPointData {
-  pointId: string;
-  pointName: string;
-  iet: number;
-  history: { date: string; iet: number }[];
-  coords: { lat: number; lng: number };
-}
-
-const useIetData = (city: string, river: string, points: string[], startDate?: Date, endDate?: Date) => {
-  return useQuery({
-    queryKey: ['iet', city, river, points, startDate, endDate],
-    queryFn: async (): Promise<IetPointData[]> => {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      console.log('IetIndice - Fetching data with date filter:', { startDate, endDate });
-      
-      // Coordinates mapping by city and river
-      const cityCoordinates = {
-        'São Paulo': {
-          'Rio Tietê': { lat: -23.5505, lng: -46.6333 },
-          'Rio Pinheiros': { lat: -23.5629, lng: -46.6544 },
-          'Rio Tamanduateí': { lat: -23.5431, lng: -46.6097 }
-        },
-        'Rio de Janeiro': {
-          'Rio Guandu': { lat: -22.8305, lng: -43.4428 },
-          'Rio Paraíba do Sul': { lat: -22.5167, lng: -43.1833 }
-        },
-        'Belo Horizonte': {
-          'Rio das Velhas': { lat: -19.9167, lng: -43.9345 },
-          'Rio Arrudas': { lat: -19.9208, lng: -43.9378 }
-        },
-        'Brasília': {
-          'Rio Descoberto': { lat: -15.7975, lng: -48.1297 },
-          'Rio Paranoá': { lat: -15.7801, lng: -47.8069 }
-        }
-      };
-
-      const baseCoords = cityCoordinates[city]?.[river] || { lat: -23.5505, lng: -46.6333 };
-      
-      // Generate date range based on filters
-      let dateRange: Date[] = [];
-      if (startDate && endDate) {
-        // Generate dates between startDate and endDate
-        const currentDate = new Date(startDate);
-        while (currentDate <= endDate) {
-          dateRange.push(new Date(currentDate));
-          currentDate.setDate(currentDate.getDate() + 1);
-        }
-      } else if (startDate && !endDate) {
-        // Single date
-        dateRange = [startDate];
-      } else {
-        // Default: last 30 days
-        dateRange = Array.from({ length: 30 }, (_, i) => 
-          new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000)
-        );
-      }
-      
-      return points.map((point, index) => ({
-        pointId: point,
-        pointName: point,
-        iet: Math.floor(Math.random() * 30) + 30, // 30-60 range
-        history: dateRange.map(date => ({
-          date: date.toISOString().split('T')[0],
-          iet: Math.floor(Math.random() * 30) + 30
-        })),
-        coords: { 
-          lat: baseCoords.lat + (index * 0.005), 
-          lng: baseCoords.lng + (index * 0.005) 
-        }
-      }));
-    },
-    enabled: !!(city && river && points.length > 0)
-  });
-};
-
 const IetIndice = ({ selectedCity, selectedRiver, selectedPoints, startDate, endDate }: IetIndiceProps) => {
-  const { data, isLoading, error } = useIetData(selectedCity, selectedRiver, selectedPoints, startDate, endDate);
+  // Get all points to map names to IDs
+  const { data: allPoints = [] } = usePoints();
+  
+  // Filter points by selected names and get their IDs
+  const selectedPointData = allPoints.filter(point => selectedPoints.includes(point.name));
+  const pointIds = selectedPointData.map(point => point.id);
+  
+  // Fetch readings for selected points
+  const { data: readings = [], isLoading, error } = useReadings(pointIds, startDate, endDate);
 
   const getIetColor = (value: number) => {
     if (value <= 20) return 'border-blue-400 bg-blue-50';
@@ -119,7 +52,32 @@ const IetIndice = ({ selectedCity, selectedRiver, selectedPoints, startDate, end
     );
   }
 
-  if (!data || data.length === 0) return null;
+  if (!readings || readings.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-gray-500 mb-4">Nenhuma leitura encontrada para os filtros selecionados</p>
+        <p className="text-sm text-gray-400">Experimente ajustar o período ou selecionar outros pontos</p>
+      </div>
+    );
+  }
+
+  // Group readings by point and get latest IET score for each
+  const pointReadings = selectedPointData.map(point => {
+    const pointReadingsList = readings.filter(r => r.point_id === point.id);
+    const latestReading = pointReadingsList[0]; // readings are ordered by measured_at desc
+    
+    return {
+      pointId: point.id.toString(),
+      pointName: point.name,
+      iet: latestReading?.iet_score || 0,
+      history: pointReadingsList.map(r => ({
+        date: r.measured_at.split('T')[0],
+        iqa: 0, // Will be used by IetTab component
+        iet: r.iet_score || 0
+      })),
+      coords: { lat: point.latitude, lng: point.longitude }
+    };
+  });
 
   return (
     <div className="space-y-6">
@@ -143,12 +101,12 @@ const IetIndice = ({ selectedCity, selectedRiver, selectedPoints, startDate, end
 
       {/* IET Overview Cards */}
       {selectedPoints.length === 1 ? (
-        <Card className={`border-2 ${getIetColor(data[0].iet)}`}>
+        <Card className={`border-2 ${getIetColor(pointReadings[0]?.iet || 0)}`}>
           <CardHeader className="text-center">
             <CardTitle className="text-lg font-medium text-gray-700">IET Atual</CardTitle>
-            <div className="text-4xl font-bold text-gray-900">{data[0].iet}</div>
+            <div className="text-4xl font-bold text-gray-900">{pointReadings[0]?.iet || 0}</div>
             <p className="text-sm text-gray-600">Índice do Estado Trófico</p>
-            <p className="text-sm text-gray-500">{data[0].pointName}</p>
+            <p className="text-sm text-gray-500">{pointReadings[0]?.pointName}</p>
             <p className="text-xs text-gray-400">{selectedCity} - {selectedRiver}</p>
           </CardHeader>
           <CardContent className="text-center">
@@ -164,7 +122,7 @@ const IetIndice = ({ selectedCity, selectedRiver, selectedPoints, startDate, end
             <p className="text-sm text-gray-500">{selectedRiver} ({selectedPoints.length} pontos)</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {data.map((pointData) => (
+            {pointReadings.map((pointData) => (
               <Card key={pointData.pointId} className={`border-2 ${getIetColor(pointData.iet)}`}>
                 <CardHeader className="text-center">
                   <CardTitle className="text-sm font-medium text-gray-700">{pointData.pointName}</CardTitle>
@@ -179,7 +137,7 @@ const IetIndice = ({ selectedCity, selectedRiver, selectedPoints, startDate, end
 
       {/* Map */}
       <IndicesMap 
-        pointsData={data.map(d => ({ 
+        pointsData={pointReadings.map(d => ({ 
           id: d.pointId, 
           name: d.pointName, 
           coords: d.coords,
@@ -191,11 +149,7 @@ const IetIndice = ({ selectedCity, selectedRiver, selectedPoints, startDate, end
 
       {/* IET Analysis */}
       <IetTab 
-        pointsData={data.map(d => ({
-          pointId: d.pointId,
-          pointName: d.pointName,
-          history: d.history.map(h => ({ ...h, iqa: 0 }))
-        }))}
+        pointsData={pointReadings}
         city={selectedCity}
         river={selectedRiver}
       />
