@@ -42,23 +42,36 @@ const FilterSection = ({
   const selectedCityData = cities.find(city => city.name === selectedCity);
   const { data: rivers = [], isLoading: riversLoading } = useRivers(selectedCityData?.id);
   const selectedRiverData = rivers.find(river => river.name === selectedRiver);
+  
+  // CORREÇÃO: Usar o ID do rio selecionado para filtrar apenas os pontos desse rio
   const { data: points = [], isLoading: pointsLoading } = usePoints(selectedRiverData?.id);
   const { data: parameters = [], isLoading: parametersLoading } = useParameters();
 
-  console.log('FilterSection Debug:', {
+  console.log('FilterSection Debug - FIXED:', {
     selectedCity,
     selectedRiver,
-    selectedRiverData,
+    selectedCityId: selectedCityData?.id,
+    selectedRiverId: selectedRiverData?.id,
     pointsCount: points.length,
     pointsLoading,
-    showPointsFilter: !!selectedRiver
+    availablePoints: points.map(p => ({ id: p.id, name: p.name, river_id: p.river_id })),
+    selectedPoints
   });
 
   const handlePointChange = (pointName: string, checked: boolean) => {
+    console.log('FilterSection - Point change:', { pointName, checked, currentSelected: selectedPoints });
+    
     if (checked) {
-      onPointsChange([...selectedPoints, pointName]);
+      // Verificar se o ponto já está selecionado para evitar duplicatas
+      if (!selectedPoints.includes(pointName)) {
+        const newPoints = [...selectedPoints, pointName];
+        console.log('FilterSection - Adding point, new list:', newPoints);
+        onPointsChange(newPoints);
+      }
     } else {
-      onPointsChange(selectedPoints.filter(p => p !== pointName));
+      const newPoints = selectedPoints.filter(p => p !== pointName);
+      console.log('FilterSection - Removing point, new list:', newPoints);
+      onPointsChange(newPoints);
     }
   };
 
@@ -71,11 +84,14 @@ const FilterSection = ({
   };
 
   const handleClearPoints = () => {
+    console.log('FilterSection - Clearing all points');
     onPointsChange([]);
   };
 
   const handleSelectAllPoints = () => {
-    onPointsChange(points.map(point => point.name));
+    const allPointNames = points.map(point => point.name);
+    console.log('FilterSection - Selecting all points:', allPointNames);
+    onPointsChange(allPointNames);
   };
 
   const handleClearParameters = () => {
@@ -190,12 +206,12 @@ const FilterSection = ({
                     {points.map((point) => (
                       <div key={point.id} className="flex items-center space-x-2">
                         <Checkbox
-                          id={point.name}
+                          id={`point-${point.id}`}
                           checked={selectedPoints.includes(point.name)}
                           onCheckedChange={(checked) => handlePointChange(point.name, checked as boolean)}
                         />
                         <label
-                          htmlFor={point.name}
+                          htmlFor={`point-${point.id}`}
                           className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
                         >
                           {point.name}
