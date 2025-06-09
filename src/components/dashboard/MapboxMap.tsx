@@ -4,7 +4,7 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MapIcon } from 'lucide-react';
-import { usePoints } from '@/hooks/useGeographicData';
+import { usePoints, useRivers, useCities } from '@/hooks/useGeographicData';
 
 interface MapboxMapProps {
   selectedPoints: string[];
@@ -19,17 +19,22 @@ const MapboxMap = ({ selectedPoints, city, river }: MapboxMapProps) => {
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
 
-  // Fetch real points data from Supabase
-  const { data: allPoints = [] } = usePoints();
+  // Fetch data with proper filtering
+  const { data: cities = [] } = useCities();
+  const selectedCityData = cities.find(c => c.name === city);
+  const { data: rivers = [] } = useRivers(selectedCityData?.id);
+  const selectedRiverData = rivers.find(r => r.name === river);
+  const { data: allPoints = [] } = usePoints(selectedRiverData?.id);
   
-  // Filter points based on selected points
+  // Filter points based on selected points AND river
   const selectedPointsData = allPoints.filter(point => 
     selectedPoints.includes(point.name)
   );
 
   console.log('MapboxMap - City:', city, 'River:', river, 'Selected Points:', selectedPoints);
-  console.log('MapboxMap - Available Points:', allPoints.map(p => p.name));
-  console.log('MapboxMap - Selected Points Data:', selectedPointsData.map(p => p.name));
+  console.log('MapboxMap - River ID:', selectedRiverData?.id);
+  console.log('MapboxMap - Available Points for this river:', allPoints.map(p => ({ name: p.name, river_id: p.river_id })));
+  console.log('MapboxMap - Selected Points Data:', selectedPointsData.map(p => ({ name: p.name, river_id: p.river_id })));
 
   // Create droplet-style marker element
   const createDropletMarker = () => {
@@ -165,7 +170,7 @@ const MapboxMap = ({ selectedPoints, city, river }: MapboxMapProps) => {
   useEffect(() => {
     if (!map.current || !isMapLoaded || selectedPointsData.length === 0) return;
 
-    console.log('Adding markers for points:', selectedPointsData.map(p => p.name));
+    console.log('Adding markers for points:', selectedPointsData.map(p => ({ name: p.name, river_id: p.river_id })));
 
     // Clear existing markers
     clearMarkers();
