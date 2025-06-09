@@ -14,32 +14,37 @@ const Index = () => {
       <Header />
       
       {/* Hero Section */}
-      <section className="relative py-20 px-4">
-        <div className="max-w-6xl mx-auto text-center">
+      <section 
+        className="relative py-20 px-4 min-h-[80vh] flex items-center justify-center bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('/lovable-uploads/6c1c5451-5d11-445d-ac6a-b3c2450303b6.png')`
+        }}
+      >
+        <div className="max-w-6xl mx-auto text-center relative z-10">
           <div className="mb-8">
             <img 
               src="/lovable-uploads/d62bdfd0-6fc8-4075-ac93-580e7557f424.png" 
               alt="Tikatu Logo" 
-              className="h-20 mx-auto mb-6"
+              className="h-20 mx-auto mb-6 drop-shadow-lg"
             />
           </div>
-          <h1 className="text-5xl font-bold text-gray-900 mb-6">
+          <h1 className="text-5xl font-bold text-white mb-6 drop-shadow-lg">
             Monitoramento da Qualidade da Água
           </h1>
-          <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+          <p className="text-xl text-white mb-8 max-w-3xl mx-auto drop-shadow-md">
             Plataforma digital para consulta e visualização de dados de monitoramento 
             da qualidade da água em tempo real. Acesse informações detalhadas sobre 
             parâmetros físico-químicos e detecção de anomalias.
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
             <Link to="/dashboard">
-              <Button size="lg" className="bg-teal-600 hover:bg-teal-700">
+              <Button size="lg" className="bg-teal-600 hover:bg-teal-700 shadow-lg">
                 Acessar Dashboard
                 <ArrowRightIcon className="ml-2 h-5 w-5" />
               </Button>
             </Link>
             <Link to="/about">
-              <Button variant="outline" size="lg">
+              <Button variant="outline" size="lg" className="bg-white/10 border-white text-white hover:bg-white hover:text-gray-900 backdrop-blur-sm">
                 Saiba Mais
               </Button>
             </Link>
