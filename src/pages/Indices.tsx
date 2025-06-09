@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
@@ -81,7 +80,7 @@ const Indices = () => {
           </Button>
         </div>
 
-        {/* Filters - Only show if an index is selected */}
+        {/* Filters - Only show if an index is selected, without parameters filter */}
         {activeIndex && (
           <FilterSection
             selectedCity={selectedCity}
@@ -93,6 +92,7 @@ const Indices = () => {
             onPointsChange={setSelectedPoints}
             onParametersChange={setSelectedParameters}
             onDateChange={handleDateChange}
+            showParametersFilter={false}
           />
         )}
 
