@@ -15,11 +15,17 @@ interface IetIndiceProps {
 }
 
 const IetIndice = ({ selectedCity, selectedRiver, selectedPoints, startDate, endDate }: IetIndiceProps) => {
+  // Remove duplicates from selected points
+  const uniqueSelectedPoints = [...new Set(selectedPoints)];
+  
+  console.log('IetIndice - Original selected points:', selectedPoints);
+  console.log('IetIndice - Unique selected points:', uniqueSelectedPoints);
+  
   // Get all points to map names to IDs
   const { data: allPoints = [] } = usePoints();
   
   // Filter points by selected names and get their IDs
-  const selectedPointData = allPoints.filter(point => selectedPoints.includes(point.name));
+  const selectedPointData = allPoints.filter(point => uniqueSelectedPoints.includes(point.name));
   const pointIds = selectedPointData.map(point => point.id);
   
   // Fetch readings for selected points
@@ -100,7 +106,7 @@ const IetIndice = ({ selectedCity, selectedRiver, selectedPoints, startDate, end
       )}
 
       {/* IET Overview Cards */}
-      {selectedPoints.length === 1 ? (
+      {uniqueSelectedPoints.length === 1 ? (
         <Card className={`border-2 ${getIetColor(pointReadings[0]?.iet || 0)}`}>
           <CardHeader className="text-center">
             <CardTitle className="text-lg font-medium text-gray-700">IET Atual</CardTitle>
@@ -119,7 +125,7 @@ const IetIndice = ({ selectedCity, selectedRiver, selectedPoints, startDate, end
         <div className="space-y-4">
           <div className="text-center">
             <h3 className="text-lg font-medium text-gray-700">IET - {selectedCity}</h3>
-            <p className="text-sm text-gray-500">{selectedRiver} ({selectedPoints.length} pontos)</p>
+            <p className="text-sm text-gray-500">{selectedRiver} ({uniqueSelectedPoints.length} pontos)</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {pointReadings.map((pointData) => (
