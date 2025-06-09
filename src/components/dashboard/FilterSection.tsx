@@ -50,7 +50,7 @@ const FilterSection = ({
 
   // Limpar pontos e parâmetros quando o rio mudar
   useEffect(() => {
-    if (selectedRiver !== previousRiver && previousRiver !== '') {
+    if (selectedRiver !== previousRiver) {
       console.log('FilterSection - Rio mudou, limpando filtros:', { 
         previousRiver, 
         newRiver: selectedRiver 
@@ -61,7 +61,15 @@ const FilterSection = ({
     setPreviousRiver(selectedRiver);
   }, [selectedRiver, previousRiver, onPointsChange, onParametersChange]);
 
-  console.log('FilterSection Debug - VERIFICAÇÃO COMPLETA:', {
+  // CORREÇÃO ADICIONAL: Garantir que pontos sejam limpos se não há rio selecionado
+  useEffect(() => {
+    if (!selectedRiver && selectedPoints.length > 0) {
+      console.log('FilterSection - Sem rio selecionado, limpando pontos');
+      onPointsChange([]);
+    }
+  }, [selectedRiver, selectedPoints.length, onPointsChange]);
+
+  console.log('FilterSection Debug - VERIFICAÇÃO ANTI-DUPLICATA:', {
     selectedCity,
     selectedRiver,
     selectedCityId: selectedCityData?.id,

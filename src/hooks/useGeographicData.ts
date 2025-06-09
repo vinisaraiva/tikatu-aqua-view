@@ -62,20 +62,20 @@ export const usePoints = (riverId?: number) => {
   return useQuery({
     queryKey: ['points', riverId],
     queryFn: async (): Promise<Point[]> => {
-      let query = supabase
-        .from('points')
-        .select('*')
-        .order('name');
-      
-      if (riverId) {
-        query = query.eq('river_id', riverId);
+      // CORREÇÃO: Só buscar pontos se há um riverId específico
+      if (!riverId) {
+        return [];
       }
       
-      const { data, error } = await query;
+      const { data, error } = await supabase
+        .from('points')
+        .select('*')
+        .eq('river_id', riverId)
+        .order('name');
       
       if (error) throw error;
       return data || [];
     },
-    enabled: riverId === undefined || !!riverId
+    enabled: !!riverId
   });
 };
