@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { usePoints } from '@/hooks/useGeographicData';
+import { useCities, useRivers, usePoints } from '@/hooks/useGeographicData';
 import { useReadings } from '@/hooks/useReadingsData';
 import IndicesMap from './IndicesMap';
 import IetTab from './IetTab';
@@ -23,8 +23,14 @@ const IetIndice = ({ selectedCity, selectedRiver, selectedPoints, startDate, end
   console.log('IetIndice - Pontos únicos (LIMPOS):', uniqueSelectedPoints);
   console.log('IetIndice - Quantidade original vs limpa:', selectedPoints.length, 'vs', uniqueSelectedPoints.length);
   
-  // Get all points to map names to IDs
-  const { data: allPoints = [] } = usePoints();
+  // CORREÇÃO PRINCIPAL: Buscar dados da cidade e rio para obter os IDs corretos
+  const { data: cities = [] } = useCities();
+  const selectedCityData = cities.find(city => city.name === selectedCity);
+  const { data: rivers = [] } = useRivers(selectedCityData?.id);
+  const selectedRiverData = rivers.find(river => river.name === selectedRiver);
+  
+  // CORREÇÃO: Usar o ID do rio para buscar pontos específicos desse rio
+  const { data: allPoints = [] } = usePoints(selectedRiverData?.id);
   
   // Filter points by selected names and get their IDs
   const selectedPointData = allPoints.filter(point => uniqueSelectedPoints.includes(point.name));
