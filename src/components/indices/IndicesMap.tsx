@@ -16,6 +16,9 @@ interface IndicesMapProps {
 }
 
 const IndicesMap = ({ pointsData, city, river }: IndicesMapProps) => {
+  // Convert point IDs to names for MapboxMap compatibility
+  const pointNames = pointsData.map(p => p.name);
+
   return (
     <Card>
       <CardHeader>
@@ -36,7 +39,7 @@ const IndicesMap = ({ pointsData, city, river }: IndicesMapProps) => {
       <CardContent>
         <div className="h-80 rounded-lg overflow-hidden">
           <MapboxMap 
-            selectedPoints={pointsData.map(p => p.id)}
+            selectedPoints={pointNames}
             city={city || ""}
             river={river || ""}
           />
