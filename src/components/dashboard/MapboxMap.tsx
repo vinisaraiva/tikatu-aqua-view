@@ -10,9 +10,10 @@ interface MapboxMapProps {
   selectedPoints: string[];
   city: string;
   river: string;
+  hideBusinessNames?: boolean;
 }
 
-const MapboxMap = ({ selectedPoints, city, river }: MapboxMapProps) => {
+const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false }: MapboxMapProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [mapError, setMapError] = useState<string | null>(null);
@@ -126,10 +127,15 @@ const MapboxMap = ({ selectedPoints, city, river }: MapboxMapProps) => {
 
       console.log('Creating new map for city:', city, 'with center:', getCenterCoordinates());
 
+      // Choose map style based on hideBusinessNames prop
+      const mapStyle = hideBusinessNames 
+        ? 'mapbox://styles/mapbox/outdoors-v12' 
+        : 'mapbox://styles/mapbox/outdoors-v12';
+
       // Create new map with dynamic center based on city
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/outdoors-v12',
+        style: mapStyle,
         center: getCenterCoordinates(),
         zoom: 12,
         preserveDrawingBuffer: true,
@@ -142,6 +148,20 @@ const MapboxMap = ({ selectedPoints, city, river }: MapboxMapProps) => {
       // Map load event
       map.current.on('load', () => {
         console.log('Map loaded successfully for city:', city);
+        
+        // Hide business labels if requested
+        if (hideBusinessNames && map.current) {
+          // Hide POI labels
+          const layers = map.current.getStyle().layers;
+          layers?.forEach((layer) => {
+            if (layer.id.includes('poi') || layer.id.includes('label') || layer.id.includes('place')) {
+              if (layer.type === 'symbol' && layer.id.includes('poi')) {
+                map.current?.setLayoutProperty(layer.id, 'visibility', 'none');
+              }
+            }
+          });
+        }
+        
         setIsMapLoaded(true);
         setMapError(null);
       });
@@ -164,7 +184,7 @@ const MapboxMap = ({ selectedPoints, city, river }: MapboxMapProps) => {
         map.current = null;
       }
     };
-  }, [city, river]); // Re-initialize map when city or river changes
+  }, [city, river, hideBusinessNames]); // Re-initialize map when city, river, or hideBusinessNames changes
 
   // Add markers when map is loaded and points are selected
   useEffect(() => {

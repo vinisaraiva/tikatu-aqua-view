@@ -42,6 +42,7 @@ const IndicesMap = ({ pointsData, city, river }: IndicesMapProps) => {
             selectedPoints={pointNames}
             city={city || ""}
             river={river || ""}
+            hideBusinessNames={true}
           />
         </div>
         
