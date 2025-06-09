@@ -47,12 +47,13 @@ const Dashboard = () => {
         </div>
 
         {/* Debug info */}
-        {(startDate || endDate || selectedParameters.length > 0) && (
+        {(startDate || endDate || selectedParameters.length > 0 || selectedPoints.length > 0) && (
           <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
             <p className="text-sm text-blue-800">
               <strong>Filtros ativos:</strong> 
               {startDate && ` Data inicial: ${startDate.toLocaleDateString('pt-BR')}`}
               {endDate && startDate !== endDate && ` | Data final: ${endDate.toLocaleDateString('pt-BR')}`}
+              {selectedPoints.length > 0 && ` | Pontos: ${selectedPoints.join(', ')}`}
               {selectedParameters.length > 0 && ` | Parâmetros: ${selectedParameters.join(', ')}`}
             </p>
           </div>

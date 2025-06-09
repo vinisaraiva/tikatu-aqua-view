@@ -8,6 +8,7 @@ interface AnomaliesChartProps {
   city: string;
   river: string;
   point: string;
+  parameters: string[];
   startDate?: Date;
   endDate?: Date;
 }
