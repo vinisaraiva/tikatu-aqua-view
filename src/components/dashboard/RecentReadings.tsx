@@ -23,11 +23,12 @@ interface RecentReadingsProps {
   city: string;
   river: string;
   points: string[];
+  parameters: string[];
   startDate?: Date;
   endDate?: Date;
 }
 
-const RecentReadings = ({ city, river, points, startDate, endDate }: RecentReadingsProps) => {
+const RecentReadings = ({ city, river, points, parameters, startDate, endDate }: RecentReadingsProps) => {
   // Get point IDs from selected point names
   const { data: allPoints = [] } = usePoints();
   const selectedPointsData = allPoints.filter(point => points.includes(point.name));
@@ -40,8 +41,14 @@ const RecentReadings = ({ city, river, points, startDate, endDate }: RecentReadi
   const readingIds = readings.map(reading => reading.id);
   const { data: readingValues = [], isLoading: valuesLoading } = useReadingValues(readingIds);
 
+  // Filter reading values by selected parameters
+  const filteredReadingValues = readingValues.filter(value => {
+    if (parameters.length === 0) return true; // Show all if no parameters selected
+    return parameters.includes(value.parameter?.code || '');
+  });
+
   // Transform data for display
-  const transformedReadings: Reading[] = readingValues.map((value) => {
+  const transformedReadings: Reading[] = filteredReadingValues.map((value) => {
     const reading = readings.find(r => r.id === value.reading_id);
     const point = selectedPointsData.find(p => p.id === reading?.point_id);
     
@@ -113,6 +120,12 @@ const RecentReadings = ({ city, river, points, startDate, endDate }: RecentReadi
     return 'Dados recentes';
   };
 
+  const getParametersText = () => {
+    if (parameters.length === 0) return 'Todos os parâmetros';
+    if (parameters.length <= 3) return parameters.join(', ');
+    return `${parameters.slice(0, 3).join(', ')} e mais ${parameters.length - 3}`;
+  };
+
   if (!city || !river || points.length === 0) {
     return (
       <div className="space-y-6">
@@ -165,7 +178,7 @@ const RecentReadings = ({ city, river, points, startDate, endDate }: RecentReadi
         <CardHeader>
           <CardTitle>Leituras Recentes</CardTitle>
           <p className="text-sm text-gray-600">
-            {city} → {river} → {points.join(', ')} | {getDateRangeText()}
+            {city} → {river} → {points.join(', ')} | {getDateRangeText()} | {getParametersText()}
           </p>
         </CardHeader>
         <CardContent>

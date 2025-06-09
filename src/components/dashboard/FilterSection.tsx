@@ -7,27 +7,30 @@ import { Button } from '@/components/ui/button';
 import { CalendarIcon } from 'lucide-react';
 import DateFilter from './DateFilter';
 import { useCities, useRivers, usePoints } from '@/hooks/useGeographicData';
+import { useParameters } from '@/hooks/useReadingsData';
 
 interface FilterSectionProps {
   selectedCity: string;
   selectedRiver: string;
   selectedPoints: string[];
+  selectedParameters: string[];
   onCityChange: (city: string) => void;
   onRiverChange: (river: string) => void;
   onPointsChange: (points: string[]) => void;
-  onDateChange?: (start: Date | undefined, end: Date | undefined) => void;
-  showDateFilter?: boolean;
+  onParametersChange: (parameters: string[]) => void;
+  onDateChange: (start: Date | undefined, end: Date | undefined) => void;
 }
 
 const FilterSection = ({
   selectedCity,
   selectedRiver,
   selectedPoints,
+  selectedParameters,
   onCityChange,
   onRiverChange,
   onPointsChange,
+  onParametersChange,
   onDateChange,
-  showDateFilter = false,
 }: FilterSectionProps) => {
   const [showDatePicker, setShowDatePicker] = useState(false);
 
@@ -37,6 +40,7 @@ const FilterSection = ({
   const { data: rivers = [], isLoading: riversLoading } = useRivers(selectedCityData?.id);
   const selectedRiverData = rivers.find(river => river.name === selectedRiver);
   const { data: points = [], isLoading: pointsLoading } = usePoints(selectedRiverData?.id);
+  const { data: parameters = [], isLoading: parametersLoading } = useParameters();
 
   const handlePointChange = (pointName: string, checked: boolean) => {
     if (checked) {
@@ -46,12 +50,28 @@ const FilterSection = ({
     }
   };
 
+  const handleParameterChange = (parameterCode: string, checked: boolean) => {
+    if (checked) {
+      onParametersChange([...selectedParameters, parameterCode]);
+    } else {
+      onParametersChange(selectedParameters.filter(p => p !== parameterCode));
+    }
+  };
+
   const handleClearPoints = () => {
     onPointsChange([]);
   };
 
   const handleSelectAllPoints = () => {
     onPointsChange(points.map(point => point.name));
+  };
+
+  const handleClearParameters = () => {
+    onParametersChange([]);
+  };
+
+  const handleSelectAllParameters = () => {
+    onParametersChange(parameters.map(param => param.code));
   };
 
   return (
@@ -147,26 +167,74 @@ const FilterSection = ({
           </div>
         )}
 
-        {/* Date Filter */}
-        {showDateFilter && (
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-sm font-medium">Período</label>
+        {/* Parameters Selection */}
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <label className="text-sm font-medium">Parâmetros</label>
+            <div className="flex gap-2">
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setShowDatePicker(!showDatePicker)}
+                onClick={handleSelectAllParameters}
+                disabled={parametersLoading || parameters.length === 0}
               >
-                <CalendarIcon className="h-4 w-4 mr-2" />
-                Filtrar por Data
+                Todos
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleClearParameters}
+                disabled={selectedParameters.length === 0}
+              >
+                Limpar
               </Button>
             </div>
-            
-            {showDatePicker && onDateChange && (
-              <DateFilter onDateChange={onDateChange} />
-            )}
           </div>
-        )}
+          
+          {parametersLoading ? (
+            <p className="text-sm text-gray-500">Carregando parâmetros...</p>
+          ) : parameters.length === 0 ? (
+            <p className="text-sm text-gray-500">Nenhum parâmetro encontrado.</p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 max-h-40 overflow-y-auto">
+              {parameters.map((parameter) => (
+                <div key={parameter.id} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={parameter.code}
+                    checked={selectedParameters.includes(parameter.code)}
+                    onCheckedChange={(checked) => handleParameterChange(parameter.code, checked as boolean)}
+                  />
+                  <label
+                    htmlFor={parameter.code}
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                    title={parameter.description}
+                  >
+                    {parameter.code}
+                  </label>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Date Filter */}
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <label className="text-sm font-medium">Período</label>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowDatePicker(!showDatePicker)}
+            >
+              <CalendarIcon className="h-4 w-4 mr-2" />
+              Filtrar por Data
+            </Button>
+          </div>
+          
+          {showDatePicker && (
+            <DateFilter onDateChange={onDateChange} />
+          )}
+        </div>
       </CardContent>
     </Card>
   );
