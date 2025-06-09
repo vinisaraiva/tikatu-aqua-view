@@ -1,0 +1,143 @@
+
+{
+  "rounds": [
+    {
+      "title": "Início da Jornada",
+      "description": "Você é o gestor ambiental de uma cidade que possui um rio importante. Uma fábrica quer se instalar próximo ao rio. Qual é sua decisão?",
+      "choices": [
+        {
+          "label": "Permitir sem restrições para gerar empregos",
+          "effects": {"pollution": 30, "biodiversity": -20, "economy": 25},
+          "score": -10,
+          "feedback": "A falta de controle ambiental pode causar danos irreversíveis ao ecossistema aquático."
+        },
+        {
+          "label": "Permitir com rigoroso controle ambiental",
+          "effects": {"pollution": 5, "biodiversity": -2, "economy": 20},
+          "score": 15,
+          "feedback": "Excelente! O desenvolvimento sustentável equilibra economia e meio ambiente."
+        },
+        {
+          "label": "Proibir completamente a instalação",
+          "effects": {"pollution": 0, "biodiversity": 5, "economy": -15},
+          "score": 5,
+          "feedback": "Protege o meio ambiente, mas pode limitar o desenvolvimento econômico da região."
+        }
+      ]
+    },
+    {
+      "title": "Tratamento de Esgoto",
+      "description": "A cidade está crescendo e o sistema de esgoto está sobrecarregado. Moradores começam a reclamar do odor do rio. O que fazer?",
+      "choices": [
+        {
+          "label": "Investir em uma nova estação de tratamento moderna",
+          "effects": {"pollution": -25, "biodiversity": 15, "economy": -10},
+          "score": 20,
+          "feedback": "Investimento essencial! O tratamento adequado do esgoto é fundamental para a saúde do rio."
+        },
+        {
+          "label": "Fazer melhorias pontuais no sistema atual",
+          "effects": {"pollution": -10, "biodiversity": 5, "economy": -5},
+          "score": 10,
+          "feedback": "Uma solução temporária que ajuda, mas pode não ser suficiente a longo prazo."
+        },
+        {
+          "label": "Aguardar recursos federais para uma solução completa",
+          "effects": {"pollution": 15, "biodiversity": -10, "economy": 0},
+          "score": -5,
+          "feedback": "A demora pode agravar o problema e causar danos ambientais irreversíveis."
+        }
+      ]
+    },
+    {
+      "title": "Agricultura Sustentável",
+      "description": "Fazendeiros da região usam fertilizantes que escorrem para o rio durante as chuvas, causando eutrofização. Como resolver?",
+      "choices": [
+        {
+          "label": "Proibir o uso de fertilizantes químicos",
+          "effects": {"pollution": -20, "biodiversity": 20, "economy": -20},
+          "score": 10,
+          "feedback": "Protege o rio, mas pode impactar negativamente a produção agrícola local."
+        },
+        {
+          "label": "Promover educação e técnicas sustentáveis",
+          "effects": {"pollution": -15, "biodiversity": 15, "economy": 5},
+          "score": 20,
+          "feedback": "Perfeito! A educação ambiental é a chave para mudanças duradouras e sustentáveis."
+        },
+        {
+          "label": "Criar faixas de proteção ciliar obrigatórias",
+          "effects": {"pollution": -10, "biodiversity": 25, "economy": -5},
+          "score": 15,
+          "feedback": "Ótima estratégia! As matas ciliares filtram poluentes e protegem o curso d'água."
+        }
+      ]
+    },
+    {
+      "title": "Desenvolvimento Urbano",
+      "description": "Um grande shopping center quer se instalar em uma área próxima ao rio que atualmente é um parque. A comunidade está dividida.",
+      "choices": [
+        {
+          "label": "Aprovar o shopping para impulsionar a economia",
+          "effects": {"pollution": 20, "biodiversity": -30, "economy": 30},
+          "score": -10,
+          "feedback": "O desenvolvimento sem planejamento pode causar impermeabilização do solo e aumento do escoamento."
+        },
+        {
+          "label": "Manter o parque e buscar alternativas de desenvolvimento",
+          "effects": {"pollution": 0, "biodiversity": 10, "economy": -10},
+          "score": 15,
+          "feedback": "Proteger áreas verdes urbanas é essencial para a qualidade da água e bem-estar da população."
+        },
+        {
+          "label": "Permitir um desenvolvimento misto com área verde",
+          "effects": {"pollution": 5, "biodiversity": 0, "economy": 15},
+          "score": 10,
+          "feedback": "Uma solução de compromisso que pode funcionar com planejamento adequado."
+        }
+      ]
+    },
+    {
+      "title": "Crise de Poluição",
+      "description": "Um acidente industrial despejou produtos químicos no rio. A água está contaminada e há mortandade de peixes. Ação imediata necessária!",
+      "choices": [
+        {
+          "label": "Minimizar o problema para evitar pânico",
+          "effects": {"pollution": 30, "biodiversity": -40, "economy": 10},
+          "score": -20,
+          "feedback": "Transparência é fundamental! Ocultar informações pode agravar os danos e perder a confiança pública."
+        },
+        {
+          "label": "Mobilizar resposta de emergência imediata",
+          "effects": {"pollution": -15, "biodiversity": -10, "economy": -15},
+          "score": 25,
+          "feedback": "Excelente! Resposta rápida e transparente é essencial em emergências ambientais."
+        },
+        {
+          "label": "Aguardar investigação completa antes de agir",
+          "effects": {"pollution": 25, "biodiversity": -30, "economy": -5},
+          "score": -10,
+          "feedback": "Em emergências ambientais, a ação rápida é crucial para minimizar danos."
+        }
+      ]
+    }
+  ],
+  "finalMessages": {
+    "excellent": {
+      "title": "Rio Saudável! 🌊✨",
+      "message": "Parabéns! Suas decisões resultaram em um rio saudável e uma comunidade próspera. Você demonstrou que desenvolvimento sustentável é possível!"
+    },
+    "good": {
+      "title": "Rio em Equilíbrio 🌿",
+      "message": "Bom trabalho! O rio está em condições razoáveis, mas ainda há espaço para melhorias. Continue buscando o equilíbrio entre desenvolvimento e conservação."
+    },
+    "poor": {
+      "title": "Rio em Risco ⚠️",
+      "message": "Atenção! Suas decisões colocaram o rio em risco. É hora de repensar as estratégias e priorizar a recuperação ambiental."
+    },
+    "critical": {
+      "title": "Rio Degradado 🚨",
+      "message": "Situação crítica! O rio está gravemente degradado. São necessárias ações urgentes de recuperação e mudanças fundamentais na gestão."
+    }
+  }
+}

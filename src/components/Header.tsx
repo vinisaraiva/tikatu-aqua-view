@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -28,6 +29,9 @@ const Header = () => {
             </Link>
             <Link to="/indices" className="text-gray-700 hover:text-teal-600 transition-colors">
               Índices
+            </Link>
+            <Link to="/education" className="text-gray-700 hover:text-teal-600 transition-colors">
+              Educação
             </Link>
             <Link to="/about" className="text-gray-700 hover:text-teal-600 transition-colors">
               Sobre
@@ -69,6 +73,13 @@ const Header = () => {
                 onClick={() => setIsMenuOpen(false)}
               >
                 Índices
+              </Link>
+              <Link 
+                to="/education" 
+                className="text-gray-700 hover:text-teal-600 py-2 transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Educação
               </Link>
               <Link 
                 to="/about" 

@@ -10,6 +10,7 @@ import About from "./pages/About";
 import NewsDetail from "./pages/NewsDetail";
 import AllNews from "./pages/AllNews";
 import Indices from "./pages/Indices";
+import Education from "./pages/Education";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -32,6 +33,7 @@ const App = () => (
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/indices" element={<Indices />} />
           <Route path="/about" element={<About />} />
+          <Route path="/education" element={<Education />} />
           <Route path="/news" element={<AllNews />} />
           <Route path="/news/:id" element={<NewsDetail />} />
           <Route path="*" element={<NotFound />} />
