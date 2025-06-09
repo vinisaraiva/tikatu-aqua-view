@@ -83,7 +83,7 @@ const MapboxMap = ({ selectedPoints, city, river }: MapboxMapProps) => {
   };
 
   // Get center coordinates for the selected city/river
-  const getCenterCoordinates = () => {
+  const getCenterCoordinates = (): [number, number] => {
     if (selectedPointsData.length > 0) {
       // Calculate center from all selected points
       const avgLat = selectedPointsData.reduce((sum, point) => sum + Number(point.latitude), 0) / selectedPointsData.length;
@@ -191,9 +191,10 @@ const MapboxMap = ({ selectedPoints, city, river }: MapboxMapProps) => {
         </div>
       `);
 
-      // Create and add marker
+      // Create and add marker with explicit type casting
+      const coordinates: [number, number] = [Number(point.longitude), Number(point.latitude)];
       const marker = new mapboxgl.Marker(markerElement)
-        .setLngLat([Number(point.longitude), Number(point.latitude)])
+        .setLngLat(coordinates)
         .setPopup(popup)
         .addTo(map.current!);
 
@@ -214,7 +215,8 @@ const MapboxMap = ({ selectedPoints, city, river }: MapboxMapProps) => {
     if (selectedPointsData.length > 0) {
       const bounds = new mapboxgl.LngLatBounds();
       selectedPointsData.forEach(point => {
-        bounds.extend([Number(point.longitude), Number(point.latitude)]);
+        const coordinates: [number, number] = [Number(point.longitude), Number(point.latitude)];
+        bounds.extend(coordinates);
       });
       
       // Add padding and ensure minimum zoom

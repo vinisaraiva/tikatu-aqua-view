@@ -18,6 +18,8 @@ export interface ReadingValue {
     code: string;
     description: string;
     unit: string;
+    conama_min: number | null;
+    conama_max: number | null;
   };
 }
 
@@ -69,7 +71,7 @@ export const useReadingValues = (readingIds: number[]) => {
         .from('reading_values')
         .select(`
           *,
-          parameter:parameters(code, description, unit)
+          parameter:parameters(code, description, unit, conama_min, conama_max)
         `)
         .in('reading_id', readingIds);
       
