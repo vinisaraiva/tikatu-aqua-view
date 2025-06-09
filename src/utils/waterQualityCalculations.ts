@@ -5,42 +5,48 @@ export interface WaterParameters {
   oxygen: number;
   nutrients: number;
   temperature: number;
+  coliforms: number;
+  dbo: number;
+  phosphorus: number;
+  nitrogen: number;
 }
 
 export function calculateIQA(params: WaterParameters): number {
-  // Simplified IQA calculation based on key parameters
-  // Real IQA uses 9 parameters with specific weight factors
-  
+  // Cálculo do IQA baseado em 9 parâmetros com pesos específicos
   const phScore = getPhScore(params.ph);
   const turbidityScore = getTurbidityScore(params.turbidity);
   const oxygenScore = getOxygenScore(params.oxygen);
   const temperatureScore = getTemperatureScore(params.temperature);
+  const coliformsScore = getColiformsScore(params.coliforms);
+  const dboScore = getDboScore(params.dbo);
+  const phosphorusScore = getPhosphorusScore(params.phosphorus);
+  const nitrogenScore = getNitrogenScore(params.nitrogen);
   
-  // Weighted average (simplified)
-  const iqa = (phScore * 0.25 + turbidityScore * 0.25 + oxygenScore * 0.35 + temperatureScore * 0.15);
+  // Pesos dos parâmetros segundo metodologia CETESB
+  const iqa = (
+    phScore * 0.11 + 
+    turbidityScore * 0.08 + 
+    oxygenScore * 0.17 + 
+    temperatureScore * 0.10 + 
+    coliformsScore * 0.15 + 
+    dboScore * 0.10 + 
+    phosphorusScore * 0.10 + 
+    nitrogenScore * 0.10 + 
+    params.nutrients * 0.09
+  );
   
   return Math.round(Math.max(0, Math.min(100, iqa)));
 }
 
-export function calculateIET(nutrients: number, chlorophyll?: number): number {
-  // Simplified IET calculation based on nutrients
-  // Real IET uses phosphorus, chlorophyll-a, and Secchi disk transparency
+export function calculateIET(nutrients: number, phosphorus: number, chlorophyll?: number): number {
+  // Cálculo do IET baseado em fósforo total e nutrientes
+  let ietPhosphorus = 10 * (6.77 + 1.08 * Math.log10(phosphorus));
+  let ietNutrients = 10 * (6.77 + 1.08 * Math.log10(nutrients));
   
-  let iet = 0;
+  // Média dos índices
+  let iet = (ietPhosphorus + ietNutrients) / 2;
   
-  if (nutrients <= 10) {
-    iet = 30; // Oligotrófico
-  } else if (nutrients <= 20) {
-    iet = 45; // Mesotrófico
-  } else if (nutrients <= 35) {
-    iet = 55; // Eutrófico
-  } else if (nutrients <= 50) {
-    iet = 65; // Supereutrófico
-  } else {
-    iet = 75; // Hipereutrófico
-  }
-  
-  return Math.round(iet);
+  return Math.round(Math.max(0, Math.min(100, iet)));
 }
 
 function getPhScore(ph: number): number {
@@ -76,6 +82,42 @@ function getTemperatureScore(temperature: number): number {
   if (temperature >= 10 && temperature < 15) return 60;
   if (temperature > 32 && temperature <= 35) return 60;
   return 30;
+}
+
+function getColiformsScore(coliforms: number): number {
+  if (coliforms <= 1) return 95;
+  if (coliforms <= 10) return 85;
+  if (coliforms <= 100) return 70;
+  if (coliforms <= 1000) return 50;
+  if (coliforms <= 10000) return 30;
+  return 10;
+}
+
+function getDboScore(dbo: number): number {
+  if (dbo <= 1) return 95;
+  if (dbo <= 2) return 85;
+  if (dbo <= 4) return 70;
+  if (dbo <= 8) return 50;
+  if (dbo <= 15) return 30;
+  return 10;
+}
+
+function getPhosphorusScore(phosphorus: number): number {
+  if (phosphorus <= 0.02) return 95;
+  if (phosphorus <= 0.05) return 85;
+  if (phosphorus <= 0.1) return 70;
+  if (phosphorus <= 0.2) return 50;
+  if (phosphorus <= 0.5) return 30;
+  return 10;
+}
+
+function getNitrogenScore(nitrogen: number): number {
+  if (nitrogen <= 0.5) return 95;
+  if (nitrogen <= 1.0) return 85;
+  if (nitrogen <= 2.0) return 70;
+  if (nitrogen <= 5.0) return 50;
+  if (nitrogen <= 10.0) return 30;
+  return 10;
 }
 
 export function getIQAStatus(iqa: number): { status: string; color: string; description: string } {

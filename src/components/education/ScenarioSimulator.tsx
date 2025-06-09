@@ -19,7 +19,11 @@ const ScenarioSimulator = () => {
     turbidity: 10,
     oxygen: 6.5,
     nutrients: 15,
-    temperature: 22
+    temperature: 22,
+    coliforms: 100,
+    dbo: 3,
+    phosphorus: 0.1,
+    nitrogen: 2
   });
 
   const handleParameterChange = (param: keyof WaterParameters, value: number[]) => {
@@ -35,12 +39,16 @@ const ScenarioSimulator = () => {
       turbidity: 10,
       oxygen: 6.5,
       nutrients: 15,
-      temperature: 22
+      temperature: 22,
+      coliforms: 100,
+      dbo: 3,
+      phosphorus: 0.1,
+      nitrogen: 2
     });
   };
 
   const iqa = calculateIQA(parameters);
-  const iet = calculateIET(parameters.nutrients);
+  const iet = calculateIET(parameters.nutrients, parameters.phosphorus);
   const iqaStatus = getIQAStatus(iqa);
   const ietStatus = getIETStatus(iet);
 
@@ -67,6 +75,22 @@ const ScenarioSimulator = () => {
       messages.push("Alta temperatura reduz a capacidade de oxigênio dissolvido");
     }
 
+    if (parameters.coliforms > 1000) {
+      messages.push("Alta concentração de coliformes indica contaminação");
+    }
+
+    if (parameters.dbo > 5) {
+      messages.push("Alta DBO indica poluição orgânica");
+    }
+
+    if (parameters.phosphorus > 0.2) {
+      messages.push("Alto fósforo contribui para eutrofização");
+    }
+
+    if (parameters.nitrogen > 5) {
+      messages.push("Alto nitrogênio pode causar problemas ambientais");
+    }
+
     return messages.length > 0 ? messages.join(". ") : "Todos os parâmetros estão em níveis adequados!";
   };
 
@@ -78,12 +102,12 @@ const ScenarioSimulator = () => {
           Simulador de Cenários - Qualidade da Água
         </CardTitle>
         <p className="text-gray-600">
-          Ajuste os parâmetros e veja como eles afetam a qualidade da água em tempo real
+          Ajuste todos os parâmetros e veja como eles afetam o IQA e IET em tempo real
         </p>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Controles dos Parâmetros */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Controles dos Parâmetros - Parte 1 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div className="space-y-2">
             <label className="text-sm font-medium text-gray-700">
               pH: {parameters.ph.toFixed(1)}
@@ -96,11 +120,7 @@ const ScenarioSimulator = () => {
               step={0.1}
               className="w-full"
             />
-            <div className="flex justify-between text-xs text-gray-500">
-              <span>Ácido (4.0)</span>
-              <span>Neutro (7.0)</span>
-              <span>Alcalino (10.0)</span>
-            </div>
+            <div className="text-xs text-gray-500">Ideal: 6.5-8.5</div>
           </div>
 
           <div className="space-y-2">
@@ -115,16 +135,12 @@ const ScenarioSimulator = () => {
               step={0.5}
               className="w-full"
             />
-            <div className="flex justify-between text-xs text-gray-500">
-              <span>Cristalina (0)</span>
-              <span>Moderada (50)</span>
-              <span>Muito turva (100)</span>
-            </div>
+            <div className="text-xs text-gray-500">Ideal: &lt; 25 NTU</div>
           </div>
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-gray-700">
-              Oxigênio Dissolvido: {parameters.oxygen.toFixed(1)} mg/L
+              Oxigênio: {parameters.oxygen.toFixed(1)} mg/L
             </label>
             <Slider
               value={[parameters.oxygen]}
@@ -134,30 +150,7 @@ const ScenarioSimulator = () => {
               step={0.1}
               className="w-full"
             />
-            <div className="flex justify-between text-xs text-gray-500">
-              <span>Anóxico (0)</span>
-              <span>Adequado (6-8)</span>
-              <span>Saturado (12)</span>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">
-              Nutrientes: {parameters.nutrients.toFixed(1)} mg/L
-            </label>
-            <Slider
-              value={[parameters.nutrients]}
-              onValueChange={(value) => handleParameterChange('nutrients', value)}
-              min={0}
-              max={60}
-              step={0.5}
-              className="w-full"
-            />
-            <div className="flex justify-between text-xs text-gray-500">
-              <span>Baixo (0)</span>
-              <span>Moderado (30)</span>
-              <span>Alto (60)</span>
-            </div>
+            <div className="text-xs text-gray-500">Ideal: &gt; 6 mg/L</div>
           </div>
 
           <div className="space-y-2">
@@ -172,11 +165,82 @@ const ScenarioSimulator = () => {
               step={0.5}
               className="w-full"
             />
-            <div className="flex justify-between text-xs text-gray-500">
-              <span>Frio (5°C)</span>
-              <span>Ideal (20-25°C)</span>
-              <span>Quente (40°C)</span>
-            </div>
+            <div className="text-xs text-gray-500">Ideal: 18-28°C</div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-700">
+              Coliformes: {parameters.coliforms.toFixed(0)} NMP/100mL
+            </label>
+            <Slider
+              value={[parameters.coliforms]}
+              onValueChange={(value) => handleParameterChange('coliforms', value)}
+              min={1}
+              max={10000}
+              step={10}
+              className="w-full"
+            />
+            <div className="text-xs text-gray-500">Ideal: &lt; 1000 NMP/100mL</div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-700">
+              DBO: {parameters.dbo.toFixed(1)} mg/L
+            </label>
+            <Slider
+              value={[parameters.dbo]}
+              onValueChange={(value) => handleParameterChange('dbo', value)}
+              min={0}
+              max={20}
+              step={0.1}
+              className="w-full"
+            />
+            <div className="text-xs text-gray-500">Ideal: &lt; 5 mg/L</div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-700">
+              Fósforo: {parameters.phosphorus.toFixed(3)} mg/L
+            </label>
+            <Slider
+              value={[parameters.phosphorus]}
+              onValueChange={(value) => handleParameterChange('phosphorus', value)}
+              min={0.01}
+              max={1}
+              step={0.01}
+              className="w-full"
+            />
+            <div className="text-xs text-gray-500">Ideal: &lt; 0.1 mg/L</div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-700">
+              Nitrogênio: {parameters.nitrogen.toFixed(1)} mg/L
+            </label>
+            <Slider
+              value={[parameters.nitrogen]}
+              onValueChange={(value) => handleParameterChange('nitrogen', value)}
+              min={0.1}
+              max={15}
+              step={0.1}
+              className="w-full"
+            />
+            <div className="text-xs text-gray-500">Ideal: &lt; 2 mg/L</div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-700">
+              Nutrientes Totais: {parameters.nutrients.toFixed(1)} mg/L
+            </label>
+            <Slider
+              value={[parameters.nutrients]}
+              onValueChange={(value) => handleParameterChange('nutrients', value)}
+              min={0}
+              max={60}
+              step={0.5}
+              className="w-full"
+            />
+            <div className="text-xs text-gray-500">Ideal: &lt; 20 mg/L</div>
           </div>
         </div>
 
@@ -185,7 +249,7 @@ const ScenarioSimulator = () => {
           <Card>
             <CardContent className="pt-6">
               <div className="text-center space-y-2">
-                <h3 className="font-semibold text-gray-700">IQA</h3>
+                <h3 className="font-semibold text-gray-700">IQA - Índice de Qualidade da Água</h3>
                 <div className="text-3xl font-bold text-teal-600">{iqa}</div>
                 <Badge className={iqaStatus.color}>
                   {iqaStatus.status}
@@ -198,7 +262,7 @@ const ScenarioSimulator = () => {
           <Card>
             <CardContent className="pt-6">
               <div className="text-center space-y-2">
-                <h3 className="font-semibold text-gray-700">IET</h3>
+                <h3 className="font-semibold text-gray-700">IET - Índice de Estado Trófico</h3>
                 <div className="text-3xl font-bold text-blue-600">{iet}</div>
                 <Badge className={ietStatus.color}>
                   {ietStatus.status}
@@ -212,7 +276,7 @@ const ScenarioSimulator = () => {
         {/* Mensagem Dinâmica */}
         <Card>
           <CardContent className="pt-6">
-            <h3 className="font-semibold text-gray-700 mb-2">Análise Dinâmica</h3>
+            <h3 className="font-semibold text-gray-700 mb-2">Análise Dinâmica dos Parâmetros</h3>
             <p className="text-gray-600">{getDynamicMessage()}</p>
           </CardContent>
         </Card>
@@ -221,7 +285,7 @@ const ScenarioSimulator = () => {
         <div className="flex justify-center">
           <Button onClick={resetParameters} variant="outline">
             <RotateCcwIcon className="h-4 w-4 mr-2" />
-            Resetar Parâmetros
+            Resetar Todos os Parâmetros
           </Button>
         </div>
       </CardContent>

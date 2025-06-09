@@ -92,8 +92,8 @@ const Education = () => {
                   onClick={() => scrollToSection(section.id)}
                   className={`${
                     activeSection === section.id 
-                      ? "bg-white text-teal-600" 
-                      : "border-white text-white hover:bg-white hover:text-teal-600"
+                      ? "bg-white text-teal-600 hover:bg-gray-100" 
+                      : "border-white text-white bg-transparent hover:bg-white hover:text-teal-600"
                   } transition-colors`}
                 >
                   <Icon className="h-4 w-4 mr-2" />
