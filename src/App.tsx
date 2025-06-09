@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import About from "./pages/About";
 import NewsDetail from "./pages/NewsDetail";
+import AllNews from "./pages/AllNews";
 import Indices from "./pages/Indices";
 import NotFound from "./pages/NotFound";
 
@@ -31,6 +32,7 @@ const App = () => (
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/indices" element={<Indices />} />
           <Route path="/about" element={<About />} />
+          <Route path="/news" element={<AllNews />} />
           <Route path="/news/:id" element={<NewsDetail />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

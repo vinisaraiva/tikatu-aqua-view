@@ -115,10 +115,12 @@ const NewsSection = () => {
             </div>
 
             <div className="text-center">
-              <Button variant="outline" size="lg">
-                Ver todas as notícias
-                <ArrowRightIcon className="ml-2 h-5 w-5" />
-              </Button>
+              <Link to="/news">
+                <Button variant="outline" size="lg">
+                  Ver todas as notícias
+                  <ArrowRightIcon className="ml-2 h-5 w-5" />
+                </Button>
+              </Link>
             </div>
           </>
         )}
