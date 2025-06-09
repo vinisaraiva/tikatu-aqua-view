@@ -35,7 +35,6 @@ const FilterSection = ({
 }: FilterSectionProps) => {
   const [showDateFilter, setShowDateFilter] = useState(false);
   const [showParametersFilter, setShowParametersFilter] = useState(false);
-  const [showPointsFilter, setShowPointsFilter] = useState(false);
 
   // Fetch real data from Supabase
   const { data: cities = [], isLoading: citiesLoading } = useCities();
@@ -128,67 +127,55 @@ const FilterSection = ({
           </div>
         )}
 
-        {/* Points Filter - Collapsible - Show when river is selected */}
+        {/* Points Filter - Show when river is selected */}
         {selectedRiver && (
-          <Collapsible open={showPointsFilter} onOpenChange={setShowPointsFilter}>
-            <div className="flex items-center justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-4">
               <label className="text-sm font-medium">Pontos de Coleta</label>
-              <CollapsibleTrigger asChild>
-                <Button variant="outline" size="sm">
-                  <MapPin className="h-4 w-4 mr-2" />
-                  {showPointsFilter ? 'Ocultar Pontos' : 'Filtrar Pontos'}
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleSelectAllPoints}
+                  disabled={pointsLoading || points.length === 0}
+                >
+                  Todos
                 </Button>
-              </CollapsibleTrigger>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleClearPoints}
+                  disabled={selectedPoints.length === 0}
+                >
+                  Limpar
+                </Button>
+              </div>
             </div>
             
-            <CollapsibleContent className="space-y-4 mt-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Selecionar pontos:</span>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleSelectAllPoints}
-                    disabled={pointsLoading || points.length === 0}
-                  >
-                    Todos
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleClearPoints}
-                    disabled={selectedPoints.length === 0}
-                  >
-                    Limpar
-                  </Button>
-                </div>
+            {pointsLoading ? (
+              <p className="text-sm text-gray-500">Carregando pontos...</p>
+            ) : points.length === 0 ? (
+              <p className="text-sm text-gray-500">Nenhum ponto encontrado para este rio.</p>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-32 overflow-y-auto">
+                {points.map((point) => (
+                  <div key={point.id} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={point.name}
+                      checked={selectedPoints.includes(point.name)}
+                      onCheckedChange={(checked) => handlePointChange(point.name, checked as boolean)}
+                    />
+                    <label
+                      htmlFor={point.name}
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                    >
+                      {point.name}
+                    </label>
+                  </div>
+                ))}
               </div>
-              
-              {pointsLoading ? (
-                <p className="text-sm text-gray-500">Carregando pontos...</p>
-              ) : points.length === 0 ? (
-                <p className="text-sm text-gray-500">Nenhum ponto encontrado para este rio.</p>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-32 overflow-y-auto">
-                  {points.map((point) => (
-                    <div key={point.id} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={point.name}
-                        checked={selectedPoints.includes(point.name)}
-                        onCheckedChange={(checked) => handlePointChange(point.name, checked as boolean)}
-                      />
-                      <label
-                        htmlFor={point.name}
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                      >
-                        {point.name}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CollapsibleContent>
-          </Collapsible>
+            )}
+          </div>
         )}
 
         {/* Parameters Filter - Collapsible */}
