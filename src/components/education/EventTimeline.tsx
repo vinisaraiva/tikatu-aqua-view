@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { CalendarIcon, ScaleIcon, AlertTriangleIcon, AwardIcon, Flask } from "lucide-react";
+import { CalendarIcon, ScaleIcon, AlertTriangleIcon, AwardIcon, TestTube } from "lucide-react";
 import { timelineEvents } from "@/data/events";
 
 const EventTimeline = () => {
@@ -29,7 +29,7 @@ const EventTimeline = () => {
       case 'achievement':
         return <AwardIcon className="h-5 w-5 text-green-600" />;
       case 'discovery':
-        return <Flask className="h-5 w-5 text-purple-600" />;
+        return <TestTube className="h-5 w-5 text-purple-600" />;
       default:
         return <CalendarIcon className="h-5 w-5 text-gray-600" />;
     }

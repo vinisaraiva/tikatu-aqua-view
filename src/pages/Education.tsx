@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
   BookOpenIcon, 
-  Flask, 
+  TestTube, 
   BrainIcon, 
   GamepadIcon, 
   ClockIcon, 
@@ -34,7 +34,7 @@ const Education = () => {
     {
       id: "simulador",
       title: "Simulador de Cenários",
-      icon: Flask,
+      icon: TestTube,
       description: "Veja como parâmetros afetam a qualidade da água",
       component: ScenarioSimulator
     },
