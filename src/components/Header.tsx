@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -11,13 +10,12 @@ const Header = () => {
     <header className="bg-white shadow-sm border-b">
       <div className="max-w-6xl mx-auto px-4">
         <div className="flex justify-between items-center py-4">
-          <Link to="/" className="flex items-center space-x-2">
+          <Link to="/" className="flex items-center">
             <img 
               src="/lovable-uploads/d62bdfd0-6fc8-4075-ac93-580e7557f424.png" 
               alt="Tikatu Logo" 
               className="h-8 w-auto"
             />
-            <span className="text-xl font-bold text-teal-600">Tikatu</span>
           </Link>
 
           {/* Desktop Navigation */}
