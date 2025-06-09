@@ -252,23 +252,25 @@ const FilterSection = ({
                     ) : parameters.length === 0 ? (
                       <p className="text-sm text-gray-500">Nenhum parâmetro encontrado.</p>
                     ) : (
-                      <div className="space-y-2 max-h-40 overflow-y-auto border rounded-md p-3 bg-gray-50">
-                        {parameters.map((parameter) => (
-                          <div key={parameter.id} className="flex items-center space-x-2">
-                            <Checkbox
-                              id={parameter.code}
-                              checked={selectedParameters.includes(parameter.code)}
-                              onCheckedChange={(checked) => handleParameterChange(parameter.code, checked as boolean)}
-                            />
-                            <label
-                              htmlFor={parameter.code}
-                              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                              title={parameter.description}
-                            >
-                              {parameter.code}
-                            </label>
-                          </div>
-                        ))}
+                      <div className="max-h-40 overflow-y-auto border rounded-md p-3 bg-gray-50">
+                        <div className="grid grid-cols-2 gap-2">
+                          {parameters.map((parameter) => (
+                            <div key={parameter.id} className="flex items-center space-x-2">
+                              <Checkbox
+                                id={parameter.code}
+                                checked={selectedParameters.includes(parameter.code)}
+                                onCheckedChange={(checked) => handleParameterChange(parameter.code, checked as boolean)}
+                              />
+                              <label
+                                htmlFor={parameter.code}
+                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                                title={parameter.description}
+                              >
+                                {parameter.code}
+                              </label>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     )}
                   </CollapsibleContent>
