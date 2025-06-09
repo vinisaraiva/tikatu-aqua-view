@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -47,7 +48,7 @@ const FilterSection = ({
   const { data: points = [], isLoading: pointsLoading } = usePoints(selectedRiverData?.id);
   const { data: parameters = [], isLoading: parametersLoading } = useParameters();
 
-  console.log('FilterSection Debug - ANTI-DUPLICATE:', {
+  console.log('FilterSection Debug - VERIFICAÇÃO COMPLETA:', {
     selectedCity,
     selectedRiver,
     selectedCityId: selectedCityData?.id,
@@ -56,29 +57,45 @@ const FilterSection = ({
     pointsLoading,
     availablePoints: points.map(p => ({ id: p.id, name: p.name, river_id: p.river_id })),
     selectedPoints,
-    selectedPointsUnique: [...new Set(selectedPoints)]
+    selectedPointsLength: selectedPoints.length,
+    selectedPointsUnique: [...new Set(selectedPoints)],
+    uniqueLength: [...new Set(selectedPoints)].length,
+    isDuplicated: selectedPoints.length !== [...new Set(selectedPoints)].length
   });
 
   const handlePointChange = (pointName: string, checked: boolean) => {
-    console.log('FilterSection - Point change START:', { pointName, checked, currentSelected: selectedPoints });
+    console.log('FilterSection - Point change START:', { 
+      pointName, 
+      checked, 
+      currentSelected: selectedPoints,
+      currentLength: selectedPoints.length 
+    });
     
-    // Garantir que selectedPoints seja sempre único antes de qualquer operação
+    // CORREÇÃO PRINCIPAL: Sempre garantir que trabalhamos com lista única
     const currentUniquePoints = [...new Set(selectedPoints)];
+    console.log('FilterSection - Current unique points:', currentUniquePoints);
+    
+    let newPoints: string[];
     
     if (checked) {
       // Verificar se o ponto já está selecionado para evitar duplicatas
       if (!currentUniquePoints.includes(pointName)) {
-        const newPoints = [...currentUniquePoints, pointName];
+        newPoints = [...currentUniquePoints, pointName];
         console.log('FilterSection - Adding point, new list:', newPoints);
-        onPointsChange(newPoints);
       } else {
         console.log('FilterSection - Point already selected, ignoring:', pointName);
+        return; // Não fazer nada se já existe
       }
     } else {
-      const newPoints = currentUniquePoints.filter(p => p !== pointName);
+      newPoints = currentUniquePoints.filter(p => p !== pointName);
       console.log('FilterSection - Removing point, new list:', newPoints);
-      onPointsChange(newPoints);
     }
+    
+    // GARANTIR que a nova lista não tem duplicatas antes de passar adiante
+    const finalUniquePoints = [...new Set(newPoints)];
+    console.log('FilterSection - Final unique points to set:', finalUniquePoints);
+    
+    onPointsChange(finalUniquePoints);
   };
 
   const handleParameterChange = (parameterCode: string, checked: boolean) => {
@@ -109,6 +126,9 @@ const FilterSection = ({
   const handleSelectAllParameters = () => {
     onParametersChange(parameters.map(param => param.code));
   };
+
+  // CORREÇÃO: Sempre usar lista única para verificações e exibições
+  const uniqueSelectedPoints = [...new Set(selectedPoints)];
 
   return (
     <div className="mb-6 space-y-6">
@@ -183,7 +203,7 @@ const FilterSection = ({
                 
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">
-                    {[...new Set(selectedPoints)].length} de {points.length} selecionados
+                    {uniqueSelectedPoints.length} de {points.length} selecionados
                   </span>
                   <div className="flex gap-2">
                     <Button
@@ -212,7 +232,7 @@ const FilterSection = ({
                 ) : (
                   <div className="space-y-2 max-h-40 overflow-y-auto border rounded-md p-3 bg-gray-50">
                     {points.map((point) => {
-                      const isChecked = [...new Set(selectedPoints)].includes(point.name);
+                      const isChecked = uniqueSelectedPoints.includes(point.name);
                       return (
                         <div key={point.id} className="flex items-center space-x-2">
                           <Checkbox
