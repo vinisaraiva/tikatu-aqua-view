@@ -10,7 +10,6 @@ import {
   BrainIcon, 
   GamepadIcon, 
   ClockIcon, 
-  EyeIcon,
   ChevronRightIcon 
 } from "lucide-react";
 import GlossaryAccordion from "@/components/education/GlossaryAccordion";
@@ -18,7 +17,6 @@ import ScenarioSimulator from "@/components/education/ScenarioSimulator";
 import EnvironmentalQuiz from "@/components/education/EnvironmentalQuiz";
 import RiverChallenge from "@/components/education/RiverChallenge";
 import EventTimeline from "@/components/education/EventTimeline";
-import CitizenForm from "@/components/education/CitizenForm";
 
 const Education = () => {
   const [activeSection, setActiveSection] = useState("glossario");
@@ -58,13 +56,6 @@ const Education = () => {
       icon: ClockIcon,
       description: "História da gestão de recursos hídricos",
       component: EventTimeline
-    },
-    {
-      id: "citizen",
-      title: "Citizen Science",
-      icon: EyeIcon,
-      description: "Contribua com observações da comunidade",
-      component: CitizenForm
     }
   ];
 
@@ -135,8 +126,8 @@ const Education = () => {
                         <div className="flex items-start gap-3">
                           <Icon className="h-5 w-5 mt-0.5 flex-shrink-0" />
                           <div className="flex-1 min-w-0">
-                            <div className="font-medium">{section.title}</div>
-                            <div className="text-xs opacity-70 mt-1">
+                            <div className="font-medium break-words">{section.title}</div>
+                            <div className="text-xs opacity-70 mt-1 break-words whitespace-normal">
                               {section.description}
                             </div>
                           </div>
@@ -184,10 +175,6 @@ const Education = () => {
             Use o que aprendeu para fazer a diferença em sua comunidade
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
-            <Button size="lg" onClick={() => scrollToSection("citizen")}>
-              <EyeIcon className="h-5 w-5 mr-2" />
-              Faça uma Observação
-            </Button>
             <Button size="lg" variant="outline" onClick={() => scrollToSection("quiz")}>
               <BrainIcon className="h-5 w-5 mr-2" />
               Testar Conhecimentos
