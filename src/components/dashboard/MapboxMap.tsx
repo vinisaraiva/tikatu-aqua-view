@@ -4,13 +4,7 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MapIcon } from 'lucide-react';
-
-interface CollectionPoint {
-  id: string;
-  name: string;
-  lat: number;
-  lng: number;
-}
+import { usePoints } from '@/hooks/useGeographicData';
 
 interface MapboxMapProps {
   selectedPoints: string[];
@@ -25,74 +19,17 @@ const MapboxMap = ({ selectedPoints, city, river }: MapboxMapProps) => {
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
 
-  // Coordinates mapping by city and river with collection points
-  const cityRiverPoints = {
-    'São Paulo': {
-      'Rio Tietê': [
-        { id: 'Ponto SP-TIE-001', name: 'Ponto SP-TIE-001', lat: -23.5505, lng: -46.6333 },
-        { id: 'Ponto SP-TIE-002', name: 'Ponto SP-TIE-002', lat: -23.5515, lng: -46.6343 },
-        { id: 'Ponto SP-TIE-003', name: 'Ponto SP-TIE-003', lat: -23.5525, lng: -46.6353 },
-        { id: 'Ponto SP-TIE-004', name: 'Ponto SP-TIE-004', lat: -23.5535, lng: -46.6363 }
-      ],
-      'Rio Pinheiros': [
-        { id: 'Ponto SP-PIN-001', name: 'Ponto SP-PIN-001', lat: -23.5629, lng: -46.6544 },
-        { id: 'Ponto SP-PIN-002', name: 'Ponto SP-PIN-002', lat: -23.5639, lng: -46.6554 },
-        { id: 'Ponto SP-PIN-003', name: 'Ponto SP-PIN-003', lat: -23.5649, lng: -46.6564 }
-      ],
-      'Rio Tamanduateí': [
-        { id: 'Ponto SP-TAM-001', name: 'Ponto SP-TAM-001', lat: -23.5431, lng: -46.6097 },
-        { id: 'Ponto SP-TAM-002', name: 'Ponto SP-TAM-002', lat: -23.5441, lng: -46.6107 }
-      ]
-    },
-    'Rio de Janeiro': {
-      'Rio Guandu': [
-        { id: 'Ponto RJ-GUA-001', name: 'Ponto RJ-GUA-001', lat: -22.8305, lng: -43.4428 },
-        { id: 'Ponto RJ-GUA-002', name: 'Ponto RJ-GUA-002', lat: -22.8315, lng: -43.4438 },
-        { id: 'Ponto RJ-GUA-003', name: 'Ponto RJ-GUA-003', lat: -22.8325, lng: -43.4448 }
-      ],
-      'Rio Paraíba do Sul': [
-        { id: 'Ponto RJ-PAR-001', name: 'Ponto RJ-PAR-001', lat: -22.5167, lng: -43.1833 },
-        { id: 'Ponto RJ-PAR-002', name: 'Ponto RJ-PAR-002', lat: -22.5177, lng: -43.1843 },
-        { id: 'Ponto RJ-PAR-003', name: 'Ponto RJ-PAR-003', lat: -22.5187, lng: -43.1853 },
-        { id: 'Ponto RJ-PAR-004', name: 'Ponto RJ-PAR-004', lat: -22.5197, lng: -43.1863 },
-        { id: 'Ponto RJ-PAR-005', name: 'Ponto RJ-PAR-005', lat: -22.5207, lng: -43.1873 }
-      ]
-    },
-    'Belo Horizonte': {
-      'Rio das Velhas': [
-        { id: 'Ponto BH-VEL-001', name: 'Ponto BH-VEL-001', lat: -19.9167, lng: -43.9345 },
-        { id: 'Ponto BH-VEL-002', name: 'Ponto BH-VEL-002', lat: -19.9177, lng: -43.9355 },
-        { id: 'Ponto BH-VEL-003', name: 'Ponto BH-VEL-003', lat: -19.9187, lng: -43.9365 }
-      ],
-      'Rio Arrudas': [
-        { id: 'Ponto BH-ARR-001', name: 'Ponto BH-ARR-001', lat: -19.9208, lng: -43.9378 },
-        { id: 'Ponto BH-ARR-002', name: 'Ponto BH-ARR-002', lat: -19.9218, lng: -43.9388 }
-      ]
-    },
-    'Brasília': {
-      'Rio Descoberto': [
-        { id: 'Ponto DF-DES-001', name: 'Ponto DF-DES-001', lat: -15.7975, lng: -48.1297 },
-        { id: 'Ponto DF-DES-002', name: 'Ponto DF-DES-002', lat: -15.7985, lng: -48.1307 },
-        { id: 'Ponto DF-DES-003', name: 'Ponto DF-DES-003', lat: -15.7995, lng: -48.1317 }
-      ],
-      'Rio Paranoá': [
-        { id: 'Ponto DF-PAR-001', name: 'Ponto DF-PAR-001', lat: -15.7801, lng: -47.8069 },
-        { id: 'Ponto DF-PAR-002', name: 'Ponto DF-PAR-002', lat: -15.7811, lng: -47.8079 }
-      ]
-    }
-  };
-
-  // Get collection points for the selected city and river
-  const availablePoints = city && river ? cityRiverPoints[city]?.[river] || [] : [];
+  // Fetch real points data from Supabase
+  const { data: allPoints = [] } = usePoints();
   
   // Filter points based on selected points
-  const selectedPointsData = availablePoints.filter(point => 
-    selectedPoints.includes(point.id)
+  const selectedPointsData = allPoints.filter(point => 
+    selectedPoints.includes(point.name)
   );
 
   console.log('MapboxMap - City:', city, 'River:', river, 'Selected Points:', selectedPoints);
-  console.log('MapboxMap - Available Points:', availablePoints.map(p => p.id));
-  console.log('MapboxMap - Selected Points Data:', selectedPointsData.map(p => p.id));
+  console.log('MapboxMap - Available Points:', allPoints.map(p => p.name));
+  console.log('MapboxMap - Selected Points Data:', selectedPointsData.map(p => p.name));
 
   // Create droplet-style marker element
   const createDropletMarker = () => {
@@ -148,12 +85,15 @@ const MapboxMap = ({ selectedPoints, city, river }: MapboxMapProps) => {
   // Get center coordinates for the selected city/river
   const getCenterCoordinates = () => {
     if (selectedPointsData.length > 0) {
-      // Use the first point as center
-      return [selectedPointsData[0].lng, selectedPointsData[0].lat];
+      // Calculate center from all selected points
+      const avgLat = selectedPointsData.reduce((sum, point) => sum + Number(point.latitude), 0) / selectedPointsData.length;
+      const avgLng = selectedPointsData.reduce((sum, point) => sum + Number(point.longitude), 0) / selectedPointsData.length;
+      return [avgLng, avgLat];
     }
     
-    // Default city centers
-    const cityCenters = {
+    // Default city centers for fallback
+    const cityCenters: { [key: string]: [number, number] } = {
+      'PORTO SEGURO': [-39.05, -16.40],
       'São Paulo': [-46.6333, -23.5505],
       'Rio de Janeiro': [-43.1833, -22.5167],
       'Belo Horizonte': [-43.9345, -19.9167],
@@ -225,7 +165,7 @@ const MapboxMap = ({ selectedPoints, city, river }: MapboxMapProps) => {
   useEffect(() => {
     if (!map.current || !isMapLoaded || selectedPointsData.length === 0) return;
 
-    console.log('Adding markers for points:', selectedPointsData.map(p => p.id));
+    console.log('Adding markers for points:', selectedPointsData.map(p => p.name));
 
     // Clear existing markers
     clearMarkers();
@@ -244,8 +184,8 @@ const MapboxMap = ({ selectedPoints, city, river }: MapboxMapProps) => {
         <div style="padding: 12px; font-size: 14px; min-width: 200px; text-align: center;">
           <strong style="color: #0f172a; display: block; margin-bottom: 8px;">${point.name}</strong>
           <div style="color: #64748b; font-size: 12px;">
-            <div>Lat: ${point.lat.toFixed(4)}</div>
-            <div>Lng: ${point.lng.toFixed(4)}</div>
+            <div>Lat: ${Number(point.latitude).toFixed(4)}</div>
+            <div>Lng: ${Number(point.longitude).toFixed(4)}</div>
             <div style="margin-top: 4px; color: #3b82f6;">${city} - ${river}</div>
           </div>
         </div>
@@ -253,7 +193,7 @@ const MapboxMap = ({ selectedPoints, city, river }: MapboxMapProps) => {
 
       // Create and add marker
       const marker = new mapboxgl.Marker(markerElement)
-        .setLngLat([point.lng, point.lat])
+        .setLngLat([Number(point.longitude), Number(point.latitude)])
         .setPopup(popup)
         .addTo(map.current!);
 
@@ -274,7 +214,7 @@ const MapboxMap = ({ selectedPoints, city, river }: MapboxMapProps) => {
     if (selectedPointsData.length > 0) {
       const bounds = new mapboxgl.LngLatBounds();
       selectedPointsData.forEach(point => {
-        bounds.extend([point.lng, point.lat]);
+        bounds.extend([Number(point.longitude), Number(point.latitude)]);
       });
       
       // Add padding and ensure minimum zoom
@@ -283,7 +223,7 @@ const MapboxMap = ({ selectedPoints, city, river }: MapboxMapProps) => {
         maxZoom: 15
       });
     }
-  }, [selectedPoints, isMapLoaded, city, river]);
+  }, [selectedPoints, isMapLoaded, city, river, selectedPointsData]);
 
   return (
     <Card className="w-full">

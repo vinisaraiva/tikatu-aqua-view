@@ -76,6 +76,6 @@ export const usePoints = (riverId?: number) => {
       if (error) throw error;
       return data || [];
     },
-    enabled: !!riverId
+    enabled: riverId === undefined || !!riverId
   });
 };

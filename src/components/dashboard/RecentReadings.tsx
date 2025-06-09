@@ -1,10 +1,12 @@
-import { useQuery } from '@tanstack/react-query';
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { AlertCircleIcon, CheckCircleIcon, XCircleIcon, LoaderIcon } from 'lucide-react';
 import ReadingsChart from './ReadingsChart';
 import CollectionPointsMap from './CollectionPointsMap';
+import { useReadings, useReadingValues } from '@/hooks/useReadingsData';
+import { usePoints } from '@/hooks/useGeographicData';
 
 interface Reading {
   id: string;
@@ -26,92 +28,61 @@ interface RecentReadingsProps {
 }
 
 const RecentReadings = ({ city, river, points, startDate, endDate }: RecentReadingsProps) => {
-  // Generate mock data for multiple points with date filtering
-  const generateMockReadings = (selectedPoints: string[], filterStartDate?: Date, filterEndDate?: Date): Reading[] => {
-    const parameters = [
-      { name: 'pH', unit: '', range: [6.5, 8.5] },
-      { name: 'Oxigênio Dissolvido', unit: 'mg/L', range: [4, 8] },
-      { name: 'Turbidez', unit: 'NTU', range: [5, 20] },
-      { name: 'Temperatura', unit: '°C', range: [20, 28] },
-    ];
+  // Get point IDs from selected point names
+  const { data: allPoints = [] } = usePoints();
+  const selectedPointsData = allPoints.filter(point => points.includes(point.name));
+  const pointIds = selectedPointsData.map(point => point.id);
 
-    const readings: Reading[] = [];
+  // Fetch real readings data
+  const { data: readings = [], isLoading: readingsLoading, error: readingsError } = useReadings(pointIds, startDate, endDate);
+  
+  // Get reading IDs to fetch parameter values
+  const readingIds = readings.map(reading => reading.id);
+  const { data: readingValues = [], isLoading: valuesLoading } = useReadingValues(readingIds);
+
+  // Transform data for display
+  const transformedReadings: Reading[] = readingValues.map((value) => {
+    const reading = readings.find(r => r.id === value.reading_id);
+    const point = selectedPointsData.find(p => p.id === reading?.point_id);
     
-    // Generate multiple readings per point if date range is specified
-    const generateDatesInRange = () => {
-      const dates = [];
-      if (filterStartDate && filterEndDate) {
-        const start = new Date(filterStartDate);
-        const end = new Date(filterEndDate);
-        const diffTime = Math.abs(end.getTime() - start.getTime());
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        
-        for (let i = 0; i <= Math.min(diffDays, 10); i++) {
-          const date = new Date(start);
-          date.setDate(start.getDate() + i);
-          dates.push(date.toISOString().replace('T', ' ').substring(0, 19));
-        }
-      } else if (filterStartDate && !filterEndDate) {
-        // Single date
-        dates.push(filterStartDate.toISOString().replace('T', ' ').substring(0, 19));
-      } else {
-        // Default to today
-        dates.push('2024-05-29 14:30:00');
+    if (!reading || !point) return null;
+
+    // Determine CONAMA status based on parameter limits
+    let conamaStatus: 'normal' | 'attention' | 'critical' = 'normal';
+    let hasAnomaly = false;
+
+    if (value.parameter) {
+      const { conama_min, conama_max } = value.parameter;
+      
+      if (conama_min !== null && value.value < conama_min) {
+        conamaStatus = 'critical';
+        hasAnomaly = true;
+      } else if (conama_max !== null && value.value > conama_max) {
+        conamaStatus = 'critical';
+        hasAnomaly = true;
+      } else if (conama_min !== null && value.value < conama_min * 1.2) {
+        conamaStatus = 'attention';
+        hasAnomaly = true;
+      } else if (conama_max !== null && value.value > conama_max * 0.8) {
+        conamaStatus = 'attention';
+        hasAnomaly = true;
       }
-      return dates;
+    }
+
+    return {
+      id: `${reading.id}-${value.parameter_id}`,
+      parameter: value.parameter?.description || 'Parâmetro Desconhecido',
+      value: value.value,
+      unit: value.parameter?.unit || '',
+      datetime: reading.measured_at,
+      conamaStatus,
+      hasAnomaly,
+      point: point.name,
     };
+  }).filter(Boolean) as Reading[];
 
-    const dates = generateDatesInRange();
-    
-    selectedPoints.forEach((point, pointIndex) => {
-      dates.forEach((datetime, dateIndex) => {
-        parameters.forEach((param, paramIndex) => {
-          const baseValue = param.range[0] + (param.range[1] - param.range[0]) * Math.random();
-          const value = Math.round(baseValue * 10) / 10;
-          
-          // Determine status based on parameter and value
-          let conamaStatus: 'normal' | 'attention' | 'critical' = 'normal';
-          let hasAnomaly = false;
-          
-          if (param.name === 'pH') {
-            if (value < 6.0 || value > 9.0) conamaStatus = 'critical';
-            else if (value < 6.5 || value > 8.5) conamaStatus = 'attention';
-          } else if (param.name === 'Oxigênio Dissolvido') {
-            if (value < 4) conamaStatus = 'critical';
-            else if (value < 5) conamaStatus = 'attention';
-          } else if (param.name === 'Turbidez') {
-            if (value > 15) conamaStatus = 'critical';
-            else if (value > 10) conamaStatus = 'attention';
-          }
-          
-          if (conamaStatus !== 'normal') hasAnomaly = true;
-          
-          readings.push({
-            id: `${pointIndex}-${dateIndex}-${paramIndex}`,
-            parameter: param.name,
-            value,
-            unit: param.unit,
-            datetime,
-            conamaStatus,
-            hasAnomaly,
-            point,
-          });
-        });
-      });
-    });
-    
-    return readings;
-  };
-
-  const { data: readings, isLoading, error } = useQuery({
-    queryKey: ['monitoring', city, river, points, startDate?.toISOString(), endDate?.toISOString()],
-    queryFn: async () => {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      return generateMockReadings(points, startDate, endDate);
-    },
-    enabled: !!(city && river && points.length > 0),
-  });
+  const isLoading = readingsLoading || valuesLoading;
+  const error = readingsError;
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -185,7 +156,7 @@ const RecentReadings = ({ city, river, points, startDate, endDate }: RecentReadi
     <div className="space-y-6">
       {/* Gráfico e Mapa lado a lado */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        {readings && <ReadingsChart readings={readings} />}
+        <ReadingsChart readings={transformedReadings} />
         <CollectionPointsMap selectedPoints={points} city={city} river={river} />
       </div>
 
@@ -203,6 +174,11 @@ const RecentReadings = ({ city, river, points, startDate, endDate }: RecentReadi
               <LoaderIcon className="h-8 w-8 animate-spin text-teal-600" />
               <span className="ml-2 text-gray-600">Carregando dados...</span>
             </div>
+          ) : transformedReadings.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              <AlertCircleIcon className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+              <p>Nenhuma leitura encontrada para os filtros selecionados</p>
+            </div>
           ) : (
             <div className="overflow-x-auto">
               <Table>
@@ -217,7 +193,7 @@ const RecentReadings = ({ city, river, points, startDate, endDate }: RecentReadi
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {readings?.map((reading) => (
+                  {transformedReadings.map((reading) => (
                     <TableRow key={reading.id}>
                       <TableCell className="font-medium">
                         {reading.point}
