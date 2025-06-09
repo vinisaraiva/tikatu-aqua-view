@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { CalendarIcon } from 'lucide-react';
-import { DateFilter } from './DateFilter';
+import DateFilter from './DateFilter';
 import { useCities, useRivers, usePoints } from '@/hooks/useGeographicData';
 
 interface FilterSectionProps {
