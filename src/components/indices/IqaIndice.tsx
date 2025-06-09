@@ -18,8 +18,11 @@ const IqaIndice = ({ selectedCity, selectedRiver, selectedPoints, startDate, end
   // Remove duplicates from selected points
   const uniqueSelectedPoints = [...new Set(selectedPoints)];
   
+  console.log('=== IQA INDICE DEBUG ===');
   console.log('IqaIndice - Original selected points:', selectedPoints);
   console.log('IqaIndice - Unique selected points:', uniqueSelectedPoints);
+  console.log('IqaIndice - selectedPoints length:', selectedPoints.length);
+  console.log('IqaIndice - uniqueSelectedPoints length:', uniqueSelectedPoints.length);
   
   // Get all points to map names to IDs
   const { data: allPoints = [] } = usePoints();
@@ -28,11 +31,14 @@ const IqaIndice = ({ selectedCity, selectedRiver, selectedPoints, startDate, end
   const selectedPointData = allPoints.filter(point => uniqueSelectedPoints.includes(point.name));
   const pointIds = selectedPointData.map(point => point.id);
   
-  console.log('IqaIndice - Selected point data:', selectedPointData);
+  console.log('IqaIndice - All points available:', allPoints.map(p => p.name));
+  console.log('IqaIndice - Selected point data:', selectedPointData.map(p => ({ id: p.id, name: p.name })));
   console.log('IqaIndice - Point IDs for readings:', pointIds);
   
   // Fetch readings for selected points
   const { data: readings = [], isLoading, error } = useReadings(pointIds, startDate, endDate);
+
+  console.log('IqaIndice - Readings received:', readings.length);
 
   const getIqaColor = (value: number) => {
     if (value >= 80) return 'border-green-400 bg-green-50';
@@ -75,6 +81,11 @@ const IqaIndice = ({ selectedCity, selectedRiver, selectedPoints, startDate, end
     const pointReadingsList = readings.filter(r => r.point_id === point.id);
     const latestReading = pointReadingsList[0]; // readings are ordered by measured_at desc
     
+    console.log(`Point ${point.name} (ID: ${point.id}):`, {
+      readingsCount: pointReadingsList.length,
+      latestIQA: latestReading?.iqa_score
+    });
+    
     return {
       pointId: point.id.toString(),
       pointName: point.name,
@@ -87,6 +98,12 @@ const IqaIndice = ({ selectedCity, selectedRiver, selectedPoints, startDate, end
       coords: { lat: point.latitude, lng: point.longitude }
     };
   });
+
+  console.log('IqaIndice - Final pointReadings:', pointReadings.map(pr => ({ 
+    pointId: pr.pointId, 
+    pointName: pr.pointName, 
+    iqa: pr.iqa 
+  })));
 
   return (
     <div className="space-y-6">
