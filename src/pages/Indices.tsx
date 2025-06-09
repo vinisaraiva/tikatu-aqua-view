@@ -13,6 +13,7 @@ const Indices = () => {
   const [selectedCity, setSelectedCity] = useState('');
   const [selectedRiver, setSelectedRiver] = useState('');
   const [selectedPoints, setSelectedPoints] = useState<string[]>([]);
+  const [selectedParameters, setSelectedParameters] = useState<string[]>([]);
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [endDate, setEndDate] = useState<Date | undefined>();
   const [activeIndex, setActiveIndex] = useState<'iqa' | 'iet' | null>(null);
@@ -86,11 +87,12 @@ const Indices = () => {
             selectedCity={selectedCity}
             selectedRiver={selectedRiver}
             selectedPoints={selectedPoints}
+            selectedParameters={selectedParameters}
             onCityChange={setSelectedCity}
             onRiverChange={setSelectedRiver}
             onPointsChange={setSelectedPoints}
+            onParametersChange={setSelectedParameters}
             onDateChange={handleDateChange}
-            showDateFilter={true}
           />
         )}
 
