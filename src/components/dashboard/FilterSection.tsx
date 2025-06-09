@@ -4,7 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, Filter } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import DateFilter from './DateFilter';
 import { useCities, useRivers, usePoints } from '@/hooks/useGeographicData';
 import { useParameters } from '@/hooks/useReadingsData';
@@ -32,7 +33,8 @@ const FilterSection = ({
   onParametersChange,
   onDateChange,
 }: FilterSectionProps) => {
-  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showDateFilter, setShowDateFilter] = useState(false);
+  const [showParametersFilter, setShowParametersFilter] = useState(false);
 
   // Fetch real data from Supabase
   const { data: cities = [], isLoading: citiesLoading } = useCities();
@@ -176,74 +178,84 @@ const FilterSection = ({
           </div>
         )}
 
-        {/* Parameters Selection */}
-        <div>
-          <div className="flex items-center justify-between mb-2">
+        {/* Parameters Filter - Collapsible */}
+        <Collapsible open={showParametersFilter} onOpenChange={setShowParametersFilter}>
+          <div className="flex items-center justify-between">
             <label className="text-sm font-medium">Parâmetros</label>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleSelectAllParameters}
-                disabled={parametersLoading || parameters.length === 0}
-              >
-                Todos
+            <CollapsibleTrigger asChild>
+              <Button variant="outline" size="sm">
+                <Filter className="h-4 w-4 mr-2" />
+                {showParametersFilter ? 'Ocultar Filtros' : 'Filtrar Parâmetros'}
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleClearParameters}
-                disabled={selectedParameters.length === 0}
-              >
-                Limpar
-              </Button>
-            </div>
+            </CollapsibleTrigger>
           </div>
           
-          {parametersLoading ? (
-            <p className="text-sm text-gray-500">Carregando parâmetros...</p>
-          ) : parameters.length === 0 ? (
-            <p className="text-sm text-gray-500">Nenhum parâmetro encontrado.</p>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 max-h-40 overflow-y-auto">
-              {parameters.map((parameter) => (
-                <div key={parameter.id} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={parameter.code}
-                    checked={selectedParameters.includes(parameter.code)}
-                    onCheckedChange={(checked) => handleParameterChange(parameter.code, checked as boolean)}
-                  />
-                  <label
-                    htmlFor={parameter.code}
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                    title={parameter.description}
-                  >
-                    {parameter.code}
-                  </label>
-                </div>
-              ))}
+          <CollapsibleContent className="space-y-4 mt-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">Selecionar parâmetros:</span>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleSelectAllParameters}
+                  disabled={parametersLoading || parameters.length === 0}
+                >
+                  Todos
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleClearParameters}
+                  disabled={selectedParameters.length === 0}
+                >
+                  Limpar
+                </Button>
+              </div>
             </div>
-          )}
-        </div>
+            
+            {parametersLoading ? (
+              <p className="text-sm text-gray-500">Carregando parâmetros...</p>
+            ) : parameters.length === 0 ? (
+              <p className="text-sm text-gray-500">Nenhum parâmetro encontrado.</p>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 max-h-40 overflow-y-auto">
+                {parameters.map((parameter) => (
+                  <div key={parameter.id} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={parameter.code}
+                      checked={selectedParameters.includes(parameter.code)}
+                      onCheckedChange={(checked) => handleParameterChange(parameter.code, checked as boolean)}
+                    />
+                    <label
+                      htmlFor={parameter.code}
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                      title={parameter.description}
+                    >
+                      {parameter.code}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CollapsibleContent>
+        </Collapsible>
 
-        {/* Date Filter */}
-        <div>
-          <div className="flex items-center justify-between mb-2">
+        {/* Date Filter - Collapsible */}
+        <Collapsible open={showDateFilter} onOpenChange={setShowDateFilter}>
+          <div className="flex items-center justify-between">
             <label className="text-sm font-medium">Período</label>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowDatePicker(!showDatePicker)}
-            >
-              <CalendarIcon className="h-4 w-4 mr-2" />
-              Filtrar por Data
-            </Button>
+            <CollapsibleTrigger asChild>
+              <Button variant="outline" size="sm">
+                <CalendarIcon className="h-4 w-4 mr-2" />
+                {showDateFilter ? 'Ocultar Filtro' : 'Filtrar por Data'}
+              </Button>
+            </CollapsibleTrigger>
           </div>
           
-          {showDatePicker && (
+          <CollapsibleContent className="mt-4">
             <DateFilter onDateChange={onDateChange} />
-          )}
-        </div>
+          </CollapsibleContent>
+        </Collapsible>
       </CardContent>
     </Card>
   );
