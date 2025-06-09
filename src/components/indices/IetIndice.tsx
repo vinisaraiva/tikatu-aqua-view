@@ -15,14 +15,13 @@ interface IetIndiceProps {
 }
 
 const IetIndice = ({ selectedCity, selectedRiver, selectedPoints, startDate, endDate }: IetIndiceProps) => {
-  // Remove duplicates from selected points
+  // CORREÇÃO: Limpar duplicatas logo no início e adicionar logs detalhados
   const uniqueSelectedPoints = [...new Set(selectedPoints)];
   
-  console.log('=== IET INDICE DEBUG ===');
-  console.log('IetIndice - Original selected points:', selectedPoints);
-  console.log('IetIndice - Unique selected points:', uniqueSelectedPoints);
-  console.log('IetIndice - selectedPoints length:', selectedPoints.length);
-  console.log('IetIndice - uniqueSelectedPoints length:', uniqueSelectedPoints.length);
+  console.log('=== IET INDICE DEBUG - ANTI-DUPLICATA ===');
+  console.log('IetIndice - Pontos recebidos (ORIGINAL):', selectedPoints);
+  console.log('IetIndice - Pontos únicos (LIMPOS):', uniqueSelectedPoints);
+  console.log('IetIndice - Quantidade original vs limpa:', selectedPoints.length, 'vs', uniqueSelectedPoints.length);
   
   // Get all points to map names to IDs
   const { data: allPoints = [] } = usePoints();
@@ -31,14 +30,13 @@ const IetIndice = ({ selectedCity, selectedRiver, selectedPoints, startDate, end
   const selectedPointData = allPoints.filter(point => uniqueSelectedPoints.includes(point.name));
   const pointIds = selectedPointData.map(point => point.id);
   
-  console.log('IetIndice - All points available:', allPoints.map(p => p.name));
-  console.log('IetIndice - Selected point data:', selectedPointData.map(p => ({ id: p.id, name: p.name })));
-  console.log('IetIndice - Point IDs for readings:', pointIds);
+  console.log('IetIndice - Dados dos pontos selecionados:', selectedPointData.map(p => ({ id: p.id, name: p.name, river_id: p.river_id })));
+  console.log('IetIndice - IDs para buscar leituras:', pointIds);
   
   // Fetch readings for selected points
   const { data: readings = [], isLoading, error } = useReadings(pointIds, startDate, endDate);
 
-  console.log('IetIndice - Readings received:', readings.length);
+  console.log('IetIndice - Leituras recebidas:', readings.length);
 
   const getIetColor = (value: number) => {
     if (value <= 20) return 'border-blue-400 bg-blue-50';
@@ -99,7 +97,7 @@ const IetIndice = ({ selectedCity, selectedRiver, selectedPoints, startDate, end
     };
   });
 
-  console.log('IetIndice - Final pointReadings:', pointReadings.map(pr => ({ 
+  console.log('IetIndice - Dados finais dos pontos:', pointReadings.map(pr => ({ 
     pointId: pr.pointId, 
     pointName: pr.pointName, 
     iet: pr.iet 

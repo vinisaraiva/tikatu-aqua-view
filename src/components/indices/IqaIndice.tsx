@@ -15,14 +15,13 @@ interface IqaIndiceProps {
 }
 
 const IqaIndice = ({ selectedCity, selectedRiver, selectedPoints, startDate, endDate }: IqaIndiceProps) => {
-  // Remove duplicates from selected points
+  // CORREÇÃO: Limpar duplicatas logo no início e adicionar logs detalhados
   const uniqueSelectedPoints = [...new Set(selectedPoints)];
   
-  console.log('=== IQA INDICE DEBUG ===');
-  console.log('IqaIndice - Original selected points:', selectedPoints);
-  console.log('IqaIndice - Unique selected points:', uniqueSelectedPoints);
-  console.log('IqaIndice - selectedPoints length:', selectedPoints.length);
-  console.log('IqaIndice - uniqueSelectedPoints length:', uniqueSelectedPoints.length);
+  console.log('=== IQA INDICE DEBUG - ANTI-DUPLICATA ===');
+  console.log('IqaIndice - Pontos recebidos (ORIGINAL):', selectedPoints);
+  console.log('IqaIndice - Pontos únicos (LIMPOS):', uniqueSelectedPoints);
+  console.log('IqaIndice - Quantidade original vs limpa:', selectedPoints.length, 'vs', uniqueSelectedPoints.length);
   
   // Get all points to map names to IDs
   const { data: allPoints = [] } = usePoints();
@@ -31,14 +30,13 @@ const IqaIndice = ({ selectedCity, selectedRiver, selectedPoints, startDate, end
   const selectedPointData = allPoints.filter(point => uniqueSelectedPoints.includes(point.name));
   const pointIds = selectedPointData.map(point => point.id);
   
-  console.log('IqaIndice - All points available:', allPoints.map(p => p.name));
-  console.log('IqaIndice - Selected point data:', selectedPointData.map(p => ({ id: p.id, name: p.name })));
-  console.log('IqaIndice - Point IDs for readings:', pointIds);
+  console.log('IqaIndice - Dados dos pontos selecionados:', selectedPointData.map(p => ({ id: p.id, name: p.name, river_id: p.river_id })));
+  console.log('IqaIndice - IDs para buscar leituras:', pointIds);
   
   // Fetch readings for selected points
   const { data: readings = [], isLoading, error } = useReadings(pointIds, startDate, endDate);
 
-  console.log('IqaIndice - Readings received:', readings.length);
+  console.log('IqaIndice - Leituras recebidas:', readings.length);
 
   const getIqaColor = (value: number) => {
     if (value >= 80) return 'border-green-400 bg-green-50';
@@ -99,7 +97,7 @@ const IqaIndice = ({ selectedCity, selectedRiver, selectedPoints, startDate, end
     };
   });
 
-  console.log('IqaIndice - Final pointReadings:', pointReadings.map(pr => ({ 
+  console.log('IqaIndice - Dados finais dos pontos:', pointReadings.map(pr => ({ 
     pointId: pr.pointId, 
     pointName: pr.pointName, 
     iqa: pr.iqa 
