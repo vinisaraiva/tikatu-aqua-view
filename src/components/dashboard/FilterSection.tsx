@@ -145,145 +145,139 @@ const FilterSection = ({
               <DateFilter onDateChange={onDateChange} />
             </CollapsibleContent>
           </Collapsible>
-        </CardContent>
-      </Card>
 
-      {/* Points and Parameters Filter Cards - Side by Side */}
-      {selectedRiver && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Points Filter Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <MapPin className="h-5 w-5" />
-                Pontos de Coleta
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-sm text-gray-600">
-                  {selectedPoints.length} de {points.length} selecionados
-                </span>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleSelectAllPoints}
-                    disabled={pointsLoading || points.length === 0}
-                  >
-                    Todos
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleClearPoints}
-                    disabled={selectedPoints.length === 0}
-                  >
-                    Limpar
-                  </Button>
-                </div>
-              </div>
-              
-              {pointsLoading ? (
-                <p className="text-sm text-gray-500">Carregando pontos...</p>
-              ) : points.length === 0 ? (
-                <p className="text-sm text-gray-500">Nenhum ponto encontrado para este rio.</p>
-              ) : (
-                <div className="space-y-2 max-h-40 overflow-y-auto">
-                  {points.map((point) => (
-                    <div key={point.id} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={point.name}
-                        checked={selectedPoints.includes(point.name)}
-                        onCheckedChange={(checked) => handlePointChange(point.name, checked as boolean)}
-                      />
-                      <label
-                        htmlFor={point.name}
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                      >
-                        {point.name}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Parameters Filter Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Filter className="h-5 w-5" />
-                Parâmetros
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Collapsible open={showParametersFilter} onOpenChange={setShowParametersFilter}>
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-sm text-gray-600">
-                    {showParametersFilter ? `${selectedParameters.length} de ${parameters.length} selecionados` : 'Filtros avançados'}
-                  </span>
-                  <CollapsibleTrigger asChild>
-                    <Button variant="outline" size="sm">
-                      {showParametersFilter ? 'Ocultar' : 'Mostrar'}
-                    </Button>
-                  </CollapsibleTrigger>
+          {/* Points and Parameters Filter - Side by Side within Main Card */}
+          {selectedRiver && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4 border-t">
+              {/* Points Filter Section */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <MapPin className="h-5 w-5" />
+                  <h3 className="text-lg font-semibold">Pontos de Coleta</h3>
                 </div>
                 
-                <CollapsibleContent className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">
+                    {selectedPoints.length} de {points.length} selecionados
+                  </span>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleSelectAllPoints}
+                      disabled={pointsLoading || points.length === 0}
+                    >
+                      Todos
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleClearPoints}
+                      disabled={selectedPoints.length === 0}
+                    >
+                      Limpar
+                    </Button>
+                  </div>
+                </div>
+                
+                {pointsLoading ? (
+                  <p className="text-sm text-gray-500">Carregando pontos...</p>
+                ) : points.length === 0 ? (
+                  <p className="text-sm text-gray-500">Nenhum ponto encontrado para este rio.</p>
+                ) : (
+                  <div className="space-y-2 max-h-40 overflow-y-auto border rounded-md p-3 bg-gray-50">
+                    {points.map((point) => (
+                      <div key={point.id} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={point.name}
+                          checked={selectedPoints.includes(point.name)}
+                          onCheckedChange={(checked) => handlePointChange(point.name, checked as boolean)}
+                        />
+                        <label
+                          htmlFor={point.name}
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                        >
+                          {point.name}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Parameters Filter Section */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <Filter className="h-5 w-5" />
+                  <h3 className="text-lg font-semibold">Parâmetros</h3>
+                </div>
+
+                <Collapsible open={showParametersFilter} onOpenChange={setShowParametersFilter}>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Selecionar parâmetros:</span>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={handleSelectAllParameters}
-                        disabled={parametersLoading || parameters.length === 0}
-                      >
-                        Todos
+                    <span className="text-sm text-gray-600">
+                      {showParametersFilter ? `${selectedParameters.length} de ${parameters.length} selecionados` : 'Filtros avançados'}
+                    </span>
+                    <CollapsibleTrigger asChild>
+                      <Button variant="outline" size="sm">
+                        {showParametersFilter ? 'Ocultar' : 'Mostrar'}
                       </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={handleClearParameters}
-                        disabled={selectedParameters.length === 0}
-                      >
-                        Limpar
-                      </Button>
-                    </div>
+                    </CollapsibleTrigger>
                   </div>
                   
-                  {parametersLoading ? (
-                    <p className="text-sm text-gray-500">Carregando parâmetros...</p>
-                  ) : parameters.length === 0 ? (
-                    <p className="text-sm text-gray-500">Nenhum parâmetro encontrado.</p>
-                  ) : (
-                    <div className="space-y-2 max-h-40 overflow-y-auto">
-                      {parameters.map((parameter) => (
-                        <div key={parameter.id} className="flex items-center space-x-2">
-                          <Checkbox
-                            id={parameter.code}
-                            checked={selectedParameters.includes(parameter.code)}
-                            onCheckedChange={(checked) => handleParameterChange(parameter.code, checked as boolean)}
-                          />
-                          <label
-                            htmlFor={parameter.code}
-                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                            title={parameter.description}
-                          >
-                            {parameter.code}
-                          </label>
-                        </div>
-                      ))}
+                  <CollapsibleContent className="space-y-4 mt-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600">Selecionar parâmetros:</span>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={handleSelectAllParameters}
+                          disabled={parametersLoading || parameters.length === 0}
+                        >
+                          Todos
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={handleClearParameters}
+                          disabled={selectedParameters.length === 0}
+                        >
+                          Limpar
+                        </Button>
+                      </div>
                     </div>
-                  )}
-                </CollapsibleContent>
-              </Collapsible>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+                    
+                    {parametersLoading ? (
+                      <p className="text-sm text-gray-500">Carregando parâmetros...</p>
+                    ) : parameters.length === 0 ? (
+                      <p className="text-sm text-gray-500">Nenhum parâmetro encontrado.</p>
+                    ) : (
+                      <div className="space-y-2 max-h-40 overflow-y-auto border rounded-md p-3 bg-gray-50">
+                        {parameters.map((parameter) => (
+                          <div key={parameter.id} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={parameter.code}
+                              checked={selectedParameters.includes(parameter.code)}
+                              onCheckedChange={(checked) => handleParameterChange(parameter.code, checked as boolean)}
+                            />
+                            <label
+                              htmlFor={parameter.code}
+                              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                              title={parameter.description}
+                            >
+                              {parameter.code}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </CollapsibleContent>
+                </Collapsible>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };
