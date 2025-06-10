@@ -42,14 +42,14 @@ const NewsSection = () => {
         <div className="mb-12">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <p className="text-teal-600 text-sm font-medium mb-2">Read Our Latest</p>
+              <p className="text-teal-600 text-sm font-medium mb-2">Leia as Últimas</p>
               <h2 className="text-4xl font-bold text-gray-900">
-                News & Articles
+                Em Destaque
               </h2>
             </div>
             <Link to="/news">
               <Button variant="outline" className="bg-green-600 text-white border-green-600 hover:bg-green-700">
-                VIEW MORE NEWS
+                VER MAIS NOTÍCIAS
               </Button>
             </Link>
           </div>
@@ -132,7 +132,7 @@ const NewsSection = () => {
                           {article.summary}
                         </p>
                         <Button variant="ghost" size="sm" className="p-0 h-auto text-teal-600 hover:text-teal-700 mt-2">
-                          READ MORE
+                          LEIA MAIS
                         </Button>
                       </div>
                     </div>
