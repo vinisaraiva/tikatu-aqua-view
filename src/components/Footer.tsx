@@ -1,6 +1,4 @@
 
-import ProgramLogo from './ProgramLogo';
-
 const Footer = () => {
   return (
     <footer className="bg-gray-900 text-white py-12">
@@ -38,18 +36,28 @@ const Footer = () => {
           <div>
             <h3 className="font-semibold mb-4">Programas de Pós-Graduação</h3>
             <div className="space-y-4">
-              <ProgramLogo
-                src="/lovable-uploads/f92e4bde-3d5e-4274-8d75-1859012aca2f.png"
-                alt="PPGCTA IFBA/UFSB"
-                title="Mestrado em"
-                subtitle="Ciências Ambientais"
-              />
-              <ProgramLogo
-                src="/lovable-uploads/76fd71ac-b435-4850-b3af-208f6e3685e6.png"
-                alt="PPG Biossistemas"
-                title="Doutorado em"
-                subtitle="Biossistemas"
-              />
+              <div className="flex items-center space-x-3">
+                <img 
+                  src="/lovable-uploads/f92e4bde-3d5e-4274-8d75-1859012aca2f.png" 
+                  alt="PPGCTA IFBA/UFSB" 
+                  className="h-12 w-auto"
+                />
+                <div className="text-xs text-gray-400">
+                  <p>Mestrado em</p>
+                  <p>Ciências Ambientais</p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-3">
+                <img 
+                  src="/lovable-uploads/76fd71ac-b435-4850-b3af-208f6e3685e6.png" 
+                  alt="PPG Biossistemas" 
+                  className="h-12 w-auto"
+                />
+                <div className="text-xs text-gray-400">
+                  <p>Doutorado em</p>
+                  <p>Biossistemas</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
