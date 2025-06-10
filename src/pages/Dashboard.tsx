@@ -77,6 +77,17 @@ const Dashboard = () => {
           onDateChange={handleDateChange}
         />
 
+        {/* Map Section - Único mapa compartilhado */}
+        {selectedCity && selectedRiver && selectedPoints.length > 0 && (
+          <div className="mb-6">
+            <CollectionPointsMap 
+              selectedPoints={selectedPoints}
+              city={selectedCity}
+              river={selectedRiver}
+            />
+          </div>
+        )}
+
         {/* Main Content */}
         <Tabs defaultValue="readings" className="space-y-6">
           <TabsList className="grid w-full lg:w-auto grid-cols-2">
@@ -93,44 +104,6 @@ const Dashboard = () => {
               startDate={startDate}
               endDate={endDate}
             />
-            
-            {/* Map Section */}
-            {selectedCity && selectedRiver && selectedPoints.length > 0 && (
-              <CollectionPointsMap 
-                selectedPoints={selectedPoints}
-                city={selectedCity}
-                river={selectedRiver}
-              />
-            )}
-            
-            {/* Generate Report Button */}
-            <div className="flex justify-center pt-4">
-              <Dialog open={isReportModalOpen} onOpenChange={setIsReportModalOpen}>
-                <DialogTrigger asChild>
-                  <Button 
-                    size="lg" 
-                    className="flex items-center gap-2"
-                    disabled={!selectedCity || !selectedRiver || selectedPoints.length === 0}
-                  >
-                    <FileTextIcon className="h-5 w-5" />
-                    Gerar Relatório
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-                  <DialogHeader>
-                    <DialogTitle>Relatório de Qualidade da Água</DialogTitle>
-                  </DialogHeader>
-                  <ReportSection 
-                    city={selectedCity}
-                    river={selectedRiver}
-                    points={selectedPoints}
-                    parameters={selectedParameters}
-                    startDate={startDate}
-                    endDate={endDate}
-                  />
-                </DialogContent>
-              </Dialog>
-            </div>
           </TabsContent>
 
           <TabsContent value="anomalies" className="space-y-6">
@@ -142,46 +115,37 @@ const Dashboard = () => {
               startDate={startDate}
               endDate={endDate}
             />
-            
-            {/* Map Section */}
-            {selectedCity && selectedRiver && selectedPoints.length > 0 && (
-              <CollectionPointsMap 
-                selectedPoints={selectedPoints}
-                city={selectedCity}
-                river={selectedRiver}
-              />
-            )}
-            
-            {/* Generate Report Button */}
-            <div className="flex justify-center pt-4">
-              <Dialog open={isReportModalOpen} onOpenChange={setIsReportModalOpen}>
-                <DialogTrigger asChild>
-                  <Button 
-                    size="lg" 
-                    className="flex items-center gap-2"
-                    disabled={!selectedCity || !selectedRiver || selectedPoints.length === 0}
-                  >
-                    <FileTextIcon className="h-5 w-5" />
-                    Gerar Relatório
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-                  <DialogHeader>
-                    <DialogTitle>Relatório de Qualidade da Água</DialogTitle>
-                  </DialogHeader>
-                  <ReportSection 
-                    city={selectedCity}
-                    river={selectedRiver}
-                    points={selectedPoints}
-                    parameters={selectedParameters}
-                    startDate={startDate}
-                    endDate={endDate}
-                  />
-                </DialogContent>
-              </Dialog>
-            </div>
           </TabsContent>
         </Tabs>
+
+        {/* Generate Report Button */}
+        <div className="flex justify-center pt-6">
+          <Dialog open={isReportModalOpen} onOpenChange={setIsReportModalOpen}>
+            <DialogTrigger asChild>
+              <Button 
+                size="lg" 
+                className="flex items-center gap-2"
+                disabled={!selectedCity || !selectedRiver || selectedPoints.length === 0}
+              >
+                <FileTextIcon className="h-5 w-5" />
+                Gerar Relatório
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Relatório de Qualidade da Água</DialogTitle>
+              </DialogHeader>
+              <ReportSection 
+                city={selectedCity}
+                river={selectedRiver}
+                points={selectedPoints}
+                parameters={selectedParameters}
+                startDate={startDate}
+                endDate={endDate}
+              />
+            </DialogContent>
+          </Dialog>
+        </div>
       </main>
 
       <Footer />
