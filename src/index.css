@@ -1,103 +1,87 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 248 250 252;
-    --foreground: 15 23 42;
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
 
-    --card: 255 255 255;
-    --card-foreground: 15 23 42;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
 
-    --popover: 255 255 255;
-    --popover-foreground: 15 23 42;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 6 78 59;
-    --primary-foreground: 240 253 250;
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
 
-    --secondary: 240 249 255;
-    --secondary-foreground: 12 74 110;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
 
-    --muted: 248 250 252;
-    --muted-foreground: 100 116 139;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 236 254 255;
-    --accent-foreground: 8 51 68;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
 
-    --destructive: 220 38 38;
-    --destructive-foreground: 248 250 252;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
 
-    --border: 226 232 240;
-    --input: 226 232 240;
-    --ring: 6 78 59;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
 
-    --radius: 12px;
+    --radius: 0.5rem;
 
-    --sidebar-background: 248 250 252;
-    --sidebar-foreground: 51 65 85;
-    --sidebar-primary: 6 78 59;
-    --sidebar-primary-foreground: 240 253 250;
-    --sidebar-accent: 240 249 255;
-    --sidebar-accent-foreground: 51 65 85;
-    --sidebar-border: 226 232 240;
-    --sidebar-ring: 6 78 59;
-
-    /* Professional water-themed colors */
-    --water-primary: 6 78 59;      /* Dark teal */
-    --water-secondary: 20 184 166; /* Bright teal */
-    --water-accent: 59 130 246;    /* Professional blue */
-    --water-neutral: 71 85 105;    /* Slate */
-    --water-light: 148 163 184;    /* Light slate */
-    --water-surface: 240 253 250;  /* Very light teal */
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
   .dark {
-    --background: 2 6 23;
-    --foreground: 248 250 252;
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
 
-    --card: 3 7 18;
-    --card-foreground: 248 250 252;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
 
-    --popover: 3 7 18;
-    --popover-foreground: 248 250 252;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
 
-    --primary: 45 212 191;
-    --primary-foreground: 3 7 18;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
 
-    --secondary: 15 23 42;
-    --secondary-foreground: 248 250 252;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
 
-    --muted: 15 23 42;
-    --muted-foreground: 148 163 184;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 15 23 42;
-    --accent-foreground: 248 250 252;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
 
-    --destructive: 220 38 38;
-    --destructive-foreground: 248 250 252;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
 
-    --border: 30 41 59;
-    --input: 30 41 59;
-    --ring: 45 212 191;
-
-    --sidebar-background: 2 6 23;
-    --sidebar-foreground: 203 213 225;
-    --sidebar-primary: 45 212 191;
-    --sidebar-primary-foreground: 3 7 18;
-    --sidebar-accent: 15 23 42;
-    --sidebar-accent-foreground: 248 250 252;
-    --sidebar-border: 30 41 59;
-    --sidebar-ring: 45 212 191;
-
-    /* Dark mode water colors */
-    --water-primary: 45 212 191;
-    --water-secondary: 34 211 238;
-    --water-accent: 56 189 248;
-    --water-neutral: 148 163 184;
-    --water-light: 100 116 139;
-    --water-surface: 15 23 42;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
 
@@ -107,102 +91,37 @@
   }
 
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-background text-foreground;
     font-family: 'Inter', sans-serif;
-    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
-  }
-
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-semibold tracking-tight;
   }
 }
 
 @layer components {
   .prose {
-    @apply text-slate-700 leading-relaxed;
+    @apply text-gray-700;
   }
   
   .prose h1 {
-    @apply text-3xl font-bold text-slate-900 mb-6 tracking-tight;
+    @apply text-3xl font-bold text-gray-900 mb-4;
   }
   
   .prose h2 {
-    @apply text-2xl font-semibold text-slate-900 mb-4 mt-8 tracking-tight;
+    @apply text-2xl font-semibold text-gray-900 mb-3 mt-6;
   }
   
   .prose h3 {
-    @apply text-xl font-semibold text-slate-900 mb-3 mt-6 tracking-tight;
+    @apply text-xl font-semibold text-gray-900 mb-2 mt-4;
   }
   
   .prose p {
-    @apply mb-4 leading-7 text-slate-600;
+    @apply mb-4 leading-relaxed;
   }
   
   .prose ul {
-    @apply mb-4 ml-6 list-disc space-y-1;
+    @apply mb-4 ml-6 list-disc;
   }
   
   .prose li {
-    @apply text-slate-600;
+    @apply mb-1;
   }
-
-  /* Professional water-themed utilities */
-  .water-gradient {
-    @apply bg-gradient-to-br from-blue-600 via-cyan-600 to-teal-600;
-  }
-  
-  .water-gradient-subtle {
-    @apply bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50;
-  }
-  
-  .water-card {
-    @apply bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200;
-  }
-  
-  .water-button-primary {
-    @apply bg-cyan-600 hover:bg-cyan-700 text-white font-medium px-6 py-3 rounded-lg shadow-sm hover:shadow-md transition-all duration-200;
-  }
-  
-  .water-button-secondary {
-    @apply bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-medium px-6 py-3 rounded-lg shadow-sm hover:shadow-md transition-all duration-200;
-  }
-
-  .professional-header {
-    @apply bg-white/95 backdrop-blur-sm border-b border-slate-200/50 shadow-sm;
-  }
-
-  .hero-professional {
-    @apply bg-gradient-to-br from-slate-900 via-blue-900 to-cyan-900;
-  }
-}
-
-/* Enhanced animations for professional feel */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideInFromLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.animate-fade-in-up {
-  animation: fadeInUp 0.6s ease-out;
-}
-
-.animate-slide-in-left {
-  animation: slideInFromLeft 0.5s ease-out;
 }
