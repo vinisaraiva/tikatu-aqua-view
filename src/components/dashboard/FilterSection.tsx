@@ -35,7 +35,7 @@ const FilterSection = ({
   showParametersFilter = true,
 }: FilterSectionProps) => {
   const [showDateFilter, setShowDateFilter] = useState(false);
-  const [showParametersFilterCollapsed, setShowParametersFilterCollapsed] = useState(false);
+  const [showParametersFilterCollapsed, setShowParametersFilterCollapsed] = useState(true); // Changed to true to show by default
   const [previousRiver, setPreviousRiver] = useState(selectedRiver);
 
   // Fetch real data from Supabase
@@ -289,7 +289,7 @@ const FilterSection = ({
                       </span>
                       <CollapsibleTrigger asChild>
                         <Button variant="outline" size="sm">
-                          {showParametersFilter ? 'Ocultar' : 'Mostrar'}
+                          {showParametersFilterCollapsed ? 'Ocultar' : 'Mostrar'}
                         </Button>
                       </CollapsibleTrigger>
                     </div>
@@ -356,3 +356,5 @@ const FilterSection = ({
 };
 
 export default FilterSection;
+
+</edits_to_apply>
