@@ -2,6 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { DownloadIcon, FileTextIcon, AlertCircleIcon } from 'lucide-react';
+import jsPDF from 'jspdf';
 
 interface ReportSectionProps {
   city: string;
@@ -13,9 +14,76 @@ interface ReportSectionProps {
 }
 
 const ReportSection = ({ city, river, points, parameters, startDate, endDate }: ReportSectionProps) => {
-  const generateReport = () => {
-    // Mock report generation
-    console.log('Generating report with filters:', {
+  const generatePdfReport = () => {
+    console.log('Generating PDF report with filters:', {
+      city,
+      river,
+      points,
+      parameters,
+      startDate,
+      endDate
+    });
+
+    try {
+      const doc = new jsPDF();
+      
+      // Título do relatório
+      doc.setFontSize(20);
+      doc.text('Relatório de Qualidade da Água', 20, 30);
+      
+      // Informações básicas
+      doc.setFontSize(12);
+      doc.text(`Cidade: ${city}`, 20, 50);
+      doc.text(`Rio: ${river}`, 20, 60);
+      doc.text(`Pontos de Coleta: ${points.join(', ')}`, 20, 70);
+      
+      const dateRangeText = getDateRangeText();
+      doc.text(`Período: ${dateRangeText}`, 20, 80);
+      
+      const parametersText = getParametersText();
+      doc.text(`Parâmetros: ${parametersText}`, 20, 90);
+      
+      // Seções do relatório
+      doc.setFontSize(14);
+      doc.text('Resumo Executivo', 20, 110);
+      doc.setFontSize(10);
+      doc.text('Análise geral da qualidade da água nos pontos selecionados.', 20, 120);
+      doc.text('Este relatório apresenta os dados coletados e uma avaliação', 20, 130);
+      doc.text('da qualidade da água baseada nos parâmetros monitorados.', 20, 140);
+      
+      doc.setFontSize(14);
+      doc.text('Dados Técnicos', 20, 160);
+      doc.setFontSize(10);
+      doc.text('Tabelas detalhadas com todos os parâmetros medidos:', 20, 170);
+      doc.text('- pH, Turbidez, Oxigênio Dissolvido', 20, 180);
+      doc.text('- Temperatura, Coliformes Fecais', 20, 190);
+      doc.text('- DBO, Fósforo Total, Nitrogênio Total', 20, 200);
+      
+      doc.setFontSize(14);
+      doc.text('Recomendações', 20, 220);
+      doc.setFontSize(10);
+      doc.text('Sugestões para melhoria da qualidade da água:', 20, 230);
+      doc.text('- Monitoramento contínuo dos parâmetros críticos', 20, 240);
+      doc.text('- Implementação de medidas de controle de poluição', 20, 250);
+      doc.text('- Educação ambiental da comunidade local', 20, 260);
+      
+      // Rodapé
+      doc.setFontSize(8);
+      doc.text(`Relatório gerado em: ${new Date().toLocaleString('pt-BR')}`, 20, 280);
+      
+      // Salvar o PDF
+      const fileName = `relatorio-agua-${city}-${river}-${new Date().toISOString().split('T')[0]}.pdf`;
+      doc.save(fileName);
+      
+      console.log('PDF gerado com sucesso:', fileName);
+    } catch (error) {
+      console.error('Erro ao gerar PDF:', error);
+      alert('Erro ao gerar o relatório PDF. Tente novamente.');
+    }
+  };
+
+  const generateExcelReport = () => {
+    console.log('Generating Excel report with filters:', {
       city,
       river,
       points,
@@ -24,8 +92,8 @@ const ReportSection = ({ city, river, points, parameters, startDate, endDate }: 
       endDate
     });
     
-    // In a real app, this would generate and download a PDF/Excel report
-    alert('Relatório gerado com sucesso!');
+    // Simular geração do Excel por enquanto
+    alert('Funcionalidade de Excel será implementada em breve!');
   };
 
   const getDateRangeText = () => {
@@ -119,11 +187,11 @@ const ReportSection = ({ city, river, points, parameters, startDate, endDate }: 
         </div>
 
         <div className="flex gap-4">
-          <Button onClick={generateReport} className="flex items-center gap-2">
+          <Button onClick={generatePdfReport} className="flex items-center gap-2">
             <DownloadIcon className="h-4 w-4" />
             Gerar Relatório PDF
           </Button>
-          <Button variant="outline" onClick={generateReport} className="flex items-center gap-2">
+          <Button variant="outline" onClick={generateExcelReport} className="flex items-center gap-2">
             <DownloadIcon className="h-4 w-4" />
             Exportar Excel
           </Button>
