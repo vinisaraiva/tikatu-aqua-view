@@ -132,9 +132,15 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Additional Features */}
-      <section className="py-20 px-4 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
+      {/* Additional Features - Por que escolher o Tikatu */}
+      <section className="py-20 px-4 bg-gradient-to-br from-primary/5 via-water-blue/5 to-teal-accent/10 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-teal-accent/5" />
+        <div className="absolute top-0 left-0 w-full h-full opacity-30">
+          <div className="absolute top-20 left-20 w-32 h-32 bg-primary/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-20 right-20 w-40 h-40 bg-water-blue/10 rounded-full blur-3xl" />
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-teal-accent/10 rounded-full blur-3xl" />
+        </div>
+        <div className="max-w-7xl mx-auto relative z-10">
           <div className="grid lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
               <h2 className="text-gray-900 mb-6 font-bold">
@@ -210,8 +216,17 @@ const Index = () => {
         </div>
       </section>
 
-      {/* News Section */}
-      <NewsSection />
+      {/* News Section - Em Destaque */}
+      <div className="relative bg-gradient-to-br from-white/95 via-primary/5 to-water-blue/10 backdrop-blur-sm">
+        <div className="absolute inset-0 bg-gradient-to-r from-white/90 to-light-water/20" />
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-10 right-10 w-24 h-24 bg-teal-accent/20 rounded-full blur-2xl" />
+          <div className="absolute bottom-10 left-10 w-32 h-32 bg-primary/20 rounded-full blur-2xl" />
+        </div>
+        <div className="relative z-10">
+          <NewsSection />
+        </div>
+      </div>
 
       {/* Agenda 2030 Section */}
       <Agenda2030Section />
