@@ -11,7 +11,7 @@ const Agenda2030Section = () => {
         <div className="text-center mb-12">
           <p className="text-teal-600 text-sm font-medium mb-2">Sustentabilidade Global</p>
           <h2 className="text-4xl font-bold text-gray-900 mb-6">
-            Agenda 2030 e a Água
+            Tikatu e a Agenda 2030
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
             Conheça como nossa plataforma contribui para os Objetivos de Desenvolvimento 

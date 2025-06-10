@@ -33,6 +33,9 @@ const Header = () => {
             <Link to="/education" className="text-gray-700 hover:text-teal-600 transition-colors">
               Educação
             </Link>
+            <Link to="/agenda-2030" className="text-gray-700 hover:text-teal-600 transition-colors">
+              Agenda 2030
+            </Link>
             <Link to="/about" className="text-gray-700 hover:text-teal-600 transition-colors">
               Sobre
             </Link>
@@ -80,6 +83,13 @@ const Header = () => {
                 onClick={() => setIsMenuOpen(false)}
               >
                 Educação
+              </Link>
+              <Link 
+                to="/agenda-2030" 
+                className="text-gray-700 hover:text-teal-600 py-2 transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Agenda 2030
               </Link>
               <Link 
                 to="/about" 
