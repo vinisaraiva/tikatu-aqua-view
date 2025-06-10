@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { DropletIcon, ArrowRightIcon, GlobalIcon, LeafIcon } from 'lucide-react';
+import { DropletIcon, ArrowRightIcon, GoalIcon, LeafIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Agenda2030Section = () => {
@@ -62,7 +62,7 @@ const Agenda2030Section = () => {
           <Card className="feature-card group">
             <CardHeader className="text-center pb-4">
               <div className="w-16 h-16 bg-teal-accent/10 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-teal-accent/20 transition-colors">
-                <GlobalIcon className="h-8 w-8 text-teal-accent" />
+                <GoalIcon className="h-8 w-8 text-teal-accent" />
               </div>
               <CardTitle className="text-xl">ODS 17</CardTitle>
             </CardHeader>

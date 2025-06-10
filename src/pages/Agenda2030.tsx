@@ -1,6 +1,5 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { DropletIcon, LeafIcon, GlobalIcon, TargetIcon, TrendingUpIcon, UsersIcon, ShieldIcon, EyeIcon } from 'lucide-react';
+import { DropletIcon, LeafIcon, GoalIcon, TargetIcon, TrendingUpIcon, UsersIcon, ShieldIcon, EyeIcon } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
@@ -40,7 +39,7 @@ const Agenda2030 = () => {
       id: 17,
       title: "Parcerias e Meios de Implementação",
       description: "Fortalecer os meios de implementação e revitalizar a parceria global para o desenvolvimento sustentável",
-      icon: GlobalIcon,
+      icon: GoalIcon,
       color: "bg-purple-500",
       colorLight: "bg-purple-50",
       textColor: "text-purple-600",
