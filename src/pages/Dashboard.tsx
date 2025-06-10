@@ -77,9 +77,10 @@ const Dashboard = () => {
           onDateChange={handleDateChange}
         />
 
-        {/* Map Section - Único mapa compartilhado */}
+        {/* Map Section - Único mapa */}
         {selectedCity && selectedRiver && selectedPoints.length > 0 && (
           <div className="mb-6">
+            <h2 className="text-xl font-semibold mb-4">Mapa dos Pontos de Coleta</h2>
             <CollectionPointsMap 
               selectedPoints={selectedPoints}
               city={selectedCity}
@@ -103,6 +104,7 @@ const Dashboard = () => {
               parameters={selectedParameters}
               startDate={startDate}
               endDate={endDate}
+              hideMap={true}
             />
           </TabsContent>
 
