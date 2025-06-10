@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -65,11 +64,12 @@ export default {
 				},
 				// Professional water-themed colors
 				water: {
-					blue: 'hsl(var(--water-blue))',
-					teal: 'hsl(var(--water-teal))',
-					cyan: 'hsl(var(--water-cyan))',
-					slate: 'hsl(var(--water-slate))',
-					gray: 'hsl(var(--water-gray))'
+					primary: 'hsl(var(--water-primary))',
+					secondary: 'hsl(var(--water-secondary))',
+					accent: 'hsl(var(--water-accent))',
+					neutral: 'hsl(var(--water-neutral))',
+					light: 'hsl(var(--water-light))',
+					surface: 'hsl(var(--water-surface))'
 				}
 			},
 			borderRadius: {
