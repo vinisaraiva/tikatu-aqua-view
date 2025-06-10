@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { NewspaperIcon, ArrowRightIcon, CalendarIcon, LoaderIcon, AlertCircleIcon } from 'lucide-react';
@@ -43,7 +42,7 @@ const NewsSection = () => {
           <div className="flex items-center justify-center gap-2 mb-4">
             <NewspaperIcon className="h-8 w-8 text-teal-600" />
             <h2 className="text-3xl font-bold text-gray-900">
-              Portal de Notícias
+              Em Destaque
             </h2>
           </div>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
