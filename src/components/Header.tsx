@@ -15,7 +15,7 @@ const Header = () => {
             <img 
               src="/lovable-uploads/d62bdfd0-6fc8-4075-ac93-580e7557f424.png" 
               alt="Tikatu Logo" 
-              className="h-8 w-auto"
+              className="h-12 w-auto"
             />
           </Link>
 
@@ -34,7 +34,7 @@ const Header = () => {
               Educação
             </Link>
             <Link to="/agenda-2030" className="text-gray-700 hover:text-teal-600 transition-colors">
-              Agenda 2030
+              Tikatu e a Agenda 2030
             </Link>
             <Link to="/about" className="text-gray-700 hover:text-teal-600 transition-colors">
               Sobre
@@ -89,7 +89,7 @@ const Header = () => {
                 className="text-gray-700 hover:text-teal-600 py-2 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Agenda 2030
+                Tikatu e a Agenda 2030
               </Link>
               <Link 
                 to="/about" 
