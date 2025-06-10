@@ -104,7 +104,6 @@ const Dashboard = () => {
               parameters={selectedParameters}
               startDate={startDate}
               endDate={endDate}
-              hideMap={true}
             />
           </TabsContent>
 
