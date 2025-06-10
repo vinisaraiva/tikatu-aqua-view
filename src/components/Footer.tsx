@@ -16,7 +16,7 @@ const Footer = () => {
           </div>
           
           <div>
-            <h4 className="font-semibold mb-4">Apoio à Pesquisa</h4>
+            <h3 className="font-semibold mb-4">Apoio à Pesquisa</h3>
             <div className="text-gray-400 space-y-2">
               <p className="text-sm">
                 <strong className="text-white">Pesquisador:</strong><br />
