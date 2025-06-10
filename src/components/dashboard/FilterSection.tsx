@@ -69,6 +69,7 @@ const FilterSection = ({
     }
   }, [selectedRiver, selectedPoints.length, onPointsChange]);
 
+  // Debug: Log current state
   console.log('FilterSection Debug - VERIFICAÇÃO ANTI-DUPLICATA:', {
     selectedCity,
     selectedRiver,
@@ -356,5 +357,3 @@ const FilterSection = ({
 };
 
 export default FilterSection;
-
-</edits_to_apply>
