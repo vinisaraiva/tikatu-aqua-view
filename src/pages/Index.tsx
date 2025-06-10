@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import NewsSection from '@/components/NewsSection';
+import Agenda2030Section from '@/components/Agenda2030Section';
 
 const Index = () => {
   return (
@@ -211,6 +212,9 @@ const Index = () => {
 
       {/* News Section */}
       <NewsSection />
+
+      {/* Agenda 2030 Section */}
+      <Agenda2030Section />
 
       {/* CTA Section */}
       <section className="py-20 px-4 gradient-hero text-white">

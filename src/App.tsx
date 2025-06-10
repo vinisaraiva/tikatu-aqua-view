@@ -11,6 +11,7 @@ import NewsDetail from "./pages/NewsDetail";
 import AllNews from "./pages/AllNews";
 import Indices from "./pages/Indices";
 import Education from "./pages/Education";
+import Agenda2030 from "./pages/Agenda2030";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -36,6 +37,7 @@ const App = () => (
           <Route path="/education" element={<Education />} />
           <Route path="/news" element={<AllNews />} />
           <Route path="/news/:id" element={<NewsDetail />} />
+          <Route path="/agenda-2030" element={<Agenda2030 />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
