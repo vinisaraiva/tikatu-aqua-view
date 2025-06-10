@@ -10,7 +10,6 @@ import FilterSection from '@/components/dashboard/FilterSection';
 import RecentReadings from '@/components/dashboard/RecentReadings';
 import AnomaliesChart from '@/components/dashboard/AnomaliesChart';
 import ReportSection from '@/components/dashboard/ReportSection';
-import CollectionPointsMap from '@/components/dashboard/CollectionPointsMap';
 
 const Dashboard = () => {
   const [selectedCity, setSelectedCity] = useState('');
@@ -76,18 +75,6 @@ const Dashboard = () => {
           onParametersChange={setSelectedParameters}
           onDateChange={handleDateChange}
         />
-
-        {/* Map Section - Único mapa */}
-        {selectedCity && selectedRiver && selectedPoints.length > 0 && (
-          <div className="mb-6">
-            <h2 className="text-xl font-semibold mb-4">Mapa dos Pontos de Coleta</h2>
-            <CollectionPointsMap 
-              selectedPoints={selectedPoints}
-              city={selectedCity}
-              river={selectedRiver}
-            />
-          </div>
-        )}
 
         {/* Main Content */}
         <Tabs defaultValue="readings" className="space-y-6">
