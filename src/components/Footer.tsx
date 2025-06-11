@@ -1,8 +1,9 @@
+
 const Footer = () => {
   return (
     <footer className="bg-gray-900 text-white py-12">
       <div className="max-w-6xl mx-auto px-4">
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
             <img 
               src="/lovable-uploads/d62bdfd0-6fc8-4075-ac93-580e7557f424.png" 
@@ -15,7 +16,7 @@ const Footer = () => {
           </div>
           
           <div>
-            <h3 className="text-base font-semibold mb-4">Apoio à Pesquisa</h3>
+            <h3 className="text-sm font-semibold mb-4">Apoio à Pesquisa</h3>
             <div className="text-gray-400 space-y-2">
               <p className="text-sm">
                 <strong className="text-white">Pesquisador:</strong><br />
@@ -25,16 +26,19 @@ const Footer = () => {
                 <strong className="text-white">Orientador:</strong><br />
                 Prof. Dr. Fabricio Berton Zanchi
               </p>
-              <p className="text-sm">
-                <strong className="text-white">Laboratório:</strong><br />
-                LabHidrometeo
-              </p>
+              <div className="mt-3">
+                <img 
+                  src="/lovable-uploads/ba62473f-93be-4e42-a08f-85d6defbfa2d.png" 
+                  alt="Laboratório de Ecohidrologia" 
+                  className="h-16 w-auto"
+                />
+              </div>
             </div>
           </div>
           
           <div>
-            <h3 className="text-base font-semibold mb-4">Programas de Pós-Graduação</h3>
-            <div className="bg-gray-700 rounded-lg p-4 space-y-4">
+            <h3 className="text-sm font-semibold mb-4">Programas de Pós-Graduação</h3>
+            <div className="bg-gray-600 rounded-lg p-4 space-y-4">
               <div className="flex items-center space-x-3">
                 <img 
                   src="/lovable-uploads/f92e4bde-3d5e-4274-8d75-1859012aca2f.png" 
@@ -56,6 +60,26 @@ const Footer = () => {
                   <p>Doutorado em</p>
                   <p>Biossistemas</p>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-sm font-semibold mb-4">Apoio Financeiro</h3>
+            <div className="space-y-4">
+              <div className="flex items-center justify-center">
+                <img 
+                  src="/lovable-uploads/4e3a4cd5-6228-4ae2-870d-9a968af40af2.png" 
+                  alt="CAPES" 
+                  className="h-12 w-auto"
+                />
+              </div>
+              <div className="flex items-center justify-center">
+                <img 
+                  src="/lovable-uploads/b06bdb32-1be3-43fc-b690-65d15f8806a4.png" 
+                  alt="CNPq" 
+                  className="h-12 w-auto"
+                />
               </div>
             </div>
           </div>
