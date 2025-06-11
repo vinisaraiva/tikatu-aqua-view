@@ -1,3 +1,4 @@
+
 const Footer = () => {
   return (
     <footer className="bg-gray-900 text-white py-12">
@@ -14,7 +15,7 @@ const Footer = () => {
             </p>
           </div>
           
-          <div>
+          <div className="pr-2">
             <h3 className="text-sm font-semibold mb-4">Apoio à Pesquisa</h3>
             <div className="text-gray-400 space-y-2">
               <p className="text-sm">
@@ -35,27 +36,27 @@ const Footer = () => {
             </div>
           </div>
           
-          <div>
+          <div className="px-1">
             <h3 className="text-sm font-semibold mb-4">Programas de Pós-Graduação</h3>
             <div className="bg-gray-600 rounded-lg p-6 space-y-4 shadow-lg">
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2">
                 <img 
                   src="/lovable-uploads/f92e4bde-3d5e-4274-8d75-1859012aca2f.png" 
                   alt="PPGCTA IFBA/UFSB" 
                   className="h-12 w-auto flex-shrink-0"
                 />
-                <div className="text-xs text-gray-300 min-w-0">
+                <div className="text-xs text-gray-300 min-w-0 flex-1">
                   <p className="font-medium">Mestrado em</p>
                   <p className="leading-tight">Ciências Ambientais</p>
                 </div>
               </div>
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2">
                 <img 
                   src="/lovable-uploads/76fd71ac-b435-4850-b3af-208f6e3685e6.png" 
                   alt="PPG Biossistemas" 
                   className="h-12 w-auto flex-shrink-0"
                 />
-                <div className="text-xs text-gray-300 min-w-0">
+                <div className="text-xs text-gray-300 min-w-0 flex-1">
                   <p className="font-medium">Doutorado em</p>
                   <p className="leading-tight">Biossistemas</p>
                 </div>
@@ -63,7 +64,7 @@ const Footer = () => {
             </div>
           </div>
 
-          <div>
+          <div className="pl-2">
             <h3 className="text-sm font-semibold mb-4">Apoio Financeiro</h3>
             <div className="space-y-4">
               <div className="flex items-center justify-center">
