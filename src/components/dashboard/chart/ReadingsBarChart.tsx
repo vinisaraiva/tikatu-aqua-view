@@ -46,7 +46,7 @@ const ReadingsBarChart = ({
             radius={[4, 4, 0, 0]}
           />
           
-          {/* CONAMA Reference Lines - now directly inside BarChart */}
+          {/* CONAMA Reference Lines - without labels */}
           {conamaMin !== undefined && conamaMin !== null && (
             <ReferenceLine 
               y={conamaMin} 
@@ -54,14 +54,6 @@ const ReadingsBarChart = ({
               strokeWidth={3} 
               strokeDasharray="8 4" 
               ifOverflow="extendDomain"
-              label={{ 
-                value: `Min CONAMA: ${conamaMin}`, 
-                position: "top", 
-                fill: '#22c55e',
-                fontSize: 12,
-                fontWeight: 'bold',
-                offset: 10
-              }}
             />
           )}
           {conamaMax !== undefined && conamaMax !== null && (
@@ -71,14 +63,6 @@ const ReadingsBarChart = ({
               strokeWidth={3} 
               strokeDasharray="8 4" 
               ifOverflow="extendDomain"
-              label={{ 
-                value: `Max CONAMA: ${conamaMax}`, 
-                position: "top", 
-                fill: '#f97316',
-                fontSize: 12, 
-                fontWeight: 'bold',
-                offset: 10
-              }}
             />
           )}
         </BarChart>
