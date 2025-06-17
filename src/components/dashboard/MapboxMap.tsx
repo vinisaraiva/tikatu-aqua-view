@@ -255,7 +255,7 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false }: M
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+        <CardTitle className="flex items-center gap-2 text-xl">
           <MapIcon className="h-5 w-5" />
           Mapa dos Pontos de Coleta
         </CardTitle>

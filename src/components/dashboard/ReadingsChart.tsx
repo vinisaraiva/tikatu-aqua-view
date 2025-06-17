@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import ReadingsBarChart from './chart/ReadingsBarChart';
 import ChartLegend from './chart/ChartLegend';
@@ -33,7 +34,7 @@ const ReadingsChart = ({ readings, selectedParameter }: ReadingsChartProps) => {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Gráfico de Parâmetros por Ponto</CardTitle>
+          <CardTitle className="text-xl">Valores de Parâmetros em cada ponto de coleta</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center py-8 text-gray-500">
@@ -56,7 +57,7 @@ const ReadingsChart = ({ readings, selectedParameter }: ReadingsChartProps) => {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Gráfico de {selectedParameter} por Ponto</CardTitle>
+          <CardTitle className="text-xl">Valores de {selectedParameter} em cada ponto de coleta</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center py-8 text-gray-500">
@@ -129,10 +130,7 @@ const ReadingsChart = ({ readings, selectedParameter }: ReadingsChartProps) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Gráfico de {parameterDescription} por Ponto de Coleta</CardTitle>
-        <p className="text-sm text-gray-600">
-          Valores medidos em cada ponto de coleta
-        </p>
+        <CardTitle className="text-xl">Valores de {parameterDescription} em cada ponto de coleta</CardTitle>
       </CardHeader>
       <CardContent>
         {/* CONAMA Legend above the chart */}

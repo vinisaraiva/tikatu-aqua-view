@@ -12,7 +12,7 @@ const ConamaLegend = ({ conamaMin, conamaMax }: ConamaLegendProps) => {
   }
 
   return (
-    <div className="mb-4 flex flex-wrap gap-6 justify-center text-sm border-b border-gray-200 pb-3">
+    <div className="mb-4 flex flex-wrap gap-6 justify-start text-sm border-b border-gray-200 pb-3">
       <span className="text-gray-600 font-medium">Referências CONAMA:</span>
       {conamaMin !== undefined && conamaMin !== null && (
         <div className="flex items-center gap-2">
