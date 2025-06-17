@@ -12,6 +12,7 @@ import AnomaliesChart from '@/components/dashboard/AnomaliesChart';
 import ReportSection from '@/components/dashboard/ReportSection';
 
 const Dashboard = () => {
+  const [selectedState, setSelectedState] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
   const [selectedRiver, setSelectedRiver] = useState('');
   const [selectedPoints, setSelectedPoints] = useState<string[]>([]);
@@ -28,6 +29,7 @@ const Dashboard = () => {
 
   // Debug: Log current state
   console.log('Dashboard - Current state:', {
+    selectedState,
     selectedCity,
     selectedRiver,
     selectedPoints,
@@ -51,11 +53,13 @@ const Dashboard = () => {
         </div>
 
         {/* Debug info */}
-        {(startDate || endDate || selectedParameters.length > 0 || selectedPoints.length > 0) && (
+        {(startDate || endDate || selectedParameters.length > 0 || selectedPoints.length > 0 || selectedState || selectedCity) && (
           <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
             <p className="text-sm text-blue-800">
               <strong>Filtros ativos:</strong> 
-              {startDate && ` Data inicial: ${startDate.toLocaleDateString('pt-BR')}`}
+              {selectedState && ` Estado: ${selectedState}`}
+              {selectedCity && ` | Cidade: ${selectedCity}`}
+              {startDate && ` | Data inicial: ${startDate.toLocaleDateString('pt-BR')}`}
               {endDate && startDate !== endDate && ` | Data final: ${endDate.toLocaleDateString('pt-BR')}`}
               {selectedPoints.length > 0 && ` | Pontos: ${selectedPoints.join(', ')}`}
               {selectedParameters.length > 0 && ` | Parâmetros: ${selectedParameters.join(', ')}`}
@@ -65,10 +69,12 @@ const Dashboard = () => {
 
         {/* Filters */}
         <FilterSection
+          selectedState={selectedState}
           selectedCity={selectedCity}
           selectedRiver={selectedRiver}
           selectedPoints={selectedPoints}
           selectedParameters={selectedParameters}
+          onStateChange={setSelectedState}
           onCityChange={setSelectedCity}
           onRiverChange={setSelectedRiver}
           onPointsChange={setSelectedPoints}

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -6,14 +7,16 @@ import { Button } from '@/components/ui/button';
 import { CalendarIcon, Filter, MapPin } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import DateFilter from './DateFilter';
-import { useCities, useRivers, usePoints } from '@/hooks/useGeographicData';
+import { useStates, useCities, useRivers, usePoints } from '@/hooks/useGeographicData';
 import { useParameters } from '@/hooks/useReadingsData';
 
 interface FilterSectionProps {
+  selectedState: string;
   selectedCity: string;
   selectedRiver: string;
   selectedPoints: string[];
   selectedParameters: string[];
+  onStateChange: (state: string) => void;
   onCityChange: (city: string) => void;
   onRiverChange: (river: string) => void;
   onPointsChange: (points: string[]) => void;
@@ -23,10 +26,12 @@ interface FilterSectionProps {
 }
 
 const FilterSection = ({
+  selectedState,
   selectedCity,
   selectedRiver,
   selectedPoints,
   selectedParameters,
+  onStateChange,
   onCityChange,
   onRiverChange,
   onPointsChange,
@@ -35,18 +40,34 @@ const FilterSection = ({
   showParametersFilter = true,
 }: FilterSectionProps) => {
   const [showDateFilter, setShowDateFilter] = useState(false);
-  const [showParametersFilterCollapsed, setShowParametersFilterCollapsed] = useState(true); // Changed to true to show by default
+  const [showParametersFilterCollapsed, setShowParametersFilterCollapsed] = useState(true);
+  const [previousState, setPreviousState] = useState(selectedState);
   const [previousRiver, setPreviousRiver] = useState(selectedRiver);
 
   // Fetch real data from Supabase
-  const { data: cities = [], isLoading: citiesLoading } = useCities();
+  const { data: states = [], isLoading: statesLoading } = useStates();
+  const { data: cities = [], isLoading: citiesLoading } = useCities(selectedState);
   const selectedCityData = cities.find(city => city.name === selectedCity);
   const { data: rivers = [], isLoading: riversLoading } = useRivers(selectedCityData?.id);
   const selectedRiverData = rivers.find(river => river.name === selectedRiver);
   
-  // CORREÇÃO: Usar o ID do rio selecionado para filtrar apenas os pontos desse rio
   const { data: points = [], isLoading: pointsLoading } = usePoints(selectedRiverData?.id);
   const { data: parameters = [], isLoading: parametersLoading } = useParameters();
+
+  // Limpar cidades, rios, pontos e parâmetros quando o estado mudar
+  useEffect(() => {
+    if (selectedState !== previousState) {
+      console.log('FilterSection - Estado mudou, limpando filtros:', { 
+        previousState, 
+        newState: selectedState 
+      });
+      onCityChange('');
+      onRiverChange('');
+      onPointsChange([]);
+      onParametersChange([]);
+    }
+    setPreviousState(selectedState);
+  }, [selectedState, previousState, onCityChange, onRiverChange, onPointsChange, onParametersChange]);
 
   // Limpar pontos e parâmetros quando o rio mudar
   useEffect(() => {
@@ -61,7 +82,7 @@ const FilterSection = ({
     setPreviousRiver(selectedRiver);
   }, [selectedRiver, previousRiver, onPointsChange, onParametersChange]);
 
-  // CORREÇÃO ADICIONAL: Garantir que pontos sejam limpos se não há rio selecionado
+  // Garantir que pontos sejam limpos se não há rio selecionado
   useEffect(() => {
     if (!selectedRiver && selectedPoints.length > 0) {
       console.log('FilterSection - Sem rio selecionado, limpando pontos');
@@ -70,19 +91,14 @@ const FilterSection = ({
   }, [selectedRiver, selectedPoints.length, onPointsChange]);
 
   // Debug: Log current state
-  console.log('FilterSection Debug - VERIFICAÇÃO ANTI-DUPLICATA:', {
+  console.log('FilterSection Debug:', {
+    selectedState,
     selectedCity,
     selectedRiver,
     selectedCityId: selectedCityData?.id,
     selectedRiverId: selectedRiverData?.id,
     pointsCount: points.length,
-    pointsLoading,
-    availablePoints: points.map(p => ({ id: p.id, name: p.name, river_id: p.river_id })),
     selectedPoints,
-    selectedPointsLength: selectedPoints.length,
-    selectedPointsUnique: [...new Set(selectedPoints)],
-    uniqueLength: [...new Set(selectedPoints)].length,
-    isDuplicated: selectedPoints.length !== [...new Set(selectedPoints)].length
   });
 
   const handlePointChange = (pointName: string, checked: boolean) => {
@@ -90,33 +106,23 @@ const FilterSection = ({
       pointName, 
       checked, 
       currentSelected: selectedPoints,
-      currentLength: selectedPoints.length 
     });
     
-    // CORREÇÃO PRINCIPAL: Sempre garantir que trabalhamos com lista única
     const currentUniquePoints = [...new Set(selectedPoints)];
-    console.log('FilterSection - Current unique points:', currentUniquePoints);
     
     let newPoints: string[];
     
     if (checked) {
-      // Verificar se o ponto já está selecionado para evitar duplicatas
       if (!currentUniquePoints.includes(pointName)) {
         newPoints = [...currentUniquePoints, pointName];
-        console.log('FilterSection - Adding point, new list:', newPoints);
       } else {
-        console.log('FilterSection - Point already selected, ignoring:', pointName);
-        return; // Não fazer nada se já existe
+        return;
       }
     } else {
       newPoints = currentUniquePoints.filter(p => p !== pointName);
-      console.log('FilterSection - Removing point, new list:', newPoints);
     }
     
-    // GARANTIR que a nova lista não tem duplicatas antes de passar adiante
     const finalUniquePoints = [...new Set(newPoints)];
-    console.log('FilterSection - Final unique points to set:', finalUniquePoints);
-    
     onPointsChange(finalUniquePoints);
   };
 
@@ -135,7 +141,6 @@ const FilterSection = ({
 
   const handleSelectAllPoints = () => {
     const allPointNames = points.map(point => point.name);
-    // Garantir que não há duplicatas ao selecionar todos
     const uniquePointNames = [...new Set(allPointNames)];
     console.log('FilterSection - Selecting all points:', uniquePointNames);
     onPointsChange(uniquePointNames);
@@ -149,7 +154,6 @@ const FilterSection = ({
     onParametersChange(parameters.map(param => param.code));
   };
 
-  // CORREÇÃO: Sempre usar lista única para verificações e exibições
   const uniqueSelectedPoints = [...new Set(selectedPoints)];
 
   return (
@@ -160,22 +164,41 @@ const FilterSection = ({
           <CardTitle>Filtros Principais</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* City Selection */}
+          {/* State Selection */}
           <div>
-            <label className="text-sm font-medium mb-2 block">Cidade</label>
-            <Select value={selectedCity} onValueChange={onCityChange} disabled={citiesLoading}>
+            <label className="text-sm font-medium mb-2 block">Estado</label>
+            <Select value={selectedState} onValueChange={onStateChange} disabled={statesLoading}>
               <SelectTrigger>
-                <SelectValue placeholder={citiesLoading ? "Carregando cidades..." : "Selecione uma cidade"} />
+                <SelectValue placeholder={statesLoading ? "Carregando estados..." : "Selecione um estado"} />
               </SelectTrigger>
               <SelectContent>
-                {cities.map((city) => (
-                  <SelectItem key={city.id} value={city.name}>
-                    {city.name}
+                {states.map((state) => (
+                  <SelectItem key={state.state} value={state.state}>
+                    {state.state} ({state.count} {state.count === 1 ? 'cidade' : 'cidades'})
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
+
+          {/* City Selection */}
+          {selectedState && (
+            <div>
+              <label className="text-sm font-medium mb-2 block">Cidade</label>
+              <Select value={selectedCity} onValueChange={onCityChange} disabled={citiesLoading}>
+                <SelectTrigger>
+                  <SelectValue placeholder={citiesLoading ? "Carregando cidades..." : "Selecione uma cidade"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {cities.map((city) => (
+                    <SelectItem key={city.id} value={city.name}>
+                      {city.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           {/* River Selection */}
           {selectedCity && (
@@ -275,7 +298,7 @@ const FilterSection = ({
                 )}
               </div>
 
-              {/* Parameters Filter Section - Only show if showParametersFilter is true */}
+              {/* Parameters Filter Section */}
               {showParametersFilter && (
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">

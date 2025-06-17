@@ -7,6 +7,7 @@ import IndicesMap from './IndicesMap';
 import IetTab from './IetTab';
 
 interface IetIndiceProps {
+  selectedState?: string;
   selectedCity: string;
   selectedRiver: string;
   selectedPoints: string[];
@@ -14,22 +15,21 @@ interface IetIndiceProps {
   endDate?: Date;
 }
 
-const IetIndice = ({ selectedCity, selectedRiver, selectedPoints, startDate, endDate }: IetIndiceProps) => {
-  // CORREÇÃO: Limpar duplicatas logo no início e adicionar logs detalhados
+const IetIndice = ({ selectedState, selectedCity, selectedRiver, selectedPoints, startDate, endDate }: IetIndiceProps) => {
+  // Limpar duplicatas logo no início
   const uniqueSelectedPoints = [...new Set(selectedPoints)];
   
-  console.log('=== IET INDICE DEBUG - ANTI-DUPLICATA ===');
+  console.log('=== IET INDICE DEBUG ===');
   console.log('IetIndice - Pontos recebidos (ORIGINAL):', selectedPoints);
   console.log('IetIndice - Pontos únicos (LIMPOS):', uniqueSelectedPoints);
-  console.log('IetIndice - Quantidade original vs limpa:', selectedPoints.length, 'vs', uniqueSelectedPoints.length);
   
-  // CORREÇÃO PRINCIPAL: Buscar dados da cidade e rio para obter os IDs corretos
-  const { data: cities = [] } = useCities();
+  // Buscar dados da cidade e rio para obter os IDs corretos
+  const { data: cities = [] } = useCities(selectedState);
   const selectedCityData = cities.find(city => city.name === selectedCity);
   const { data: rivers = [] } = useRivers(selectedCityData?.id);
   const selectedRiverData = rivers.find(river => river.name === selectedRiver);
   
-  // CORREÇÃO: Usar o ID do rio para buscar pontos específicos desse rio
+  // Usar o ID do rio para buscar pontos específicos desse rio
   const { data: allPoints = [] } = usePoints(selectedRiverData?.id);
   
   // Filter points by selected names and get their IDs
