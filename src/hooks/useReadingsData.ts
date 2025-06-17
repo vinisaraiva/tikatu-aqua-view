@@ -36,7 +36,12 @@ export const useReadings = (pointIds: number[], startDate?: Date, endDate?: Date
   return useQuery({
     queryKey: ['readings', pointIds, startDate, endDate],
     queryFn: async (): Promise<Reading[]> => {
-      if (pointIds.length === 0) return [];
+      console.log('useReadings - Buscando leituras para pontos:', pointIds);
+      
+      if (pointIds.length === 0) {
+        console.log('useReadings - Nenhum ponto selecionado, retornando array vazio');
+        return [];
+      }
       
       let query = supabase
         .from('readings')
@@ -45,16 +50,24 @@ export const useReadings = (pointIds: number[], startDate?: Date, endDate?: Date
         .order('measured_at', { ascending: false });
       
       if (startDate) {
+        console.log('useReadings - Aplicando filtro de data inicial:', startDate);
         query = query.gte('measured_at', startDate.toISOString());
       }
       
       if (endDate) {
+        console.log('useReadings - Aplicando filtro de data final:', endDate);
         query = query.lte('measured_at', endDate.toISOString());
       }
       
+      console.log('useReadings - Executando query...');
       const { data, error } = await query;
       
-      if (error) throw error;
+      if (error) {
+        console.error('useReadings - Erro na query:', error);
+        throw error;
+      }
+      
+      console.log('useReadings - Dados retornados:', data?.length || 0, 'leituras');
       return data || [];
     },
     enabled: pointIds.length > 0
@@ -65,8 +78,14 @@ export const useReadingValues = (readingIds: number[]) => {
   return useQuery({
     queryKey: ['reading_values', readingIds],
     queryFn: async (): Promise<ReadingValue[]> => {
-      if (readingIds.length === 0) return [];
+      console.log('useReadingValues - Buscando valores para leituras:', readingIds);
       
+      if (readingIds.length === 0) {
+        console.log('useReadingValues - Nenhuma leitura fornecida, retornando array vazio');
+        return [];
+      }
+      
+      console.log('useReadingValues - Executando query...');
       const { data, error } = await supabase
         .from('reading_values')
         .select(`
@@ -75,7 +94,13 @@ export const useReadingValues = (readingIds: number[]) => {
         `)
         .in('reading_id', readingIds);
       
-      if (error) throw error;
+      if (error) {
+        console.error('useReadingValues - Erro na query:', error);
+        throw error;
+      }
+      
+      console.log('useReadingValues - Dados retornados:', data?.length || 0, 'valores de leitura');
+      console.log('useReadingValues - Detalhes dos valores:', data);
       return data || [];
     },
     enabled: readingIds.length > 0

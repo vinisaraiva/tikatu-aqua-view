@@ -25,18 +25,56 @@ export const transformReadingsData = ({
   selectedPointsData, 
   parameter 
 }: TransformReadingsParams): Reading[] => {
+  console.log('TransformReadingsData - Iniciando transformação:', {
+    readingValuesCount: readingValues.length,
+    readingsCount: readings.length,
+    selectedPointsCount: selectedPointsData.length,
+    selectedParameter: parameter
+  });
+
+  // Debug: log all reading values with their parameters
+  readingValues.forEach((value, index) => {
+    console.log(`ReadingValue ${index}:`, {
+      reading_id: value.reading_id,
+      parameter_id: value.parameter_id,
+      value: value.value,
+      parameter_code: value.parameter?.code,
+      parameter_description: value.parameter?.description
+    });
+  });
+
   // Filter reading values by selected parameter
   const filteredReadingValues = readingValues.filter(value => {
-    if (!parameter) return true; // Show all if no parameter selected
-    return parameter === (value.parameter?.code || '');
+    const parameterCode = value.parameter?.code || '';
+    const shouldInclude = !parameter || parameter === parameterCode;
+    
+    console.log('Filtro de parâmetro:', {
+      valueParameterCode: parameterCode,
+      selectedParameter: parameter,
+      shouldInclude
+    });
+    
+    return shouldInclude;
   });
+
+  console.log('ReadingValues após filtro de parâmetro:', filteredReadingValues.length);
 
   // Transform data for display
   const transformedReadings: Reading[] = filteredReadingValues.map((value) => {
     const reading = readings.find(r => r.id === value.reading_id);
     const point = selectedPointsData.find(p => p.id === reading?.point_id);
     
-    if (!reading || !point) return null;
+    console.log('Transformando value:', {
+      reading_id: value.reading_id,
+      reading_found: !!reading,
+      point_found: !!point,
+      point_id: reading?.point_id
+    });
+
+    if (!reading || !point) {
+      console.log('Dados faltando - pulando:', { reading: !!reading, point: !!point });
+      return null;
+    }
 
     // Determine CONAMA status based on parameter limits
     let conamaStatus: 'normal' | 'attention' | 'critical' = 'normal';
@@ -60,7 +98,7 @@ export const transformReadingsData = ({
       }
     }
 
-    return {
+    const transformedReading = {
       id: `${reading.id}-${value.parameter_id}`,
       parameter: value.parameter?.description || 'Parâmetro Desconhecido',
       value: value.value,
@@ -70,7 +108,11 @@ export const transformReadingsData = ({
       hasAnomaly,
       point: point.name,
     };
+
+    console.log('Reading transformado:', transformedReading);
+    return transformedReading;
   }).filter(Boolean) as Reading[];
 
+  console.log('Total de readings transformados:', transformedReadings.length);
   return transformedReadings;
 };
