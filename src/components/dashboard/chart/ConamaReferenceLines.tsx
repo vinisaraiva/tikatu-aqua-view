@@ -20,7 +20,7 @@ const ConamaReferenceLines = ({ conamaMin, conamaMax }: ConamaReferenceLinesProp
           ifOverflow="extendDomain"
           label={{ 
             value: `Min CONAMA: ${conamaMin}`, 
-            position: "topLeft", 
+            position: "top", 
             fill: '#22c55e',
             fontSize: 12,
             fontWeight: 'bold',
@@ -37,7 +37,7 @@ const ConamaReferenceLines = ({ conamaMin, conamaMax }: ConamaReferenceLinesProp
           ifOverflow="extendDomain"
           label={{ 
             value: `Max CONAMA: ${conamaMax}`, 
-            position: "topLeft", 
+            position: "top", 
             fill: '#f97316',
             fontSize: 12, 
             fontWeight: 'bold',
