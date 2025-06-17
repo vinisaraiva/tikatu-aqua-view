@@ -16,7 +16,7 @@ const Dashboard = () => {
   const [selectedCity, setSelectedCity] = useState('');
   const [selectedRiver, setSelectedRiver] = useState('');
   const [selectedPoints, setSelectedPoints] = useState<string[]>([]);
-  const [selectedParameter, setSelectedParameter] = useState(''); // Changed from array to single string
+  const [selectedParameter, setSelectedParameter] = useState('');
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [endDate, setEndDate] = useState<Date | undefined>();
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
@@ -33,7 +33,7 @@ const Dashboard = () => {
     selectedCity,
     selectedRiver,
     selectedPoints,
-    selectedParameter, // Updated log
+    selectedParameter,
     startDate: startDate?.toISOString(),
     endDate: endDate?.toISOString()
   });
@@ -62,7 +62,7 @@ const Dashboard = () => {
               {startDate && ` | Data inicial: ${startDate.toLocaleDateString('pt-BR')}`}
               {endDate && startDate !== endDate && ` | Data final: ${endDate.toLocaleDateString('pt-BR')}`}
               {selectedPoints.length > 0 && ` | Pontos: ${selectedPoints.join(', ')}`}
-              {selectedParameter && ` | Parâmetro: ${selectedParameter}`} {/* Updated display */}
+              {selectedParameter && ` | Parâmetro: ${selectedParameter}`}
             </p>
           </div>
         )}
@@ -73,12 +73,12 @@ const Dashboard = () => {
           selectedCity={selectedCity}
           selectedRiver={selectedRiver}
           selectedPoints={selectedPoints}
-          selectedParameter={selectedParameter} // Changed prop name
+          selectedParameter={selectedParameter}
           onStateChange={setSelectedState}
           onCityChange={setSelectedCity}
           onRiverChange={setSelectedRiver}
           onPointsChange={setSelectedPoints}
-          onParameterChange={setSelectedParameter} // Changed prop name
+          onParameterChange={setSelectedParameter}
           onDateChange={handleDateChange}
         />
 
@@ -94,7 +94,7 @@ const Dashboard = () => {
               city={selectedCity}
               river={selectedRiver}
               points={selectedPoints}
-              parameter={selectedParameter} // Changed prop
+              parameter={selectedParameter}
               startDate={startDate}
               endDate={endDate}
             />
@@ -105,7 +105,7 @@ const Dashboard = () => {
               city={selectedCity}
               river={selectedRiver}
               point={selectedPoints[0] || ''}
-              parameters={selectedParameter ? [selectedParameter] : []} // Convert single parameter to array for backward compatibility
+              parameters={selectedParameter ? [selectedParameter] : []}
               startDate={startDate}
               endDate={endDate}
             />
@@ -133,7 +133,7 @@ const Dashboard = () => {
                 city={selectedCity}
                 river={selectedRiver}
                 points={selectedPoints}
-                parameters={selectedParameter ? [selectedParameter] : []} // Convert for backward compatibility
+                parameters={selectedParameter ? [selectedParameter] : []}
                 startDate={startDate}
                 endDate={endDate}
               />

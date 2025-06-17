@@ -151,7 +151,7 @@ const ReadingsChart = ({ readings, selectedParameter }: ReadingsChartProps) => {
                   y={conamaMin} 
                   stroke="#94a3b8" 
                   strokeDasharray="5 5" 
-                  label={{ value: `Min CONAMA: ${conamaMin}`, position: "topLeft" }}
+                  label={{ value: `Min CONAMA: ${conamaMin}`, position: "top" }}
                 />
               )}
               {conamaMax !== undefined && (
@@ -159,7 +159,7 @@ const ReadingsChart = ({ readings, selectedParameter }: ReadingsChartProps) => {
                   y={conamaMax} 
                   stroke="#94a3b8" 
                   strokeDasharray="5 5" 
-                  label={{ value: `Max CONAMA: ${conamaMax}`, position: "topLeft" }}
+                  label={{ value: `Max CONAMA: ${conamaMax}`, position: "top" }}
                 />
               )}
               

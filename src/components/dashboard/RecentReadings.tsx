@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -22,12 +23,12 @@ interface RecentReadingsProps {
   city: string;
   river: string;
   points: string[];
-  parameters: string[];
+  parameter: string;
   startDate?: Date;
   endDate?: Date;
 }
 
-const RecentReadings = ({ city, river, points, parameters, startDate, endDate }: RecentReadingsProps) => {
+const RecentReadings = ({ city, river, points, parameter, startDate, endDate }: RecentReadingsProps) => {
   // CORREÇÃO: Buscar dados da cidade e rio para obter os IDs corretos
   const { data: cities = [] } = useCities();
   const selectedCityData = cities.find(c => c.name === city);
@@ -46,10 +47,10 @@ const RecentReadings = ({ city, river, points, parameters, startDate, endDate }:
   const readingIds = readings.map(reading => reading.id);
   const { data: readingValues = [], isLoading: valuesLoading } = useReadingValues(readingIds);
 
-  // Filter reading values by selected parameters
+  // Filter reading values by selected parameter
   const filteredReadingValues = readingValues.filter(value => {
-    if (parameters.length === 0) return true; // Show all if no parameters selected
-    return parameters.includes(value.parameter?.code || '');
+    if (!parameter) return true; // Show all if no parameter selected
+    return parameter === (value.parameter?.code || '');
   });
 
   // Transform data for display
@@ -125,10 +126,9 @@ const RecentReadings = ({ city, river, points, parameters, startDate, endDate }:
     return 'Dados recentes';
   };
 
-  const getParametersText = () => {
-    if (parameters.length === 0) return 'Todos os parâmetros';
-    if (parameters.length <= 3) return parameters.join(', ');
-    return `${parameters.slice(0, 3).join(', ')} e mais ${parameters.length - 3}`;
+  const getParameterText = () => {
+    if (!parameter) return 'Todos os parâmetros';
+    return parameter;
   };
 
   if (!city || !river || points.length === 0) {
@@ -147,7 +147,7 @@ const RecentReadings = ({ city, river, points, parameters, startDate, endDate }:
         </Card>
         
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-          <ReadingsChart readings={[]} />
+          <ReadingsChart readings={[]} selectedParameter={parameter} />
           <CollectionPointsMap selectedPoints={[]} city="" river="" />
         </div>
       </div>
@@ -174,7 +174,7 @@ const RecentReadings = ({ city, river, points, parameters, startDate, endDate }:
     <div className="space-y-6">
       {/* Gráfico e Mapa lado a lado */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        <ReadingsChart readings={transformedReadings} />
+        <ReadingsChart readings={transformedReadings} selectedParameter={parameter} />
         <CollectionPointsMap selectedPoints={points} city={city} river={river} />
       </div>
 
@@ -183,7 +183,7 @@ const RecentReadings = ({ city, river, points, parameters, startDate, endDate }:
         <CardHeader>
           <CardTitle>Leituras Recentes</CardTitle>
           <p className="text-sm text-gray-600">
-            {city} → {river} → {points.join(', ')} | {getDateRangeText()} | {getParametersText()}
+            {city} → {river} → {points.join(', ')} | {getDateRangeText()} | {getParameterText()}
           </p>
         </CardHeader>
         <CardContent>
