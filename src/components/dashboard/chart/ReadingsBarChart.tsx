@@ -18,6 +18,8 @@ const ReadingsBarChart = ({
   conamaMin, 
   conamaMax 
 }: ReadingsBarChartProps) => {
+  console.log('ReadingsBarChart - CONAMA values received:', { conamaMin, conamaMax });
+  
   return (
     <div className="h-80">
       <ResponsiveContainer width="100%" height="100%">
@@ -38,15 +40,15 @@ const ReadingsBarChart = ({
           />
           <Tooltip content={<ChartTooltip unit={unit} />} />
           
-          {/* Reference lines for CONAMA limits - positioned BEFORE Bar to appear BEHIND */}
-          <ConamaReferenceLines conamaMin={conamaMin} conamaMax={conamaMax} />
-          
-          {/* Bar chart positioned AFTER reference lines so they appear BEHIND */}
+          {/* Bar chart */}
           <Bar
             dataKey="value"
             name={`${parameterDescription} (${unit})`}
             radius={[4, 4, 0, 0]}
           />
+          
+          {/* Reference lines for CONAMA limits - positioned AFTER Bar to appear ON TOP */}
+          <ConamaReferenceLines conamaMin={conamaMin} conamaMax={conamaMax} />
         </BarChart>
       </ResponsiveContainer>
     </div>
