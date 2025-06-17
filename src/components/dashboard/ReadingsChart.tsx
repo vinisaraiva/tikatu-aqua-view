@@ -1,7 +1,7 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import ReadingsBarChart from './chart/ReadingsBarChart';
 import ChartLegend from './chart/ChartLegend';
+import ConamaLegend from './chart/ConamaLegend';
 
 interface Reading {
   id: string;
@@ -138,6 +138,9 @@ const ReadingsChart = ({ readings, selectedParameter }: ReadingsChartProps) => {
         </p>
       </CardHeader>
       <CardContent>
+        {/* CONAMA Legend above the chart */}
+        <ConamaLegend conamaMin={conamaMin} conamaMax={conamaMax} />
+        
         <ReadingsBarChart
           chartData={chartData}
           unit={unit}
@@ -146,8 +149,8 @@ const ReadingsChart = ({ readings, selectedParameter }: ReadingsChartProps) => {
           conamaMax={conamaMax}
         />
         
-        {/* Legend for colors with differentiated CONAMA lines */}
-        <ChartLegend conamaMin={conamaMin} conamaMax={conamaMax} />
+        {/* Status Legend below the chart (without CONAMA items) */}
+        <ChartLegend />
       </CardContent>
     </Card>
   );
