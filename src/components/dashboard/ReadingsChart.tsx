@@ -131,10 +131,7 @@ const ReadingsChart = ({ readings, selectedParameter }: ReadingsChartProps) => {
       <CardHeader>
         <CardTitle>Gráfico de {parameterDescription} por Ponto de Coleta</CardTitle>
         <p className="text-sm text-gray-600">
-          Valores medidos em cada ponto com referências CONAMA
-          {(conamaMin !== null && conamaMin !== undefined) || (conamaMax !== null && conamaMax !== undefined) 
-            ? ` (Min: ${conamaMin || 'N/A'}, Max: ${conamaMax || 'N/A'})` 
-            : ' (Sem limites CONAMA definidos)'}
+          Valores medidos em cada ponto de coleta
         </p>
       </CardHeader>
       <CardContent>
