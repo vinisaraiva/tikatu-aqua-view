@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
@@ -9,6 +10,7 @@ import IqaIndice from '@/components/indices/IqaIndice';
 import IetIndice from '@/components/indices/IetIndice';
 
 const Indices = () => {
+  const [selectedState, setSelectedState] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
   const [selectedRiver, setSelectedRiver] = useState('');
   const [selectedPoints, setSelectedPoints] = useState<string[]>([]);
@@ -17,7 +19,18 @@ const Indices = () => {
   const [endDate, setEndDate] = useState<Date | undefined>();
   const [activeIndex, setActiveIndex] = useState<'iqa' | 'iet' | null>(null);
 
-  // Limpar pontos e parâmetros quando a cidade mudar
+  // Limpar cidade, rio, pontos e parâmetros quando o estado mudar
+  useEffect(() => {
+    if (selectedState !== '' && selectedCity !== '') {
+      console.log('Indices - Estado mudou, limpando filtros');
+      setSelectedCity('');
+      setSelectedRiver('');
+      setSelectedPoints([]);
+      setSelectedParameters([]);
+    }
+  }, [selectedState]);
+
+  // Limpar rio, pontos e parâmetros quando a cidade mudar
   useEffect(() => {
     if (selectedCity && selectedRiver) {
       console.log('Indices - Cidade mudou, limpando rio e filtros');
@@ -31,6 +44,11 @@ const Indices = () => {
     console.log('Indices - Date filter changed:', { start, end });
     setStartDate(start);
     setEndDate(end);
+  };
+
+  const handleStateChange = (state: string) => {
+    console.log('Indices - Estado mudou:', state);
+    setSelectedState(state);
   };
 
   const handleRiverChange = (river: string) => {
@@ -99,10 +117,12 @@ const Indices = () => {
         {/* Filters - Only show if an index is selected, without parameters filter */}
         {activeIndex && (
           <FilterSection
+            selectedState={selectedState}
             selectedCity={selectedCity}
             selectedRiver={selectedRiver}
             selectedPoints={selectedPoints}
             selectedParameters={selectedParameters}
+            onStateChange={handleStateChange}
             onCityChange={setSelectedCity}
             onRiverChange={handleRiverChange}
             onPointsChange={setSelectedPoints}

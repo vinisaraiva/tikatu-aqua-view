@@ -164,30 +164,41 @@ const FilterSection = ({
           <CardTitle>Filtros Principais</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* State Selection */}
-          <div>
-            <label className="text-sm font-medium mb-2 block">Estado</label>
-            <Select value={selectedState} onValueChange={onStateChange} disabled={statesLoading}>
-              <SelectTrigger>
-                <SelectValue placeholder={statesLoading ? "Carregando estados..." : "Selecione um estado"} />
-              </SelectTrigger>
-              <SelectContent>
-                {states.map((state) => (
-                  <SelectItem key={state.state} value={state.state}>
-                    {state.state} ({state.count} {state.count === 1 ? 'cidade' : 'cidades'})
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          {/* Primeira linha: Estado e Cidade (sempre visíveis) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* State Selection */}
+            <div>
+              <label className="text-sm font-medium mb-2 block">Estado</label>
+              <Select value={selectedState} onValueChange={onStateChange} disabled={statesLoading}>
+                <SelectTrigger>
+                  <SelectValue placeholder={statesLoading ? "Carregando estados..." : "Selecione um estado"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {states.map((state) => (
+                    <SelectItem key={state.state} value={state.state}>
+                      {state.state} ({state.count} {state.count === 1 ? 'cidade' : 'cidades'})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-          {/* City Selection */}
-          {selectedState && (
+            {/* City Selection */}
             <div>
               <label className="text-sm font-medium mb-2 block">Cidade</label>
-              <Select value={selectedCity} onValueChange={onCityChange} disabled={citiesLoading}>
+              <Select 
+                value={selectedCity} 
+                onValueChange={onCityChange} 
+                disabled={citiesLoading || !selectedState}
+              >
                 <SelectTrigger>
-                  <SelectValue placeholder={citiesLoading ? "Carregando cidades..." : "Selecione uma cidade"} />
+                  <SelectValue placeholder={
+                    !selectedState 
+                      ? "Selecione um estado primeiro" 
+                      : citiesLoading 
+                        ? "Carregando cidades..." 
+                        : "Selecione uma cidade"
+                  } />
                 </SelectTrigger>
                 <SelectContent>
                   {cities.map((city) => (
@@ -198,47 +209,50 @@ const FilterSection = ({
                 </SelectContent>
               </Select>
             </div>
-          )}
+          </div>
 
-          {/* River Selection */}
+          {/* Segunda linha: Rio e Data */}
           {selectedCity && (
-            <div>
-              <label className="text-sm font-medium mb-2 block">Rio</label>
-              <Select value={selectedRiver} onValueChange={onRiverChange} disabled={riversLoading}>
-                <SelectTrigger>
-                  <SelectValue placeholder={riversLoading ? "Carregando rios..." : "Selecione um rio"} />
-                </SelectTrigger>
-                <SelectContent>
-                  {rivers.map((river) => (
-                    <SelectItem key={river.id} value={river.name}>
-                      {river.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* River Selection */}
+              <div>
+                <label className="text-sm font-medium mb-2 block">Rio</label>
+                <Select value={selectedRiver} onValueChange={onRiverChange} disabled={riversLoading}>
+                  <SelectTrigger>
+                    <SelectValue placeholder={riversLoading ? "Carregando rios..." : "Selecione um rio"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {rivers.map((river) => (
+                      <SelectItem key={river.id} value={river.name}>
+                        {river.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Date Filter */}
+              <div>
+                <label className="text-sm font-medium mb-2 block">Período</label>
+                <Collapsible open={showDateFilter} onOpenChange={setShowDateFilter}>
+                  <CollapsibleTrigger asChild>
+                    <Button variant="outline" className="w-full justify-start">
+                      <CalendarIcon className="h-4 w-4 mr-2" />
+                      {showDateFilter ? 'Ocultar Filtro de Data' : 'Filtrar por Data'}
+                    </Button>
+                  </CollapsibleTrigger>
+                  
+                  <CollapsibleContent className="mt-2">
+                    <DateFilter onDateChange={onDateChange} />
+                  </CollapsibleContent>
+                </Collapsible>
+              </div>
             </div>
           )}
 
-          {/* Date Filter - Collapsible */}
-          <Collapsible open={showDateFilter} onOpenChange={setShowDateFilter}>
-            <div className="flex items-center justify-between">
-              <label className="text-sm font-medium">Período</label>
-              <CollapsibleTrigger asChild>
-                <Button variant="outline" size="sm">
-                  <CalendarIcon className="h-4 w-4 mr-2" />
-                  {showDateFilter ? 'Ocultar Filtro' : 'Filtrar por Data'}
-                </Button>
-              </CollapsibleTrigger>
-            </div>
-            
-            <CollapsibleContent className="mt-4">
-              <DateFilter onDateChange={onDateChange} />
-            </CollapsibleContent>
-          </Collapsible>
-
-          {/* Points and Parameters Filter - Side by Side within Main Card */}
+          {/* Points and Parameters Filter - Below main filters */}
           {selectedRiver && (
-            <div className={`pt-4 border-t ${showParametersFilter ? 'grid grid-cols-1 lg:grid-cols-2 gap-6' : ''}`}>
+            <div className={`pt-6 border-t ${showParametersFilter ? 'grid grid-cols-1 lg:grid-cols-2 gap-6' : ''}`}>
               {/* Points Filter Section */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
