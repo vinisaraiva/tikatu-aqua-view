@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -15,12 +14,12 @@ interface FilterSectionProps {
   selectedCity: string;
   selectedRiver: string;
   selectedPoints: string[];
-  selectedParameter: string; // Changed from array to single string
+  selectedParameter: string; // This will now be the parameter CODE, not description
   onStateChange: (state: string) => void;
   onCityChange: (city: string) => void;
   onRiverChange: (river: string) => void;
   onPointsChange: (points: string[]) => void;
-  onParameterChange: (parameter: string) => void; // Changed from array to single string
+  onParameterChange: (parameter: string) => void; // This will now receive parameter CODE
   onDateChange: (start: Date | undefined, end: Date | undefined) => void;
   showParametersFilter?: boolean;
 }
@@ -30,12 +29,12 @@ const FilterSection = ({
   selectedCity,
   selectedRiver,
   selectedPoints,
-  selectedParameter, // Updated prop
+  selectedParameter,
   onStateChange,
   onCityChange,
   onRiverChange,
   onPointsChange,
-  onParameterChange, // Updated prop
+  onParameterChange,
   onDateChange,
   showParametersFilter = true,
 }: FilterSectionProps) => {
@@ -52,6 +51,9 @@ const FilterSection = ({
   
   const { data: points = [], isLoading: pointsLoading } = usePoints(selectedRiverData?.id);
   const { data: parameters = [], isLoading: parametersLoading } = useParameters();
+
+  // Find the selected parameter data for display
+  const selectedParameterData = parameters.find(param => param.code === selectedParameter);
 
   // Limpar cidades, rios, pontos e parâmetros quando o estado mudar
   useEffect(() => {
@@ -98,7 +100,8 @@ const FilterSection = ({
     selectedRiverId: selectedRiverData?.id,
     pointsCount: points.length,
     selectedPoints,
-    selectedParameter, // Updated log
+    selectedParameter,
+    selectedParameterData,
   });
 
   const handlePointChange = (pointName: string, checked: boolean) => {
@@ -296,7 +299,7 @@ const FilterSection = ({
                 )}
               </div>
 
-              {/* Parameters Filter Section - Single selection */}
+              {/* Parameters Filter Section - Single selection with CODES */}
               {showParametersFilter && (
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
@@ -322,11 +325,11 @@ const FilterSection = ({
                         ))}
                       </SelectContent>
                     </Select>
-                    {selectedParameter && (
+                    {selectedParameterData && (
                       <div className="mt-2 text-xs text-gray-500">
-                        {parameters.find(p => p.code === selectedParameter)?.description}
-                        {parameters.find(p => p.code === selectedParameter)?.unit && (
-                          <span> ({parameters.find(p => p.code === selectedParameter)?.unit})</span>
+                        {selectedParameterData.description}
+                        {selectedParameterData.unit && (
+                          <span> ({selectedParameterData.unit})</span>
                         )}
                       </div>
                     )}

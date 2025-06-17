@@ -17,7 +17,7 @@ interface Reading {
 
 interface ReadingsChartProps {
   readings: Reading[];
-  selectedParameter?: string;
+  selectedParameter?: string; // This is now the parameter CODE
 }
 
 const ReadingsChart = ({ readings, selectedParameter }: ReadingsChartProps) => {
@@ -39,8 +39,10 @@ const ReadingsChart = ({ readings, selectedParameter }: ReadingsChartProps) => {
     );
   }
 
-  // Filter readings for the selected parameter only
-  const parameterReadings = readings.filter(r => r.parameter === selectedParameter);
+  // Since we now receive parameter CODE but readings have parameter DESCRIPTION,
+  // we need to filter differently. The transformer already filtered by code,
+  // so we can use all readings here.
+  const parameterReadings = readings;
   
   if (parameterReadings.length === 0) {
     return (
@@ -56,6 +58,9 @@ const ReadingsChart = ({ readings, selectedParameter }: ReadingsChartProps) => {
       </Card>
     );
   }
+
+  // Get the parameter description for display (from the first reading)
+  const parameterDescription = parameterReadings[0]?.parameter || selectedParameter;
 
   // Transform readings data for the chart - one bar per point
   const chartData = parameterReadings.reduce((acc, reading) => {
@@ -123,7 +128,7 @@ const ReadingsChart = ({ readings, selectedParameter }: ReadingsChartProps) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Gráfico de {selectedParameter} por Ponto de Coleta</CardTitle>
+        <CardTitle>Gráfico de {parameterDescription} por Ponto de Coleta</CardTitle>
         <p className="text-sm text-gray-600">
           Valores medidos em cada ponto com referências CONAMA
         </p>
@@ -165,7 +170,7 @@ const ReadingsChart = ({ readings, selectedParameter }: ReadingsChartProps) => {
               
               <Bar
                 dataKey="value"
-                name={`${selectedParameter} (${unit})`}
+                name={`${parameterDescription} (${unit})`}
                 radius={[4, 4, 0, 0]}
               />
             </BarChart>

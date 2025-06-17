@@ -16,7 +16,7 @@ interface TransformReadingsParams {
   readingValues: ReadingValue[];
   readings: any[];
   selectedPointsData: any[];
-  parameter: string;
+  parameter: string; // This is now expected to be a parameter CODE
 }
 
 export const transformReadingsData = ({ 
@@ -29,7 +29,7 @@ export const transformReadingsData = ({
     readingValuesCount: readingValues.length,
     readingsCount: readings.length,
     selectedPointsCount: selectedPointsData.length,
-    selectedParameter: parameter
+    selectedParameterCode: parameter // Now using parameter CODE
   });
 
   // Debug: log all reading values with their parameters
@@ -43,14 +43,14 @@ export const transformReadingsData = ({
     });
   });
 
-  // Filter reading values by selected parameter
+  // Filter reading values by selected parameter CODE (not description)
   const filteredReadingValues = readingValues.filter(value => {
     const parameterCode = value.parameter?.code || '';
     const shouldInclude = !parameter || parameter === parameterCode;
     
-    console.log('Filtro de parâmetro:', {
+    console.log('Filtro de parâmetro (usando código):', {
       valueParameterCode: parameterCode,
-      selectedParameter: parameter,
+      selectedParameterCode: parameter,
       shouldInclude
     });
     
@@ -100,7 +100,7 @@ export const transformReadingsData = ({
 
     const transformedReading = {
       id: `${reading.id}-${value.parameter_id}`,
-      parameter: value.parameter?.description || 'Parâmetro Desconhecido',
+      parameter: value.parameter?.description || 'Parâmetro Desconhecido', // Still display description in UI
       value: value.value,
       unit: value.parameter?.unit || '',
       datetime: reading.measured_at,
