@@ -1,7 +1,6 @@
 
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import ChartTooltip from './ChartTooltip';
-import ConamaReferenceLines from './ConamaReferenceLines';
 
 interface ReadingsBarChartProps {
   chartData: any[];
@@ -47,8 +46,41 @@ const ReadingsBarChart = ({
             radius={[4, 4, 0, 0]}
           />
           
-          {/* Reference lines for CONAMA limits - positioned AFTER Bar to appear ON TOP */}
-          <ConamaReferenceLines conamaMin={conamaMin} conamaMax={conamaMax} />
+          {/* CONAMA Reference Lines - now directly inside BarChart */}
+          {conamaMin !== undefined && conamaMin !== null && (
+            <ReferenceLine 
+              y={conamaMin} 
+              stroke="#22c55e" 
+              strokeWidth={3} 
+              strokeDasharray="8 4" 
+              ifOverflow="extendDomain"
+              label={{ 
+                value: `Min CONAMA: ${conamaMin}`, 
+                position: "top", 
+                fill: '#22c55e',
+                fontSize: 12,
+                fontWeight: 'bold',
+                offset: 10
+              }}
+            />
+          )}
+          {conamaMax !== undefined && conamaMax !== null && (
+            <ReferenceLine 
+              y={conamaMax} 
+              stroke="#f97316" 
+              strokeWidth={3} 
+              strokeDasharray="8 4" 
+              ifOverflow="extendDomain"
+              label={{ 
+                value: `Max CONAMA: ${conamaMax}`, 
+                position: "top", 
+                fill: '#f97316',
+                fontSize: 12, 
+                fontWeight: 'bold',
+                offset: 10
+              }}
+            />
+          )}
         </BarChart>
       </ResponsiveContainer>
     </div>
