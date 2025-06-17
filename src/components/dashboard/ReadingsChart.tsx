@@ -93,11 +93,14 @@ const ReadingsChart = ({ readings, selectedParameter }: ReadingsChartProps) => {
     return acc;
   }, [] as any[]);
 
-  // Get CONAMA limits for reference lines
+  // Get CONAMA limits for reference lines - ensure we have valid numbers
   const sampleReading = parameterReadings[0];
   const conamaMin = sampleReading?.conamaMin;
   const conamaMax = sampleReading?.conamaMax;
   const unit = sampleReading?.unit || '';
+
+  // Debug log for CONAMA values
+  console.log('CONAMA values:', { conamaMin, conamaMax, sampleReading });
 
   // Custom tooltip
   const CustomTooltip = ({ active, payload, label }: any) => {
@@ -108,10 +111,10 @@ const ReadingsChart = ({ readings, selectedParameter }: ReadingsChartProps) => {
           <p className="font-medium">{`${label}`}</p>
           <p className="text-blue-600">{`Valor: ${data.value} ${unit}`}</p>
           {data.conamaMin !== undefined && (
-            <p className="text-blue-600 text-sm">{`Min CONAMA: ${data.conamaMin} ${unit}`}</p>
+            <p className="text-green-600 text-sm">{`Min CONAMA: ${data.conamaMin} ${unit}`}</p>
           )}
           {data.conamaMax !== undefined && (
-            <p className="text-red-600 text-sm">{`Max CONAMA: ${data.conamaMax} ${unit}`}</p>
+            <p className="text-orange-600 text-sm">{`Max CONAMA: ${data.conamaMax} ${unit}`}</p>
           )}
           <p className={`text-sm font-medium ${
             data.status === 'normal' ? 'text-green-600' : 
@@ -136,7 +139,7 @@ const ReadingsChart = ({ readings, selectedParameter }: ReadingsChartProps) => {
       <CardContent>
         <div className="h-80">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+            <BarChart data={chartData} margin={{ top: 40, right: 30, left: 20, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis 
                 dataKey="point" 
@@ -150,29 +153,49 @@ const ReadingsChart = ({ readings, selectedParameter }: ReadingsChartProps) => {
               />
               <Tooltip content={<CustomTooltip />} />
               
-              {/* Reference lines for CONAMA limits with different colors */}
-              {conamaMin !== undefined && (
-                <ReferenceLine 
-                  y={conamaMin} 
-                  stroke="#3b82f6" 
-                  strokeDasharray="5 5" 
-                  label={{ value: `Min CONAMA: ${conamaMin}`, position: "top", style: { fill: '#3b82f6' } }}
-                />
-              )}
-              {conamaMax !== undefined && (
-                <ReferenceLine 
-                  y={conamaMax} 
-                  stroke="#ef4444" 
-                  strokeDasharray="5 5" 
-                  label={{ value: `Max CONAMA: ${conamaMax}`, position: "top", style: { fill: '#ef4444' } }}
-                />
-              )}
-              
               <Bar
                 dataKey="value"
                 name={`${parameterDescription} (${unit})`}
                 radius={[4, 4, 0, 0]}
               />
+
+              {/* Reference lines for CONAMA limits with different colors - positioned after Bar */}
+              {conamaMin !== undefined && conamaMin !== null && (
+                <ReferenceLine 
+                  y={conamaMin} 
+                  stroke="#22c55e" 
+                  strokeWidth={3}
+                  strokeDasharray="8 4" 
+                  label={{ 
+                    value: `Min CONAMA: ${conamaMin}`, 
+                    position: "topRight", 
+                    offset: 10,
+                    style: { 
+                      fill: '#22c55e', 
+                      fontWeight: 'bold',
+                      fontSize: '12px'
+                    } 
+                  }}
+                />
+              )}
+              {conamaMax !== undefined && conamaMax !== null && (
+                <ReferenceLine 
+                  y={conamaMax} 
+                  stroke="#f97316" 
+                  strokeWidth={3}
+                  strokeDasharray="8 4" 
+                  label={{ 
+                    value: `Max CONAMA: ${conamaMax}`, 
+                    position: "topRight", 
+                    offset: 10,
+                    style: { 
+                      fill: '#f97316', 
+                      fontWeight: 'bold',
+                      fontSize: '12px'
+                    } 
+                  }}
+                />
+              )}
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -191,16 +214,16 @@ const ReadingsChart = ({ readings, selectedParameter }: ReadingsChartProps) => {
             <div className="w-4 h-4 bg-red-500 rounded"></div>
             <span>Crítico</span>
           </div>
-          {conamaMin !== undefined && (
+          {conamaMin !== undefined && conamaMin !== null && (
             <div className="flex items-center gap-2">
-              <div className="w-4 h-1 bg-blue-500 border-dashed border border-blue-500"></div>
-              <span>Limite Min CONAMA</span>
+              <div className="w-6 h-1 bg-green-500" style={{ borderTop: '3px dashed #22c55e' }}></div>
+              <span>Min CONAMA: {conamaMin}</span>
             </div>
           )}
-          {conamaMax !== undefined && (
+          {conamaMax !== undefined && conamaMax !== null && (
             <div className="flex items-center gap-2">
-              <div className="w-4 h-1 bg-red-500 border-dashed border border-red-500"></div>
-              <span>Limite Max CONAMA</span>
+              <div className="w-6 h-1 bg-orange-500" style={{ borderTop: '3px dashed #f97316' }}></div>
+              <span>Max CONAMA: {conamaMax}</span>
             </div>
           )}
         </div>
