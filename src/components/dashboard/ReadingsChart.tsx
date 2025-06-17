@@ -1,6 +1,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, ReferenceLine } from 'recharts';
+import ReadingsBarChart from './chart/ReadingsBarChart';
+import ChartLegend from './chart/ChartLegend';
 
 interface Reading {
   id: string;
@@ -102,32 +103,6 @@ const ReadingsChart = ({ readings, selectedParameter }: ReadingsChartProps) => {
   // Debug log for CONAMA values
   console.log('CONAMA values:', { conamaMin, conamaMax, sampleReading });
 
-  // Custom tooltip
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload;
-      return (
-        <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
-          <p className="font-medium">{`${label}`}</p>
-          <p className="text-blue-600">{`Valor: ${data.value} ${unit}`}</p>
-          {data.conamaMin !== undefined && (
-            <p className="text-green-600 text-sm">{`Min CONAMA: ${data.conamaMin} ${unit}`}</p>
-          )}
-          {data.conamaMax !== undefined && (
-            <p className="text-orange-600 text-sm">{`Max CONAMA: ${data.conamaMax} ${unit}`}</p>
-          )}
-          <p className={`text-sm font-medium ${
-            data.status === 'normal' ? 'text-green-600' : 
-            data.status === 'attention' ? 'text-yellow-600' : 'text-red-600'
-          }`}>
-            Status: {data.status === 'normal' ? 'Normal' : data.status === 'attention' ? 'Atenção' : 'Crítico'}
-          </p>
-        </div>
-      );
-    }
-    return null;
-  };
-
   return (
     <Card>
       <CardHeader>
@@ -137,96 +112,16 @@ const ReadingsChart = ({ readings, selectedParameter }: ReadingsChartProps) => {
         </p>
       </CardHeader>
       <CardContent>
-        <div className="h-80">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart 
-              data={chartData} 
-              margin={{ top: 40, right: 30, left: 20, bottom: 5 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis 
-                dataKey="point" 
-                angle={-45}
-                textAnchor="end"
-                height={80}
-                fontSize={12}
-              />
-              <YAxis 
-                label={{ value: unit, angle: -90, position: 'insideLeft' }}
-              />
-              <Tooltip content={<CustomTooltip />} />
-              
-              {/* Reference lines for CONAMA limits - positioned BEFORE Bar to appear BEHIND */}
-              {conamaMin !== undefined && conamaMin !== null && (
-                <ReferenceLine 
-                  y={conamaMin} 
-                  stroke="#22c55e" 
-                  strokeWidth={2} 
-                  strokeDasharray="5 5" 
-                  ifOverflow="extendDomain"
-                  label={{ 
-                    value: `Min CONAMA: ${conamaMin}`, 
-                    position: "top", 
-                    fill: '#22c55e',
-                    fontSize: 12,
-                    fontWeight: 600
-                  }}
-                />
-              )}
-              {conamaMax !== undefined && conamaMax !== null && (
-                <ReferenceLine 
-                  y={conamaMax} 
-                  stroke="#f97316" 
-                  strokeWidth={2} 
-                  strokeDasharray="5 5" 
-                  ifOverflow="extendDomain"
-                  label={{ 
-                    value: `Max CONAMA: ${conamaMax}`, 
-                    position: "top", 
-                    fill: '#f97316',
-                    fontSize: 12, 
-                    fontWeight: 600
-                  }}
-                />
-              )}
-              
-              {/* Bar chart positioned AFTER reference lines so they appear BEHIND */}
-              <Bar
-                dataKey="value"
-                name={`${parameterDescription} (${unit})`}
-                radius={[4, 4, 0, 0]}
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+        <ReadingsBarChart
+          chartData={chartData}
+          unit={unit}
+          parameterDescription={parameterDescription}
+          conamaMin={conamaMin}
+          conamaMax={conamaMax}
+        />
         
         {/* Legend for colors with differentiated CONAMA lines */}
-        <div className="mt-4 flex flex-wrap gap-6 justify-center text-sm">
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-green-500 rounded"></div>
-            <span>Normal</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-yellow-500 rounded"></div>
-            <span>Atenção</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-red-500 rounded"></div>
-            <span>Crítico</span>
-          </div>
-          {conamaMin !== undefined && conamaMin !== null && (
-            <div className="flex items-center gap-2">
-              <div className="w-10 h-0 border-t-2 border-green-500 border-dashed"></div>
-              <span>Min CONAMA: {conamaMin}</span>
-            </div>
-          )}
-          {conamaMax !== undefined && conamaMax !== null && (
-            <div className="flex items-center gap-2">
-              <div className="w-10 h-0 border-t-2 border-orange-500 border-dashed"></div>
-              <span>Max CONAMA: {conamaMax}</span>
-            </div>
-          )}
-        </div>
+        <ChartLegend conamaMin={conamaMin} conamaMax={conamaMax} />
       </CardContent>
     </Card>
   );
