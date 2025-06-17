@@ -10,6 +10,8 @@ interface Reading {
   conamaStatus: 'normal' | 'attention' | 'critical';
   hasAnomaly: boolean;
   point: string;
+  conamaMin?: number | null;
+  conamaMax?: number | null;
 }
 
 interface TransformReadingsParams {
@@ -39,7 +41,9 @@ export const transformReadingsData = ({
       parameter_id: value.parameter_id,
       value: value.value,
       parameter_code: value.parameter?.code,
-      parameter_description: value.parameter?.description
+      parameter_description: value.parameter?.description,
+      conama_min: value.parameter?.conama_min,
+      conama_max: value.parameter?.conama_max
     });
   });
 
@@ -68,13 +72,21 @@ export const transformReadingsData = ({
       reading_id: value.reading_id,
       reading_found: !!reading,
       point_found: !!point,
-      point_id: reading?.point_id
+      point_id: reading?.point_id,
+      conama_values: {
+        min: value.parameter?.conama_min,
+        max: value.parameter?.conama_max
+      }
     });
 
     if (!reading || !point) {
       console.log('Dados faltando - pulando:', { reading: !!reading, point: !!point });
       return null;
     }
+
+    // Extract CONAMA values from parameter
+    const conamaMin = value.parameter?.conama_min || null;
+    const conamaMax = value.parameter?.conama_max || null;
 
     // Determine CONAMA status based on parameter limits
     let conamaStatus: 'normal' | 'attention' | 'critical' = 'normal';
@@ -107,12 +119,24 @@ export const transformReadingsData = ({
       conamaStatus,
       hasAnomaly,
       point: point.name,
+      conamaMin, // Include CONAMA minimum value
+      conamaMax  // Include CONAMA maximum value
     };
 
-    console.log('Reading transformado:', transformedReading);
+    console.log('Reading transformado com CONAMA:', {
+      ...transformedReading,
+      conamaMin,
+      conamaMax
+    });
     return transformedReading;
   }).filter(Boolean) as Reading[];
 
   console.log('Total de readings transformados:', transformedReadings.length);
+  console.log('CONAMA values nos dados transformados:', transformedReadings.map(r => ({
+    parameter: r.parameter,
+    conamaMin: r.conamaMin,
+    conamaMax: r.conamaMax
+  })));
+  
   return transformedReadings;
 };

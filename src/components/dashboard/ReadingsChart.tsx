@@ -12,8 +12,8 @@ interface Reading {
   conamaStatus: 'normal' | 'attention' | 'critical';
   hasAnomaly: boolean;
   point: string;
-  conamaMin?: number;
-  conamaMax?: number;
+  conamaMin?: number | null;
+  conamaMax?: number | null;
 }
 
 interface ReadingsChartProps {
@@ -22,6 +22,13 @@ interface ReadingsChartProps {
 }
 
 const ReadingsChart = ({ readings, selectedParameter }: ReadingsChartProps) => {
+  console.log('ReadingsChart - Props recebidas:', {
+    readingsCount: readings.length,
+    selectedParameter,
+    firstReading: readings[0],
+    conamaValues: readings.map(r => ({ conamaMin: r.conamaMin, conamaMax: r.conamaMax }))
+  });
+
   if (!selectedParameter || readings.length === 0) {
     return (
       <Card>
@@ -63,6 +70,28 @@ const ReadingsChart = ({ readings, selectedParameter }: ReadingsChartProps) => {
   // Get the parameter description for display (from the first reading)
   const parameterDescription = parameterReadings[0]?.parameter || selectedParameter;
 
+  // Get CONAMA limits from the first reading (should be the same for all readings of the same parameter)
+  const sampleReading = parameterReadings[0];
+  const conamaMin = sampleReading?.conamaMin;
+  const conamaMax = sampleReading?.conamaMax;
+  const unit = sampleReading?.unit || '';
+
+  // Enhanced debug log for CONAMA values
+  console.log('ReadingsChart - CONAMA values extracted:', { 
+    conamaMin, 
+    conamaMax, 
+    sampleReading: {
+      parameter: sampleReading?.parameter,
+      conamaMin: sampleReading?.conamaMin,
+      conamaMax: sampleReading?.conamaMax
+    },
+    allReadingsConama: parameterReadings.map(r => ({
+      point: r.point,
+      conamaMin: r.conamaMin,
+      conamaMax: r.conamaMax
+    }))
+  });
+
   // Transform readings data for the chart - one bar per point
   const chartData = parameterReadings.reduce((acc, reading) => {
     const existingPoint = acc.find(item => item.point === reading.point);
@@ -70,12 +99,13 @@ const ReadingsChart = ({ readings, selectedParameter }: ReadingsChartProps) => {
     if (!existingPoint) {
       // Determine color based on CONAMA limits
       let barColor = '#10b981'; // Default green
-      if (reading.conamaMin !== undefined || reading.conamaMax !== undefined) {
-        if (reading.conamaMin !== undefined && reading.value < reading.conamaMin) {
+      if (reading.conamaMin !== undefined && reading.conamaMin !== null || 
+          reading.conamaMax !== undefined && reading.conamaMax !== null) {
+        if (reading.conamaMin !== undefined && reading.conamaMin !== null && reading.value < reading.conamaMin) {
           barColor = '#ef4444'; // Red - below minimum
-        } else if (reading.conamaMax !== undefined && reading.value > reading.conamaMax) {
+        } else if (reading.conamaMax !== undefined && reading.conamaMax !== null && reading.value > reading.conamaMax) {
           barColor = '#ef4444'; // Red - above maximum
-        } else if (reading.conamaMax !== undefined && reading.value > reading.conamaMax * 0.8) {
+        } else if (reading.conamaMax !== undefined && reading.conamaMax !== null && reading.value > reading.conamaMax * 0.8) {
           barColor = '#f59e0b'; // Yellow - approaching limit (80% of max)
         }
       }
@@ -94,14 +124,7 @@ const ReadingsChart = ({ readings, selectedParameter }: ReadingsChartProps) => {
     return acc;
   }, [] as any[]);
 
-  // Get CONAMA limits for reference lines - ensure we have valid numbers
-  const sampleReading = parameterReadings[0];
-  const conamaMin = sampleReading?.conamaMin;
-  const conamaMax = sampleReading?.conamaMax;
-  const unit = sampleReading?.unit || '';
-
-  // Debug log for CONAMA values
-  console.log('CONAMA values:', { conamaMin, conamaMax, sampleReading });
+  console.log('ReadingsChart - Chart data prepared:', chartData);
 
   return (
     <Card>
@@ -109,6 +132,9 @@ const ReadingsChart = ({ readings, selectedParameter }: ReadingsChartProps) => {
         <CardTitle>Gráfico de {parameterDescription} por Ponto de Coleta</CardTitle>
         <p className="text-sm text-gray-600">
           Valores medidos em cada ponto com referências CONAMA
+          {(conamaMin !== null && conamaMin !== undefined) || (conamaMax !== null && conamaMax !== undefined) 
+            ? ` (Min: ${conamaMin || 'N/A'}, Max: ${conamaMax || 'N/A'})` 
+            : ' (Sem limites CONAMA definidos)'}
         </p>
       </CardHeader>
       <CardContent>
