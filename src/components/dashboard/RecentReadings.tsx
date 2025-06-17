@@ -1,23 +1,13 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { AlertCircleIcon, CheckCircleIcon, XCircleIcon, LoaderIcon } from 'lucide-react';
+import { AlertCircleIcon, LoaderIcon } from 'lucide-react';
 import ReadingsChart from './ReadingsChart';
 import CollectionPointsMap from './CollectionPointsMap';
+import ReadingsTable from './ReadingsTable';
+import ReadingsFilters from './ReadingsFilters';
+import { transformReadingsData } from './ReadingsDataTransformer';
 import { useReadings, useReadingValues } from '@/hooks/useReadingsData';
 import { useCities, useRivers, usePoints } from '@/hooks/useGeographicData';
-
-interface Reading {
-  id: string;
-  parameter: string;
-  value: number;
-  unit: string;
-  datetime: string;
-  conamaStatus: 'normal' | 'attention' | 'critical';
-  hasAnomaly: boolean;
-  point: string;
-}
 
 interface RecentReadingsProps {
   city: string;
@@ -47,89 +37,16 @@ const RecentReadings = ({ city, river, points, parameter, startDate, endDate }: 
   const readingIds = readings.map(reading => reading.id);
   const { data: readingValues = [], isLoading: valuesLoading } = useReadingValues(readingIds);
 
-  // Filter reading values by selected parameter
-  const filteredReadingValues = readingValues.filter(value => {
-    if (!parameter) return true; // Show all if no parameter selected
-    return parameter === (value.parameter?.code || '');
-  });
-
   // Transform data for display
-  const transformedReadings: Reading[] = filteredReadingValues.map((value) => {
-    const reading = readings.find(r => r.id === value.reading_id);
-    const point = selectedPointsData.find(p => p.id === reading?.point_id);
-    
-    if (!reading || !point) return null;
-
-    // Determine CONAMA status based on parameter limits
-    let conamaStatus: 'normal' | 'attention' | 'critical' = 'normal';
-    let hasAnomaly = false;
-
-    if (value.parameter) {
-      const { conama_min, conama_max } = value.parameter;
-      
-      if (conama_min !== null && value.value < conama_min) {
-        conamaStatus = 'critical';
-        hasAnomaly = true;
-      } else if (conama_max !== null && value.value > conama_max) {
-        conamaStatus = 'critical';
-        hasAnomaly = true;
-      } else if (conama_min !== null && value.value < conama_min * 1.2) {
-        conamaStatus = 'attention';
-        hasAnomaly = true;
-      } else if (conama_max !== null && value.value > conama_max * 0.8) {
-        conamaStatus = 'attention';
-        hasAnomaly = true;
-      }
-    }
-
-    return {
-      id: `${reading.id}-${value.parameter_id}`,
-      parameter: value.parameter?.description || 'Parâmetro Desconhecido',
-      value: value.value,
-      unit: value.parameter?.unit || '',
-      datetime: reading.measured_at,
-      conamaStatus,
-      hasAnomaly,
-      point: point.name,
-    };
-  }).filter(Boolean) as Reading[];
+  const transformedReadings = transformReadingsData({
+    readingValues,
+    readings,
+    selectedPointsData,
+    parameter
+  });
 
   const isLoading = readingsLoading || valuesLoading;
   const error = readingsError;
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'normal':
-        return <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Normal</Badge>;
-      case 'attention':
-        return <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">Atenção</Badge>;
-      case 'critical':
-        return <Badge className="bg-red-100 text-red-800 hover:bg-red-100">Crítico</Badge>;
-      default:
-        return <Badge variant="secondary">-</Badge>;
-    }
-  };
-
-  const getAnomalyIcon = (hasAnomaly: boolean) => {
-    if (hasAnomaly) {
-      return <XCircleIcon className="h-4 w-4 text-red-500" />;
-    }
-    return <CheckCircleIcon className="h-4 w-4 text-green-500" />;
-  };
-
-  const getDateRangeText = () => {
-    if (startDate && endDate) {
-      return `${startDate.toLocaleDateString('pt-BR')} - ${endDate.toLocaleDateString('pt-BR')}`;
-    } else if (startDate) {
-      return startDate.toLocaleDateString('pt-BR');
-    }
-    return 'Dados recentes';
-  };
-
-  const getParameterText = () => {
-    if (!parameter) return 'Todos os parâmetros';
-    return parameter;
-  };
 
   if (!city || !river || points.length === 0) {
     return (
@@ -182,9 +99,14 @@ const RecentReadings = ({ city, river, points, parameter, startDate, endDate }: 
       <Card>
         <CardHeader>
           <CardTitle>Leituras Recentes</CardTitle>
-          <p className="text-sm text-gray-600">
-            {city} → {river} → {points.join(', ')} | {getDateRangeText()} | {getParameterText()}
-          </p>
+          <ReadingsFilters 
+            city={city}
+            river={river}
+            points={points}
+            parameter={parameter}
+            startDate={startDate}
+            endDate={endDate}
+          />
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -198,44 +120,7 @@ const RecentReadings = ({ city, river, points, parameter, startDate, endDate }: 
               <p>Nenhuma leitura encontrada para os filtros selecionados</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Ponto</TableHead>
-                    <TableHead>Parâmetro</TableHead>
-                    <TableHead>Valor</TableHead>
-                    <TableHead>Data/Hora</TableHead>
-                    <TableHead>Status CONAMA</TableHead>
-                    <TableHead>Anomalia</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {transformedReadings.map((reading) => (
-                    <TableRow key={reading.id}>
-                      <TableCell className="font-medium">
-                        {reading.point}
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        {reading.parameter}
-                      </TableCell>
-                      <TableCell>
-                        {reading.value} {reading.unit}
-                      </TableCell>
-                      <TableCell>
-                        {new Date(reading.datetime).toLocaleString('pt-BR')}
-                      </TableCell>
-                      <TableCell>
-                        {getStatusBadge(reading.conamaStatus)}
-                      </TableCell>
-                      <TableCell>
-                        {getAnomalyIcon(reading.hasAnomaly)}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+            <ReadingsTable readings={transformedReadings} />
           )}
         </CardContent>
       </Card>
