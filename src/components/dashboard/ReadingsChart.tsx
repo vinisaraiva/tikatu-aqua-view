@@ -108,10 +108,10 @@ const ReadingsChart = ({ readings, selectedParameter }: ReadingsChartProps) => {
           <p className="font-medium">{`${label}`}</p>
           <p className="text-blue-600">{`Valor: ${data.value} ${unit}`}</p>
           {data.conamaMin !== undefined && (
-            <p className="text-gray-600 text-sm">{`Min CONAMA: ${data.conamaMin} ${unit}`}</p>
+            <p className="text-blue-600 text-sm">{`Min CONAMA: ${data.conamaMin} ${unit}`}</p>
           )}
           {data.conamaMax !== undefined && (
-            <p className="text-gray-600 text-sm">{`Max CONAMA: ${data.conamaMax} ${unit}`}</p>
+            <p className="text-red-600 text-sm">{`Max CONAMA: ${data.conamaMax} ${unit}`}</p>
           )}
           <p className={`text-sm font-medium ${
             data.status === 'normal' ? 'text-green-600' : 
@@ -150,21 +150,21 @@ const ReadingsChart = ({ readings, selectedParameter }: ReadingsChartProps) => {
               />
               <Tooltip content={<CustomTooltip />} />
               
-              {/* Reference lines for CONAMA limits */}
+              {/* Reference lines for CONAMA limits with different colors */}
               {conamaMin !== undefined && (
                 <ReferenceLine 
                   y={conamaMin} 
-                  stroke="#94a3b8" 
+                  stroke="#3b82f6" 
                   strokeDasharray="5 5" 
-                  label={{ value: `Min CONAMA: ${conamaMin}`, position: "top" }}
+                  label={{ value: `Min CONAMA: ${conamaMin}`, position: "top", style: { fill: '#3b82f6' } }}
                 />
               )}
               {conamaMax !== undefined && (
                 <ReferenceLine 
                   y={conamaMax} 
-                  stroke="#94a3b8" 
+                  stroke="#ef4444" 
                   strokeDasharray="5 5" 
-                  label={{ value: `Max CONAMA: ${conamaMax}`, position: "top" }}
+                  label={{ value: `Max CONAMA: ${conamaMax}`, position: "top", style: { fill: '#ef4444' } }}
                 />
               )}
               
@@ -177,7 +177,7 @@ const ReadingsChart = ({ readings, selectedParameter }: ReadingsChartProps) => {
           </ResponsiveContainer>
         </div>
         
-        {/* Legend for colors */}
+        {/* Legend for colors with differentiated CONAMA lines */}
         <div className="mt-4 flex flex-wrap gap-6 justify-center text-sm">
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 bg-green-500 rounded"></div>
@@ -191,10 +191,16 @@ const ReadingsChart = ({ readings, selectedParameter }: ReadingsChartProps) => {
             <div className="w-4 h-4 bg-red-500 rounded"></div>
             <span>Crítico</span>
           </div>
-          {(conamaMin !== undefined || conamaMax !== undefined) && (
+          {conamaMin !== undefined && (
             <div className="flex items-center gap-2">
-              <div className="w-4 h-1 bg-gray-400 border-dashed border border-gray-400"></div>
-              <span>Limites CONAMA</span>
+              <div className="w-4 h-1 bg-blue-500 border-dashed border border-blue-500"></div>
+              <span>Limite Min CONAMA</span>
+            </div>
+          )}
+          {conamaMax !== undefined && (
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-1 bg-red-500 border-dashed border border-red-500"></div>
+              <span>Limite Max CONAMA</span>
             </div>
           )}
         </div>
