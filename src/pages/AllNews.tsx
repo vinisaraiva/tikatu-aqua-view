@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { NewspaperIcon, ArrowLeftIcon, CalendarIcon, LoaderIcon, AlertCircleIcon, ClockIcon } from 'lucide-react';
+import { NewspaperIcon, ArrowLeftIcon, CalendarIcon, LoaderIcon, AlertCircleIcon, ClockIcon, TrendingUpIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -30,7 +30,7 @@ const AllNews = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-teal-50">
         <Header />
         <main className="max-w-6xl mx-auto px-4 py-8">
           <div className="text-center py-12">
@@ -55,29 +55,37 @@ const AllNews = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-teal-50">
       <Header />
       
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        {/* Header da página */}
-        <div className="mb-8">
-          <Link to="/">
-            <Button variant="ghost" className="text-teal-600 hover:text-teal-700 mb-4">
-              <ArrowLeftIcon className="h-4 w-4 mr-2" />
-              Voltar ao início
+      {/* Hero Section */}
+      <section className="py-16 px-4 bg-gradient-to-r from-teal-600 to-blue-600 text-white">
+        <div className="max-w-6xl mx-auto text-center">
+          <h1 className="text-4xl md:text-5xl font-bold mb-6">
+            Central de Notícias
+          </h1>
+          <p className="text-xl md:text-2xl mb-8 opacity-90 max-w-3xl mx-auto">
+            Mantenha-se informado sobre monitoramento ambiental, pesquisas científicas e avanços tecnológicos
+          </p>
+          <div className="flex gap-4 justify-center flex-wrap">
+            <Link to="/">
+              <Button
+                variant="secondary"
+                className="bg-white text-teal-600 hover:bg-gray-100 transition-colors"
+              >
+                <ArrowLeftIcon className="h-4 w-4 mr-2" />
+                Voltar ao Início
+              </Button>
+            </Link>
+            <Button
+              variant="outline"
+              className="border-white text-white bg-transparent hover:bg-white hover:text-teal-600 transition-colors"
+            >
+              <TrendingUpIcon className="h-4 w-4 mr-2" />
+              Mais Lidas
             </Button>
-          </Link>
-          
-          <div className="text-center mb-8">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <NewspaperIcon className="h-10 w-10 text-teal-600" />
-              <h1 className="text-4xl font-bold text-gray-900">
-                Notícias
-              </h1>
-            </div>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Todas as notícias sobre monitoramento ambiental, pesquisas científicas e avanços tecnológicos
-            </p>
           </div>
         </div>
-
+      </section>
+      
+      <main className="max-w-7xl mx-auto px-4 py-8">
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
             <LoaderIcon className="h-8 w-8 animate-spin text-teal-600 mr-3" />
@@ -96,29 +104,29 @@ const AllNews = () => {
         ) : (
           <>
             {/* Estatísticas */}
-            <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
-                <div>
-                  <div className="text-2xl font-bold text-teal-600">{news.length}</div>
-                  <div className="text-sm text-gray-600">Total de Notícias</div>
+            <div className="bg-white rounded-2xl shadow-sm border p-8 mb-8">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
+                <div className="stats-card">
+                  <div className="text-3xl font-bold text-teal-600 mb-2">{news.length}</div>
+                  <div className="text-gray-600 font-medium">Total de Notícias</div>
                 </div>
-                <div>
-                  <div className="text-2xl font-bold text-blue-600">
+                <div className="stats-card">
+                  <div className="text-3xl font-bold text-blue-600 mb-2">
                     {news.filter(n => n.category === 'Tecnologia').length}
                   </div>
-                  <div className="text-sm text-gray-600">Tecnologia</div>
+                  <div className="text-gray-600 font-medium">Tecnologia</div>
                 </div>
-                <div>
-                  <div className="text-2xl font-bold text-green-600">
+                <div className="stats-card">
+                  <div className="text-3xl font-bold text-green-600 mb-2">
                     {news.filter(n => n.category === 'Meio Ambiente').length}
                   </div>
-                  <div className="text-sm text-gray-600">Meio Ambiente</div>
+                  <div className="text-gray-600 font-medium">Meio Ambiente</div>
                 </div>
-                <div>
-                  <div className="text-2xl font-bold text-purple-600">
+                <div className="stats-card">
+                  <div className="text-3xl font-bold text-purple-600 mb-2">
                     {news.filter(n => n.category === 'Pesquisa').length}
                   </div>
-                  <div className="text-sm text-gray-600">Pesquisa</div>
+                  <div className="text-gray-600 font-medium">Pesquisa</div>
                 </div>
               </div>
             </div>

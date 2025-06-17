@@ -22,28 +22,31 @@ const Index = () => {
             backgroundImage: `url('/lovable-uploads/6c1c5451-5d11-445d-ac6a-b3c2450303b6.png')`
           }}
         />
-        <div className="absolute inset-0 gradient-overlay" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-black/60" />
         
         <div className="relative z-10 max-w-7xl mx-auto px-4 text-center">
           <div className="animate-fade-in">
-            <h1 className="text-white font-bold mb-6 leading-tight">
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
               Monitoramento Avançado da
               <span className="block text-sky-blue">Qualidade da Água</span>
             </h1>
-            <p className="text-xl text-gray-200 mb-8 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl md:text-2xl text-gray-200 mb-8 max-w-3xl mx-auto leading-relaxed opacity-90">
               Plataforma digital para consulta e visualização de dados de monitoramento 
               da qualidade da água em tempo real. Acesse informações detalhadas sobre 
               parâmetros físico-químicos e detecção de anomalias.
             </p>
             <div className="flex gap-4 justify-center flex-wrap">
               <Link to="/dashboard">
-                <Button className="btn-primary">
+                <Button className="bg-white text-teal-600 hover:bg-gray-100 px-8 py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl">
                   Acessar Dashboard
                   <ArrowRightIcon className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
               <Link to="/about">
-                <Button className="btn-secondary">
+                <Button 
+                  variant="outline"
+                  className="border-white text-white bg-transparent hover:bg-white hover:text-teal-600 px-8 py-4 rounded-xl font-semibold transition-all duration-300"
+                >
                   Saiba Mais
                 </Button>
               </Link>
@@ -232,7 +235,7 @@ const Index = () => {
       <Agenda2030Section />
 
       {/* CTA Section */}
-      <section className="py-20 px-4 gradient-hero text-white">
+      <section className="py-20 px-4 bg-gradient-to-r from-teal-600 to-blue-600 text-white">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl font-bold mb-6">
             Acesse Dados Ambientais em Tempo Real
@@ -241,7 +244,7 @@ const Index = () => {
             Monitore a qualidade da água com precisão e tome decisões baseadas em dados confiáveis
           </p>
           <Link to="/dashboard">
-            <Button className="btn-secondary text-primary hover:text-primary">
+            <Button className="bg-white text-teal-600 hover:bg-gray-100 px-8 py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl">
               Começar Agora
               <ArrowRightIcon className="ml-2 h-5 w-5" />
             </Button>

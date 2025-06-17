@@ -1,5 +1,7 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { DropletIcon, LeafIcon, GoalIcon, TargetIcon, TrendingUpIcon, UsersIcon, ShieldIcon, EyeIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { DropletIcon, LeafIcon, GoalIcon, TargetIcon, TrendingUpIcon, UsersIcon, ShieldIcon, EyeIcon, ArrowRightIcon } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
@@ -53,36 +55,55 @@ const Agenda2030 = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-teal-50">
       <Header />
       
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        {/* Hero Section */}
-        <div className="text-center mb-16">
-          <h1 className="text-4xl font-bold text-gray-900 mb-6">
+      {/* Hero Section */}
+      <section className="py-16 px-4 bg-gradient-to-r from-teal-600 to-blue-600 text-white">
+        <div className="max-w-6xl mx-auto text-center">
+          <h1 className="text-4xl md:text-5xl font-bold mb-6">
             Tikatu e a Agenda 2030
           </h1>
-          <div className="max-w-4xl mx-auto">
-            <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-              A Agenda 2030 é um plano de ação global adotado pelas Nações Unidas em 2015, 
-              composto por 17 Objetivos de Desenvolvimento Sustentável (ODS) que visam 
-              acabar com a pobreza, proteger o planeta e garantir prosperidade para todos.
-            </p>
-            <p className="text-lg text-gray-600 leading-relaxed">
-              Os ODS são um apelo universal para ação, buscando equilibrar as três dimensões 
-              do desenvolvimento sustentável: econômica, social e ambiental. Nossa plataforma 
-              contribui diretamente para vários desses objetivos através do monitoramento 
-              da qualidade da água.
-            </p>
+          <p className="text-xl md:text-2xl mb-8 opacity-90 max-w-3xl mx-auto">
+            Conheça como nossa plataforma contribui para os Objetivos de Desenvolvimento Sustentável da ONU
+          </p>
+          <div className="flex gap-4 justify-center flex-wrap">
+            <Button
+              variant="secondary"
+              className="bg-white text-teal-600 hover:bg-gray-100 transition-colors"
+            >
+              <TargetIcon className="h-4 w-4 mr-2" />
+              Explorar ODS
+            </Button>
+            <Button
+              variant="outline"
+              className="border-white text-white bg-transparent hover:bg-white hover:text-teal-600 transition-colors"
+            >
+              <EyeIcon className="h-4 w-4 mr-2" />
+              Saiba Mais
+            </Button>
           </div>
         </div>
+      </section>
 
+      <main className="max-w-7xl mx-auto px-4 py-8">
         {/* O que são os ODS */}
         <section className="mb-16">
           <div className="bg-white rounded-2xl p-8 shadow-sm">
             <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
               O que são os Objetivos de Desenvolvimento Sustentável?
             </h2>
+            <div className="max-w-4xl mx-auto text-center mb-8">
+              <p className="text-xl text-gray-600 mb-6 leading-relaxed">
+                A Agenda 2030 é um plano de ação global adotado pelas Nações Unidas em 2015, 
+                composto por 17 Objetivos de Desenvolvimento Sustentável (ODS) que visam 
+                acabar com a pobreza, proteger o planeta e garantir prosperidade para todos.
+              </p>
+              <p className="text-lg text-gray-600 leading-relaxed">
+                Os ODS são um apelo universal para ação, buscando equilibrar as três dimensões 
+                do desenvolvimento sustentável: econômica, social e ambiental.
+              </p>
+            </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               <div className="text-center">
                 <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -131,7 +152,7 @@ const Agenda2030 = () => {
           </h2>
           <div className="space-y-8">
             {odsData.map((ods, index) => (
-              <Card key={ods.id} className="overflow-hidden">
+              <Card key={ods.id} className="overflow-hidden hover:shadow-xl transition-all duration-300">
                 <div className="flex flex-col lg:flex-row">
                   <div className={`${ods.colorLight} p-8 lg:w-1/3 flex flex-col items-center justify-center text-center`}>
                     <div className={`w-20 h-20 ${ods.color} rounded-full flex items-center justify-center mb-4`}>
@@ -182,9 +203,10 @@ const Agenda2030 = () => {
                 href="https://sdgs.un.org/goals" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="bg-white text-primary px-6 py-3 rounded-xl font-semibold hover:bg-gray-100 transition-colors"
+                className="bg-white text-primary px-6 py-3 rounded-xl font-semibold hover:bg-gray-100 transition-colors inline-flex items-center"
               >
                 Saiba Mais sobre os ODS
+                <ArrowRightIcon className="ml-2 h-4 w-4" />
               </a>
             </div>
           </div>
