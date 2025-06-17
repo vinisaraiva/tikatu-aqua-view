@@ -168,7 +168,7 @@ const ReadingsChart = ({ readings, selectedParameter }: ReadingsChartProps) => {
                   strokeDasharray="8 4" 
                   label={{ 
                     value: `Min CONAMA: ${conamaMin}`, 
-                    position: "topRight", 
+                    position: "top", 
                     offset: 10,
                     style: { 
                       fill: '#22c55e', 
@@ -186,7 +186,7 @@ const ReadingsChart = ({ readings, selectedParameter }: ReadingsChartProps) => {
                   strokeDasharray="8 4" 
                   label={{ 
                     value: `Max CONAMA: ${conamaMax}`, 
-                    position: "topRight", 
+                    position: "top", 
                     offset: 10,
                     style: { 
                       fill: '#f97316', 
