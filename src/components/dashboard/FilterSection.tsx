@@ -15,12 +15,12 @@ interface FilterSectionProps {
   selectedCity: string;
   selectedRiver: string;
   selectedPoints: string[];
-  selectedParameters: string[];
+  selectedParameter: string; // Changed from array to single string
   onStateChange: (state: string) => void;
   onCityChange: (city: string) => void;
   onRiverChange: (river: string) => void;
   onPointsChange: (points: string[]) => void;
-  onParametersChange: (parameters: string[]) => void;
+  onParameterChange: (parameter: string) => void; // Changed from array to single string
   onDateChange: (start: Date | undefined, end: Date | undefined) => void;
   showParametersFilter?: boolean;
 }
@@ -30,17 +30,16 @@ const FilterSection = ({
   selectedCity,
   selectedRiver,
   selectedPoints,
-  selectedParameters,
+  selectedParameter, // Updated prop
   onStateChange,
   onCityChange,
   onRiverChange,
   onPointsChange,
-  onParametersChange,
+  onParameterChange, // Updated prop
   onDateChange,
   showParametersFilter = true,
 }: FilterSectionProps) => {
   const [showDateFilter, setShowDateFilter] = useState(false);
-  const [showParametersFilterCollapsed, setShowParametersFilterCollapsed] = useState(true);
   const [previousState, setPreviousState] = useState(selectedState);
   const [previousRiver, setPreviousRiver] = useState(selectedRiver);
 
@@ -64,10 +63,10 @@ const FilterSection = ({
       onCityChange('');
       onRiverChange('');
       onPointsChange([]);
-      onParametersChange([]);
+      onParameterChange(''); // Clear single parameter
     }
     setPreviousState(selectedState);
-  }, [selectedState, previousState, onCityChange, onRiverChange, onPointsChange, onParametersChange]);
+  }, [selectedState, previousState, onCityChange, onRiverChange, onPointsChange, onParameterChange]);
 
   // Limpar pontos e parâmetros quando o rio mudar
   useEffect(() => {
@@ -77,10 +76,10 @@ const FilterSection = ({
         newRiver: selectedRiver 
       });
       onPointsChange([]);
-      onParametersChange([]);
+      onParameterChange(''); // Clear single parameter
     }
     setPreviousRiver(selectedRiver);
-  }, [selectedRiver, previousRiver, onPointsChange, onParametersChange]);
+  }, [selectedRiver, previousRiver, onPointsChange, onParameterChange]);
 
   // Garantir que pontos sejam limpos se não há rio selecionado
   useEffect(() => {
@@ -99,6 +98,7 @@ const FilterSection = ({
     selectedRiverId: selectedRiverData?.id,
     pointsCount: points.length,
     selectedPoints,
+    selectedParameter, // Updated log
   });
 
   const handlePointChange = (pointName: string, checked: boolean) => {
@@ -126,14 +126,6 @@ const FilterSection = ({
     onPointsChange(finalUniquePoints);
   };
 
-  const handleParameterChange = (parameterCode: string, checked: boolean) => {
-    if (checked) {
-      onParametersChange([...selectedParameters, parameterCode]);
-    } else {
-      onParametersChange(selectedParameters.filter(p => p !== parameterCode));
-    }
-  };
-
   const handleClearPoints = () => {
     console.log('FilterSection - Clearing all points');
     onPointsChange([]);
@@ -144,14 +136,6 @@ const FilterSection = ({
     const uniquePointNames = [...new Set(allPointNames)];
     console.log('FilterSection - Selecting all points:', uniquePointNames);
     onPointsChange(uniquePointNames);
-  };
-
-  const handleClearParameters = () => {
-    onParametersChange([]);
-  };
-
-  const handleSelectAllParameters = () => {
-    onParametersChange(parameters.map(param => param.code));
   };
 
   const uniqueSelectedPoints = [...new Set(selectedPoints)];
@@ -312,77 +296,41 @@ const FilterSection = ({
                 )}
               </div>
 
-              {/* Parameters Filter Section */}
+              {/* Parameters Filter Section - Single selection */}
               {showParametersFilter && (
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
                     <Filter className="h-5 w-5" />
-                    <h3 className="text-lg font-semibold">Parâmetros</h3>
+                    <h3 className="text-lg font-semibold">Parâmetro</h3>
                   </div>
 
-                  <Collapsible open={showParametersFilterCollapsed} onOpenChange={setShowParametersFilterCollapsed}>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600">
-                        {showParametersFilter ? `${selectedParameters.length} de ${parameters.length} selecionados` : 'Filtros avançados'}
-                      </span>
-                      <CollapsibleTrigger asChild>
-                        <Button variant="outline" size="sm">
-                          {showParametersFilterCollapsed ? 'Ocultar' : 'Mostrar'}
-                        </Button>
-                      </CollapsibleTrigger>
-                    </div>
-                    
-                    <CollapsibleContent className="space-y-4 mt-4">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-600">Selecionar parâmetros:</span>
-                        <div className="flex gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={handleSelectAllParameters}
-                            disabled={parametersLoading || parameters.length === 0}
-                          >
-                            Todos
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={handleClearParameters}
-                            disabled={selectedParameters.length === 0}
-                          >
-                            Limpar
-                          </Button>
-                        </div>
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Selecione um parâmetro</label>
+                    <Select 
+                      value={selectedParameter} 
+                      onValueChange={onParameterChange} 
+                      disabled={parametersLoading}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder={parametersLoading ? "Carregando parâmetros..." : "Selecione um parâmetro"} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {parameters.map((parameter) => (
+                          <SelectItem key={parameter.id} value={parameter.code}>
+                            {parameter.code} - {parameter.description}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {selectedParameter && (
+                      <div className="mt-2 text-xs text-gray-500">
+                        {parameters.find(p => p.code === selectedParameter)?.description}
+                        {parameters.find(p => p.code === selectedParameter)?.unit && (
+                          <span> ({parameters.find(p => p.code === selectedParameter)?.unit})</span>
+                        )}
                       </div>
-                      
-                      {parametersLoading ? (
-                        <p className="text-sm text-gray-500">Carregando parâmetros...</p>
-                      ) : parameters.length === 0 ? (
-                        <p className="text-sm text-gray-500">Nenhum parâmetro encontrado.</p>
-                      ) : (
-                        <div className="max-h-40 overflow-y-auto border rounded-md p-3 bg-gray-50">
-                          <div className="grid grid-cols-2 gap-2">
-                            {parameters.map((parameter) => (
-                              <div key={parameter.id} className="flex items-center space-x-2">
-                                <Checkbox
-                                  id={parameter.code}
-                                  checked={selectedParameters.includes(parameter.code)}
-                                  onCheckedChange={(checked) => handleParameterChange(parameter.code, checked as boolean)}
-                                />
-                                <label
-                                  htmlFor={parameter.code}
-                                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                                  title={parameter.description}
-                                >
-                                  {parameter.code}
-                                </label>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </CollapsibleContent>
-                  </Collapsible>
+                    )}
+                  </div>
                 </div>
               )}
             </div>

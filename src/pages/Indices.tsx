@@ -14,7 +14,7 @@ const Indices = () => {
   const [selectedCity, setSelectedCity] = useState('');
   const [selectedRiver, setSelectedRiver] = useState('');
   const [selectedPoints, setSelectedPoints] = useState<string[]>([]);
-  const [selectedParameters, setSelectedParameters] = useState<string[]>([]);
+  const [selectedParameter, setSelectedParameter] = useState(''); // Changed from array to single string
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [endDate, setEndDate] = useState<Date | undefined>();
   const [activeIndex, setActiveIndex] = useState<'iqa' | 'iet' | null>(null);
@@ -26,7 +26,7 @@ const Indices = () => {
       setSelectedCity('');
       setSelectedRiver('');
       setSelectedPoints([]);
-      setSelectedParameters([]);
+      setSelectedParameter(''); // Clear single parameter
     }
   }, [selectedState]);
 
@@ -36,7 +36,7 @@ const Indices = () => {
       console.log('Indices - Cidade mudou, limpando rio e filtros');
       setSelectedRiver('');
       setSelectedPoints([]);
-      setSelectedParameters([]);
+      setSelectedParameter(''); // Clear single parameter
     }
   }, [selectedCity]);
 
@@ -121,12 +121,12 @@ const Indices = () => {
             selectedCity={selectedCity}
             selectedRiver={selectedRiver}
             selectedPoints={selectedPoints}
-            selectedParameters={selectedParameters}
+            selectedParameter={selectedParameter} // Updated prop
             onStateChange={handleStateChange}
             onCityChange={setSelectedCity}
             onRiverChange={handleRiverChange}
             onPointsChange={setSelectedPoints}
-            onParametersChange={setSelectedParameters}
+            onParameterChange={setSelectedParameter} // Updated prop
             onDateChange={handleDateChange}
             showParametersFilter={false}
           />
