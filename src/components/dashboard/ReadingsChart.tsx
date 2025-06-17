@@ -139,7 +139,10 @@ const ReadingsChart = ({ readings, selectedParameter }: ReadingsChartProps) => {
       <CardContent>
         <div className="h-80">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData} margin={{ top: 40, right: 30, left: 20, bottom: 5 }}>
+            <BarChart 
+              data={chartData} 
+              margin={{ top: 40, right: 30, left: 20, bottom: 5 }}
+            >
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis 
                 dataKey="point" 
@@ -153,28 +156,20 @@ const ReadingsChart = ({ readings, selectedParameter }: ReadingsChartProps) => {
               />
               <Tooltip content={<CustomTooltip />} />
               
-              <Bar
-                dataKey="value"
-                name={`${parameterDescription} (${unit})`}
-                radius={[4, 4, 0, 0]}
-              />
-
-              {/* Reference lines for CONAMA limits with different colors - positioned after Bar */}
+              {/* Reference lines for CONAMA limits - positioned BEFORE Bar to appear BEHIND */}
               {conamaMin !== undefined && conamaMin !== null && (
                 <ReferenceLine 
                   y={conamaMin} 
                   stroke="#22c55e" 
-                  strokeWidth={3}
-                  strokeDasharray="8 4" 
+                  strokeWidth={2} 
+                  strokeDasharray="5 5" 
+                  ifOverflow="extendDomain"
                   label={{ 
                     value: `Min CONAMA: ${conamaMin}`, 
                     position: "top", 
-                    offset: 10,
-                    style: { 
-                      fill: '#22c55e', 
-                      fontWeight: 'bold',
-                      fontSize: '12px'
-                    } 
+                    fill: '#22c55e',
+                    fontSize: 12,
+                    fontWeight: 600
                   }}
                 />
               )}
@@ -182,20 +177,25 @@ const ReadingsChart = ({ readings, selectedParameter }: ReadingsChartProps) => {
                 <ReferenceLine 
                   y={conamaMax} 
                   stroke="#f97316" 
-                  strokeWidth={3}
-                  strokeDasharray="8 4" 
+                  strokeWidth={2} 
+                  strokeDasharray="5 5" 
+                  ifOverflow="extendDomain"
                   label={{ 
                     value: `Max CONAMA: ${conamaMax}`, 
                     position: "top", 
-                    offset: 10,
-                    style: { 
-                      fill: '#f97316', 
-                      fontWeight: 'bold',
-                      fontSize: '12px'
-                    } 
+                    fill: '#f97316',
+                    fontSize: 12, 
+                    fontWeight: 600
                   }}
                 />
               )}
+              
+              {/* Bar chart positioned AFTER reference lines so they appear BEHIND */}
+              <Bar
+                dataKey="value"
+                name={`${parameterDescription} (${unit})`}
+                radius={[4, 4, 0, 0]}
+              />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -216,13 +216,13 @@ const ReadingsChart = ({ readings, selectedParameter }: ReadingsChartProps) => {
           </div>
           {conamaMin !== undefined && conamaMin !== null && (
             <div className="flex items-center gap-2">
-              <div className="w-6 h-1 bg-green-500" style={{ borderTop: '3px dashed #22c55e' }}></div>
+              <div className="w-10 h-0 border-t-2 border-green-500 border-dashed"></div>
               <span>Min CONAMA: {conamaMin}</span>
             </div>
           )}
           {conamaMax !== undefined && conamaMax !== null && (
             <div className="flex items-center gap-2">
-              <div className="w-6 h-1 bg-orange-500" style={{ borderTop: '3px dashed #f97316' }}></div>
+              <div className="w-10 h-0 border-t-2 border-orange-500 border-dashed"></div>
               <span>Max CONAMA: {conamaMax}</span>
             </div>
           )}
