@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Tikatu AR</title>
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script src="https://cdn.rawgit.com/jeromeetienne/ar.js/2.0.1/aframe/build/aframe-ar.js"></script>
+    <style>
+      body { margin: 0; overflow: hidden; }
+      #msgbox {
+        position: fixed;
+        bottom: 10px;
+        left: 10px;
+        background: rgba(255, 255, 255, 0.8);
+        padding: 10px;
+        border-radius: 10px;
+        font-family: sans-serif;
+        max-width: 300px;
+      }
+    </style>
+  </head>
+  <body>
+    <a-scene embedded arjs>
+      <!-- Marcador padrão Hiro -->
+      <a-marker preset="hiro">
+        <!-- Avatar simples -->
+        <a-entity
+          gltf-model="https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models/2.0/CesiumMan/glTF/CesiumMan.gltf"
+          scale="0.5 0.5 0.5"
+          position="0 0 0"
+          rotation="0 180 0"
+          animation-mixer>
+        </a-entity>
+
+        <!-- Balão de fala 3D -->
+        <a-entity
+          text="value: Olá! Eu sou o guardião do Rio Mutari.\nNível de turbidez na última coleta: 80 NTU.; color: black; width: 2"
+          position="0 1.5 0"
+          rotation="-30 0 0">
+        </a-entity>
+      </a-marker>
+
+      <a-entity camera></a-entity>
+    </a-scene>
+
+    <!-- Caixa de mensagem para dispositivos sem suporte -->
+    <div id="msgbox">
+      Aponte para o marcador <strong>Hiro</strong> com sua câmera.<br>
+      (Use o QR para acessar via celular e imprima o marcador Hiro se precisar)
+    </div>
+  </body>
+</html>
