@@ -13,6 +13,10 @@ import Indices from "./pages/Indices";
 import Education from "./pages/Education";
 import Agenda2030 from "./pages/Agenda2030";
 import NotFound from "./pages/NotFound";
+import AdminLogin from "./pages/admin/AdminLogin";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import CitiesPage from "./pages/admin/cities/CitiesPage";
+import { AdminLayout } from "./components/admin/AdminLayout";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -38,6 +42,14 @@ const App = () => (
           <Route path="/news" element={<AllNews />} />
           <Route path="/news/:id" element={<NewsDetail />} />
           <Route path="/agenda-2030" element={<Agenda2030 />} />
+          
+          {/* Admin Routes */}
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<AdminDashboard />} />
+            <Route path="cities" element={<CitiesPage />} />
+          </Route>
+          
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

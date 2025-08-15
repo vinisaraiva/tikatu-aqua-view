@@ -39,6 +39,9 @@ const Header = () => {
             <Link to="/about" className="text-gray-700 hover:text-teal-600 transition-colors">
               Sobre
             </Link>
+            <Link to="/admin/login" className="text-gray-700 hover:text-teal-600 transition-colors">
+              Admin
+            </Link>
           </nav>
 
           {/* Mobile Menu Button */}
@@ -97,6 +100,13 @@ const Header = () => {
                 onClick={() => setIsMenuOpen(false)}
               >
                 Sobre
+              </Link>
+              <Link 
+                to="/admin/login" 
+                className="text-gray-700 hover:text-teal-600 py-2 transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Admin
               </Link>
             </div>
           </nav>
