@@ -234,6 +234,44 @@ export type Database = {
         }
         Relationships: []
       }
+      reading_factors: {
+        Row: {
+          color_changed: boolean | null
+          created_at: string | null
+          odor_changed: boolean | null
+          rain_48h: boolean | null
+          reading_id: number
+          solids_nearby: boolean | null
+          volume_lower: boolean | null
+        }
+        Insert: {
+          color_changed?: boolean | null
+          created_at?: string | null
+          odor_changed?: boolean | null
+          rain_48h?: boolean | null
+          reading_id: number
+          solids_nearby?: boolean | null
+          volume_lower?: boolean | null
+        }
+        Update: {
+          color_changed?: boolean | null
+          created_at?: string | null
+          odor_changed?: boolean | null
+          rain_48h?: boolean | null
+          reading_id?: number
+          solids_nearby?: boolean | null
+          volume_lower?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reading_factors_reading_id_fkey"
+            columns: ["reading_id"]
+            isOneToOne: true
+            referencedRelation: "readings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reading_values: {
         Row: {
           created_at: string
@@ -272,28 +310,46 @@ export type Database = {
       }
       readings: {
         Row: {
+          cheiro_alterado: boolean | null
+          chuva_48h: boolean | null
+          context: Json | null
+          cor_alterada: boolean | null
           created_at: string
           id: number
           iet_score: number | null
           iqa_score: number | null
           measured_at: string
           point_id: number
+          residuos_visiveis: boolean | null
+          volume_reduzido: boolean | null
         }
         Insert: {
+          cheiro_alterado?: boolean | null
+          chuva_48h?: boolean | null
+          context?: Json | null
+          cor_alterada?: boolean | null
           created_at?: string
           id?: number
           iet_score?: number | null
           iqa_score?: number | null
           measured_at?: string
           point_id: number
+          residuos_visiveis?: boolean | null
+          volume_reduzido?: boolean | null
         }
         Update: {
+          cheiro_alterado?: boolean | null
+          chuva_48h?: boolean | null
+          context?: Json | null
+          cor_alterada?: boolean | null
           created_at?: string
           id?: number
           iet_score?: number | null
           iqa_score?: number | null
           measured_at?: string
           point_id?: number
+          residuos_visiveis?: boolean | null
+          volume_reduzido?: boolean | null
         }
         Relationships: [
           {
@@ -404,7 +460,23 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      list_admins: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+        }[]
+      }
+      register_admin_user: {
+        Args: {
+          admin_email: string
+          admin_full_name: string
+          admin_password: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
