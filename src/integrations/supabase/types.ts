@@ -227,44 +227,6 @@ export type Database = {
         }
         Relationships: []
       }
-      reading_factors: {
-        Row: {
-          color_changed: boolean | null
-          created_at: string | null
-          odor_changed: boolean | null
-          rain_48h: boolean | null
-          reading_id: number
-          solids_nearby: boolean | null
-          volume_lower: boolean | null
-        }
-        Insert: {
-          color_changed?: boolean | null
-          created_at?: string | null
-          odor_changed?: boolean | null
-          rain_48h?: boolean | null
-          reading_id: number
-          solids_nearby?: boolean | null
-          volume_lower?: boolean | null
-        }
-        Update: {
-          color_changed?: boolean | null
-          created_at?: string | null
-          odor_changed?: boolean | null
-          rain_48h?: boolean | null
-          reading_id?: number
-          solids_nearby?: boolean | null
-          volume_lower?: boolean | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "reading_factors_reading_id_fkey"
-            columns: ["reading_id"]
-            isOneToOne: true
-            referencedRelation: "readings"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       reading_values: {
         Row: {
           created_at: string
@@ -389,6 +351,7 @@ export type Database = {
           created_at: string | null
           id: number
           is_active: boolean
+          nome: string | null
           password_hash: string
           point_id: number
         }
@@ -397,6 +360,7 @@ export type Database = {
           created_at?: string | null
           id?: number
           is_active?: boolean
+          nome?: string | null
           password_hash: string
           point_id: number
         }
@@ -405,6 +369,7 @@ export type Database = {
           created_at?: string | null
           id?: number
           is_active?: boolean
+          nome?: string | null
           password_hash?: string
           point_id?: number
         }
