@@ -201,13 +201,6 @@ export type Database = {
             referencedRelation: "rivers"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "points_river_id_fkey"
-            columns: ["river_id"]
-            isOneToOne: false
-            referencedRelation: "volunteers_view"
-            referencedColumns: ["river_id"]
-          },
         ]
       }
       profiles: {
@@ -388,13 +381,6 @@ export type Database = {
             referencedRelation: "cities"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "rivers_city_id_fkey"
-            columns: ["city_id"]
-            isOneToOne: false
-            referencedRelation: "volunteers_view"
-            referencedColumns: ["city_id"]
-          },
         ]
       }
       volunteers: {
@@ -449,6 +435,20 @@ export type Database = {
           state: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "points_river_id_fkey"
+            columns: ["river_id"]
+            isOneToOne: false
+            referencedRelation: "rivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rivers_city_id_fkey"
+            columns: ["city_id"]
+            isOneToOne: false
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "volunteers_point_id_fkey"
             columns: ["point_id"]
