@@ -95,6 +95,18 @@ export const useDeleteCity = () => {
 
   return useMutation({
     mutationFn: async (id: number) => {
+      // Check for related rivers
+      const { data: riversCount, error: checkError } = await supabase
+        .from('rivers')
+        .select('id', { count: 'exact' })
+        .eq('city_id', id);
+      
+      if (checkError) throw checkError;
+      
+      if (riversCount && riversCount.length > 0) {
+        throw new Error(`Não é possível excluir esta cidade pois ela possui ${riversCount.length} rio(s) associado(s). Exclua primeiro os rios relacionados.`);
+      }
+      
       const { error } = await supabase
         .from('cities')
         .delete()
@@ -109,10 +121,10 @@ export const useDeleteCity = () => {
         description: 'Cidade excluída com sucesso.',
       });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
         title: 'Erro',
-        description: error.message,
+        description: error.message || 'Erro ao excluir cidade.',
         variant: 'destructive',
       });
     },

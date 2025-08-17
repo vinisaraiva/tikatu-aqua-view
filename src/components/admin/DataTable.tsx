@@ -57,6 +57,12 @@ export function DataTable<T extends { id: number | string }>({
     );
   }
 
+  // Auto-add actions column if edit/delete handlers are provided
+  const columnsWithActions = [...columns];
+  if ((onEdit || onDelete) && !columns.some(col => col.key === 'actions')) {
+    columnsWithActions.push({ key: 'actions', label: 'Ações' } as Column<T>);
+  }
+
   return (
     <div className="space-y-4">
       {searchKey && (
@@ -75,7 +81,7 @@ export function DataTable<T extends { id: number | string }>({
         <Table>
           <TableHeader>
             <TableRow>
-              {columns.map((column) => (
+              {columnsWithActions.map((column) => (
                 <TableHead key={String(column.key)}>
                   {column.label}
                 </TableHead>
@@ -85,14 +91,14 @@ export function DataTable<T extends { id: number | string }>({
           <TableBody>
             {filteredData.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={columns.length} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={columnsWithActions.length} className="text-center py-8 text-muted-foreground">
                   Nenhum resultado encontrado
                 </TableCell>
               </TableRow>
             ) : (
               filteredData.map((item) => (
                 <TableRow key={item.id}>
-                  {columns.map((column) => (
+                  {columnsWithActions.map((column) => (
                     <TableCell key={String(column.key)}>
                       {column.key === 'actions' ? (
                         <div className="flex gap-2">

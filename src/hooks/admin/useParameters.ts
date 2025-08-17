@@ -113,6 +113,18 @@ export const useDeleteParameter = () => {
 
   return useMutation({
     mutationFn: async (id: number) => {
+      // Check for related reading values
+      const { data: readingValuesCount, error: checkError } = await supabase
+        .from('reading_values')
+        .select('reading_id', { count: 'exact' })
+        .eq('parameter_id', id);
+      
+      if (checkError) throw checkError;
+      
+      if (readingValuesCount && readingValuesCount.length > 0) {
+        throw new Error(`Não é possível excluir este parâmetro pois ele possui ${readingValuesCount.length} valor(es) de leitura associado(s). Exclua primeiro as leituras relacionadas.`);
+      }
+
       const { error } = await supabase
         .from('parameters')
         .delete()
@@ -127,10 +139,10 @@ export const useDeleteParameter = () => {
         description: 'Parâmetro excluído com sucesso!',
       });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
         title: 'Erro',
-        description: 'Erro ao excluir parâmetro.',
+        description: error.message || 'Erro ao excluir parâmetro.',
         variant: 'destructive',
       });
       console.error('Error deleting parameter:', error);

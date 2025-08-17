@@ -110,6 +110,35 @@ export const useDeletePoint = () => {
 
   return useMutation({
     mutationFn: async (id: number) => {
+      // Check for related readings
+      const { data: readingsCount, error: readingsError } = await supabase
+        .from('readings')
+        .select('id', { count: 'exact' })
+        .eq('point_id', id);
+      
+      if (readingsError) throw readingsError;
+      
+      // Check for related volunteers
+      const { data: volunteersCount, error: volunteersError } = await supabase
+        .from('volunteers')
+        .select('id', { count: 'exact' })
+        .eq('point_id', id);
+      
+      if (volunteersError) throw volunteersError;
+      
+      const totalRelated = (readingsCount?.length || 0) + (volunteersCount?.length || 0);
+      
+      if (totalRelated > 0) {
+        const messages = [];
+        if (readingsCount && readingsCount.length > 0) {
+          messages.push(`${readingsCount.length} leitura(s)`);
+        }
+        if (volunteersCount && volunteersCount.length > 0) {
+          messages.push(`${volunteersCount.length} voluntário(s)`);
+        }
+        throw new Error(`Não é possível excluir este ponto pois ele possui ${messages.join(' e ')} associado(s). Exclua primeiro os registros relacionados.`);
+      }
+
       const { error } = await supabase
         .from('points')
         .delete()
@@ -124,10 +153,10 @@ export const useDeletePoint = () => {
         description: 'Ponto excluído com sucesso!',
       });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
         title: 'Erro',
-        description: 'Erro ao excluir ponto.',
+        description: error.message || 'Erro ao excluir ponto.',
         variant: 'destructive',
       });
       console.error('Error deleting point:', error);

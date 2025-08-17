@@ -184,11 +184,20 @@ export const useDeleteReading = () => {
 
   return useMutation({
     mutationFn: async (id: number) => {
+      // Delete related reading values first (cascade delete)
+      const { error: valuesError } = await supabase
+        .from('reading_values')
+        .delete()
+        .eq('reading_id', id);
+      
+      if (valuesError) throw valuesError;
+      
+      // Then delete the reading
       const { error } = await supabase
         .from('readings')
         .delete()
         .eq('id', id);
-
+      
       if (error) throw error;
     },
     onSuccess: () => {
@@ -198,10 +207,10 @@ export const useDeleteReading = () => {
         description: 'Leitura excluída com sucesso!',
       });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
         title: 'Erro',
-        description: 'Erro ao excluir leitura.',
+        description: error.message || 'Erro ao excluir leitura.',
         variant: 'destructive',
       });
       console.error('Error deleting reading:', error);

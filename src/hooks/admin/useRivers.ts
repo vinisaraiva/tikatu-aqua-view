@@ -104,6 +104,18 @@ export const useDeleteRiver = () => {
 
   return useMutation({
     mutationFn: async (id: number) => {
+      // Check for related points
+      const { data: pointsCount, error: checkError } = await supabase
+        .from('points')
+        .select('id', { count: 'exact' })
+        .eq('river_id', id);
+      
+      if (checkError) throw checkError;
+      
+      if (pointsCount && pointsCount.length > 0) {
+        throw new Error(`Não é possível excluir este rio pois ele possui ${pointsCount.length} ponto(s) de coleta associado(s). Exclua primeiro os pontos relacionados.`);
+      }
+
       const { error } = await supabase
         .from('rivers')
         .delete()
@@ -118,10 +130,10 @@ export const useDeleteRiver = () => {
         description: 'Rio excluído com sucesso!',
       });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
         title: 'Erro',
-        description: 'Erro ao excluir rio.',
+        description: error.message || 'Erro ao excluir rio.',
         variant: 'destructive',
       });
       console.error('Error deleting river:', error);
