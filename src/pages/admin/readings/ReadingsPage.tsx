@@ -21,7 +21,8 @@ import {
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
 
-const getConamaStatus = (value: number, min: number | null, max: number | null) => {
+const getConamaStatus = (value: number | null, min: number | null, max: number | null) => {
+  if (value === null) return 'not-measured';
   if (min === null && max === null) return 'normal';
   if (min !== null && value < min) return 'critical';
   if (max !== null && value > max) return 'critical';
@@ -34,6 +35,8 @@ const getStatusBadge = (status: string) => {
       return <Badge variant="destructive">Crítico</Badge>;
     case 'attention':
       return <Badge variant="secondary">Atenção</Badge>;
+    case 'not-measured':
+      return <Badge variant="outline" className="text-muted-foreground">Não medido</Badge>;
     default:
       return <Badge variant="default">Normal</Badge>;
   }
@@ -84,10 +87,10 @@ function ReadingRow({ reading, onEdit, onDelete }: {
         <TableRow>
           <TableCell colSpan={7} className="bg-muted/20">
             <div className="space-y-4 p-4">
-              {/* Parâmetros Coletados */}
+              {/* Todos os Parâmetros */}
               {reading.reading_values && reading.reading_values.length > 0 && (
                 <div>
-                  <h4 className="font-semibold mb-2">Parâmetros Coletados:</h4>
+                  <h4 className="font-semibold mb-2">Parâmetros de Qualidade da Água:</h4>
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     {reading.reading_values.map((rv, index) => {
                       const status = getConamaStatus(
@@ -95,14 +98,16 @@ function ReadingRow({ reading, onEdit, onDelete }: {
                         rv.parameter.conama_min,
                         rv.parameter.conama_max
                       );
+                      const isMeasured = rv.value !== null;
+                      
                       return (
-                        <div key={index} className="bg-background p-3 rounded-lg border">
+                        <div key={index} className={`bg-background p-3 rounded-lg border ${!isMeasured ? 'opacity-60 bg-muted/20' : ''}`}>
                           <div className="flex justify-between items-start mb-1">
                             <span className="font-medium text-sm">{rv.parameter.code}</span>
                             {getStatusBadge(status)}
                           </div>
-                          <div className="text-lg font-bold">
-                            {rv.value} {rv.parameter.unit}
+                          <div className={`text-lg font-bold ${!isMeasured ? 'text-muted-foreground' : ''}`}>
+                            {isMeasured ? `${rv.value} ${rv.parameter.unit}` : 'N/A'}
                           </div>
                           <div className="text-xs text-muted-foreground">
                             {rv.parameter.description}
