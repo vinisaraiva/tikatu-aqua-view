@@ -32,8 +32,8 @@ import { useRivers } from '@/hooks/admin/useRivers';
 const pointSchema = z.object({
   name: z.string().min(1, 'Nome é obrigatório'),
   river_id: z.number().min(1, 'Rio é obrigatório'),
-  latitude: z.number().min(-90).max(90, 'Latitude deve estar entre -90 e 90'),
-  longitude: z.number().min(-180).max(180, 'Longitude deve estar entre -180 e 180'),
+  latitude: z.coerce.number().min(-90, 'Latitude deve estar entre -90 e 90').max(90, 'Latitude deve estar entre -90 e 90'),
+  longitude: z.coerce.number().min(-180, 'Longitude deve estar entre -180 e 180').max(180, 'Longitude deve estar entre -180 e 180'),
 });
 
 type PointFormData = z.infer<typeof pointSchema>;
@@ -214,7 +214,7 @@ export function PointFormDialog({ open, onClose, point }: PointFormDialogProps) 
                         step="any"
                         placeholder="-14.123456" 
                         {...field}
-                        onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                        onChange={(e) => field.onChange(e.target.value)}
                       />
                     </FormControl>
                     <FormMessage />
@@ -234,7 +234,7 @@ export function PointFormDialog({ open, onClose, point }: PointFormDialogProps) 
                         step="any"
                         placeholder="-39.123456" 
                         {...field}
-                        onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                        onChange={(e) => field.onChange(e.target.value)}
                       />
                     </FormControl>
                     <FormMessage />
