@@ -16,6 +16,11 @@ import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import CitiesPage from "./pages/admin/cities/CitiesPage";
+import RiversPage from "./pages/admin/rivers/RiversPage";
+import PointsPage from "./pages/admin/points/PointsPage";
+import ParametersPage from "./pages/admin/parameters/ParametersPage";
+import VolunteersPage from "./pages/admin/volunteers/VolunteersPage";
+import NewsPage from "./pages/admin/news/NewsPage";
 import { AdminLayout } from "./components/admin/AdminLayout";
 
 const queryClient = new QueryClient({
@@ -48,6 +53,11 @@ const App = () => (
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
             <Route path="cities" element={<CitiesPage />} />
+            <Route path="rivers" element={<RiversPage />} />
+            <Route path="points" element={<PointsPage />} />
+            <Route path="parameters" element={<ParametersPage />} />
+            <Route path="volunteers" element={<VolunteersPage />} />
+            <Route path="news" element={<NewsPage />} />
           </Route>
           
           <Route path="*" element={<NotFound />} />
