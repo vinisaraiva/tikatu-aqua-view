@@ -1,6 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import { useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -50,11 +51,27 @@ export function VolunteerFormDialog({ open, onClose, volunteer }: VolunteerFormD
   const form = useForm<VolunteerFormData>({
     resolver: zodResolver(volunteerSchema),
     defaultValues: {
-      point_id: volunteer?.point_id || 0,
+      point_id: 0,
       password: '',
-      is_active: volunteer?.is_active ?? true,
+      is_active: true,
     },
   });
+
+  useEffect(() => {
+    if (volunteer) {
+      form.reset({
+        point_id: volunteer.point_id,
+        password: '',
+        is_active: volunteer.is_active,
+      });
+    } else {
+      form.reset({
+        point_id: 0,
+        password: '',
+        is_active: true,
+      });
+    }
+  }, [volunteer, form]);
 
   const onSubmit = (data: VolunteerFormData) => {
     if (volunteer) {

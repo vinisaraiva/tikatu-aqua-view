@@ -1,6 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import { useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -48,10 +49,24 @@ export function RiverFormDialog({ open, onClose, river }: RiverFormDialogProps) 
   const form = useForm<RiverFormData>({
     resolver: zodResolver(riverSchema),
     defaultValues: {
-      name: river?.name || '',
-      city_id: river?.city_id || 0,
+      name: '',
+      city_id: 0,
     },
   });
+
+  useEffect(() => {
+    if (river) {
+      form.reset({
+        name: river.name,
+        city_id: river.city_id,
+      });
+    } else {
+      form.reset({
+        name: '',
+        city_id: 0,
+      });
+    }
+  }, [river, form]);
 
   const onSubmit = (data: RiverFormData) => {
     if (river) {

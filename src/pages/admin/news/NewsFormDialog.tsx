@@ -1,6 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import { useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -63,16 +64,42 @@ export function NewsFormDialog({ open, onClose, news }: NewsFormDialogProps) {
   const form = useForm<NewsFormData>({
     resolver: zodResolver(newsSchema),
     defaultValues: {
-      title: news?.title || '',
-      summary: news?.summary || '',
-      content: news?.content || '',
-      category: news?.category || '',
-      author: news?.author || '',
-      image_url: news?.image_url || '',
-      read_time: news?.read_time || '3 min',
-      is_published: news?.is_published ?? false,
+      title: '',
+      summary: '',
+      content: '',
+      category: '',
+      author: '',
+      image_url: '',
+      read_time: '3 min',
+      is_published: false,
     },
   });
+
+  useEffect(() => {
+    if (news) {
+      form.reset({
+        title: news.title,
+        summary: news.summary,
+        content: news.content,
+        category: news.category,
+        author: news.author,
+        image_url: news.image_url || '',
+        read_time: news.read_time,
+        is_published: news.is_published,
+      });
+    } else {
+      form.reset({
+        title: '',
+        summary: '',
+        content: '',
+        category: '',
+        author: '',
+        image_url: '',
+        read_time: '3 min',
+        is_published: false,
+      });
+    }
+  }, [news, form]);
 
   const onSubmit = (data: NewsFormData) => {
     if (news) {

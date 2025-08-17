@@ -1,6 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import { useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -42,13 +43,33 @@ export function ParameterFormDialog({ open, onClose, parameter }: ParameterFormD
   const form = useForm<ParameterFormData>({
     resolver: zodResolver(parameterSchema),
     defaultValues: {
-      code: parameter?.code || '',
-      description: parameter?.description || '',
-      unit: parameter?.unit || '',
-      conama_min: parameter?.conama_min || undefined,
-      conama_max: parameter?.conama_max || undefined,
+      code: '',
+      description: '',
+      unit: '',
+      conama_min: undefined,
+      conama_max: undefined,
     },
   });
+
+  useEffect(() => {
+    if (parameter) {
+      form.reset({
+        code: parameter.code,
+        description: parameter.description,
+        unit: parameter.unit,
+        conama_min: parameter.conama_min,
+        conama_max: parameter.conama_max,
+      });
+    } else {
+      form.reset({
+        code: '',
+        description: '',
+        unit: '',
+        conama_min: undefined,
+        conama_max: undefined,
+      });
+    }
+  }, [parameter, form]);
 
   const onSubmit = (data: ParameterFormData) => {
     if (parameter) {

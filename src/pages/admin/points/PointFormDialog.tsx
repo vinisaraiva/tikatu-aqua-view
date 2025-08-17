@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -55,12 +55,36 @@ export function PointFormDialog({ open, onClose, point }: PointFormDialogProps) 
   const form = useForm<PointFormData>({
     resolver: zodResolver(pointSchema),
     defaultValues: {
-      name: point?.name || '',
-      river_id: point?.river_id || 0,
-      latitude: point?.latitude || 0,
-      longitude: point?.longitude || 0,
+      name: '',
+      river_id: 0,
+      latitude: 0,
+      longitude: 0,
     },
   });
+
+  useEffect(() => {
+    if (point) {
+      form.reset({
+        name: point.name,
+        river_id: point.river_id,
+        latitude: point.latitude,
+        longitude: point.longitude,
+      });
+      // Set the city filter based on the selected river
+      const selectedRiver = rivers?.find(r => r.id === point.river_id);
+      if (selectedRiver) {
+        setSelectedCityId(selectedRiver.city_id);
+      }
+    } else {
+      form.reset({
+        name: '',
+        river_id: 0,
+        latitude: 0,
+        longitude: 0,
+      });
+      setSelectedCityId(null);
+    }
+  }, [point, form, rivers]);
 
   // Filter rivers by selected city
   const filteredRivers = rivers?.filter(river => 

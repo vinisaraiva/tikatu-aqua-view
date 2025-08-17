@@ -1,6 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import { useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -56,17 +57,45 @@ export function ReadingFormDialog({ open, onClose, reading }: ReadingFormDialogP
   const form = useForm<ReadingFormData>({
     resolver: zodResolver(readingSchema),
     defaultValues: {
-      point_id: reading?.point_id || 0,
-      measured_at: reading?.measured_at ? new Date(reading.measured_at).toISOString().slice(0, 16) : '',
-      iqa_score: reading?.iqa_score || undefined,
-      iet_score: reading?.iet_score || undefined,
-      cor_alterada: reading?.cor_alterada || false,
-      cheiro_alterado: reading?.cheiro_alterado || false,
-      chuva_48h: reading?.chuva_48h || false,
-      residuos_visiveis: reading?.residuos_visiveis || false,
-      volume_reduzido: reading?.volume_reduzido || false,
+      point_id: 0,
+      measured_at: '',
+      iqa_score: undefined,
+      iet_score: undefined,
+      cor_alterada: false,
+      cheiro_alterado: false,
+      chuva_48h: false,
+      residuos_visiveis: false,
+      volume_reduzido: false,
     },
   });
+
+  useEffect(() => {
+    if (reading) {
+      form.reset({
+        point_id: reading.point_id,
+        measured_at: new Date(reading.measured_at).toISOString().slice(0, 16),
+        iqa_score: reading.iqa_score,
+        iet_score: reading.iet_score,
+        cor_alterada: reading.cor_alterada,
+        cheiro_alterado: reading.cheiro_alterado,
+        chuva_48h: reading.chuva_48h,
+        residuos_visiveis: reading.residuos_visiveis,
+        volume_reduzido: reading.volume_reduzido,
+      });
+    } else {
+      form.reset({
+        point_id: 0,
+        measured_at: '',
+        iqa_score: undefined,
+        iet_score: undefined,
+        cor_alterada: false,
+        cheiro_alterado: false,
+        chuva_48h: false,
+        residuos_visiveis: false,
+        volume_reduzido: false,
+      });
+    }
+  }, [reading, form]);
 
   const onSubmit = (data: ReadingFormData) => {
     if (reading) {
