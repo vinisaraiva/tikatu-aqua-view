@@ -2,6 +2,20 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
+export interface ReadingValue {
+  reading_id: number;
+  parameter_id: number;
+  value: number;
+  parameter: {
+    id: number;
+    code: string;
+    description: string;
+    unit: string;
+    conama_min: number | null;
+    conama_max: number | null;
+  };
+}
+
 export interface Reading {
   id: number;
   point_id: number;
@@ -15,6 +29,20 @@ export interface Reading {
   volume_reduzido: boolean | null;
   context: any;
   created_at: string;
+  points: {
+    id: number;
+    name: string;
+    rivers: {
+      id: number;
+      name: string;
+      cities: {
+        id: number;
+        name: string;
+        state: string;
+      };
+    };
+  };
+  reading_values: ReadingValue[];
 }
 
 export const useReadings = () => {
@@ -36,6 +64,19 @@ export const useReadings = () => {
                 name,
                 state
               )
+            )
+          ),
+          reading_values (
+            reading_id,
+            parameter_id,
+            value,
+            parameter:parameters (
+              id,
+              code,
+              description,
+              unit,
+              conama_min,
+              conama_max
             )
           )
         `)
