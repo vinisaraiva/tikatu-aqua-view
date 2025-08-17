@@ -21,6 +21,7 @@ import PointsPage from "./pages/admin/points/PointsPage";
 import ParametersPage from "./pages/admin/parameters/ParametersPage";
 import VolunteersPage from "./pages/admin/volunteers/VolunteersPage";
 import NewsPage from "./pages/admin/news/NewsPage";
+import ReadingsPage from "./pages/admin/readings/ReadingsPage";
 import { AdminLayout } from "./components/admin/AdminLayout";
 
 const queryClient = new QueryClient({
@@ -56,6 +57,7 @@ const App = () => (
             <Route path="rivers" element={<RiversPage />} />
             <Route path="points" element={<PointsPage />} />
             <Route path="parameters" element={<ParametersPage />} />
+            <Route path="readings" element={<ReadingsPage />} />
             <Route path="volunteers" element={<VolunteersPage />} />
             <Route path="news" element={<NewsPage />} />
           </Route>
