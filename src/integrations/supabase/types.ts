@@ -425,6 +425,14 @@ export type Database = {
       }
     }
     Functions: {
+      can_access_volunteer_file: {
+        Args: { file_path: string }
+        Returns: boolean
+      }
+      extract_volunteer_code_from_path: {
+        Args: { file_path: string }
+        Returns: string
+      }
       list_admins: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -441,6 +449,10 @@ export type Database = {
           admin_password: string
         }
         Returns: string
+      }
+      validate_volunteer_file_path: {
+        Args: { bucket_name: string; file_path: string }
+        Returns: boolean
       }
     }
     Enums: {
