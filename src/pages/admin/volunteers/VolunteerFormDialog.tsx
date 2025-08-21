@@ -30,6 +30,7 @@ import { useCreateVolunteer, useUpdateVolunteer } from '@/hooks/admin/useVolunte
 import { usePoints } from '@/hooks/admin/usePoints';
 
 const volunteerSchema = z.object({
+  nome: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
   point_id: z.number().min(1, 'Ponto é obrigatório'),
   password: z.string().min(4, 'Senha deve ter pelo menos 4 caracteres').optional(),
   is_active: z.boolean(),
@@ -51,6 +52,7 @@ export function VolunteerFormDialog({ open, onClose, volunteer }: VolunteerFormD
   const form = useForm<VolunteerFormData>({
     resolver: zodResolver(volunteerSchema),
     defaultValues: {
+      nome: '',
       point_id: 0,
       password: '',
       is_active: true,
@@ -60,12 +62,14 @@ export function VolunteerFormDialog({ open, onClose, volunteer }: VolunteerFormD
   useEffect(() => {
     if (volunteer) {
       form.reset({
+        nome: volunteer.nome || '',
         point_id: volunteer.point_id,
         password: '',
         is_active: volunteer.is_active,
       });
     } else {
       form.reset({
+        nome: '',
         point_id: 0,
         password: '',
         is_active: true,
@@ -78,6 +82,7 @@ export function VolunteerFormDialog({ open, onClose, volunteer }: VolunteerFormD
       updateVolunteer.mutate(
         { 
           id: volunteer.id, 
+          nome: data.nome,
           point_id: data.point_id,
           is_active: data.is_active,
           password: data.password
@@ -94,7 +99,7 @@ export function VolunteerFormDialog({ open, onClose, volunteer }: VolunteerFormD
         form.setError('password', { message: 'Senha é obrigatória para novos voluntários' });
         return;
       }
-      createVolunteer.mutate({ point_id: data.point_id, password: data.password }, {
+      createVolunteer.mutate({ nome: data.nome, point_id: data.point_id, password: data.password }, {
         onSuccess: () => {
           form.reset();
           onClose();
@@ -119,6 +124,20 @@ export function VolunteerFormDialog({ open, onClose, volunteer }: VolunteerFormD
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="nome"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nome do Voluntário</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Digite o nome do voluntário" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <FormField
               control={form.control}
               name="point_id"

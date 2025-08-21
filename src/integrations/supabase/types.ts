@@ -393,6 +393,7 @@ export type Database = {
           created_at: string | null
           id: number | null
           is_active: boolean | null
+          nome: string | null
           point_id: number | null
           point_name: string | null
           river_id: number | null

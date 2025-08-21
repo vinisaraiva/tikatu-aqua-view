@@ -53,26 +53,36 @@ function ReadingRow({ reading, onEdit, onDelete }: {
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
       <CollapsibleTrigger asChild>
         <TableRow className="cursor-pointer hover:bg-muted/50">
-          <TableCell>
+          <TableCell className="w-[200px]">
             <div className="flex items-center gap-2">
               {isOpen ? (
-                <ChevronDown className="h-4 w-4" />
+                <ChevronDown className="h-4 w-4 flex-shrink-0" />
               ) : (
-                <ChevronRight className="h-4 w-4" />
+                <ChevronRight className="h-4 w-4 flex-shrink-0" />
               )}
-              {reading.points?.name}
+              <span className="truncate">{reading.points?.name}</span>
             </div>
           </TableCell>
-          <TableCell>{reading.points?.rivers?.name}</TableCell>
-          <TableCell>{reading.points?.rivers?.cities?.name}</TableCell>
-          <TableCell>
-            {new Date(reading.measured_at).toLocaleDateString('pt-BR')} {' '}
-            {new Date(reading.measured_at).toLocaleTimeString('pt-BR')}
+          <TableCell className="w-[150px]">
+            <span className="truncate block">{reading.points?.rivers?.name}</span>
           </TableCell>
-          <TableCell>{reading.iqa_score?.toFixed(2) || '-'}</TableCell>
-          <TableCell>{reading.iet_score?.toFixed(2) || '-'}</TableCell>
-          <TableCell>
-            <div className="flex gap-2">
+          <TableCell className="w-[120px]">
+            <span className="truncate block">{reading.points?.rivers?.cities?.name}</span>
+          </TableCell>
+          <TableCell className="w-[180px]">
+            <div className="text-sm">
+              <div>{new Date(reading.measured_at).toLocaleDateString('pt-BR')}</div>
+              <div className="text-muted-foreground">{new Date(reading.measured_at).toLocaleTimeString('pt-BR')}</div>
+            </div>
+          </TableCell>
+          <TableCell className="w-[80px] text-center">
+            <span className="font-mono text-sm">{reading.iqa_score?.toFixed(2) || '-'}</span>
+          </TableCell>
+          <TableCell className="w-[80px] text-center">
+            <span className="font-mono text-sm">{reading.iet_score?.toFixed(2) || '-'}</span>
+          </TableCell>
+          <TableCell className="w-[120px]">
+            <div className="flex gap-1 justify-center">
               <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); onEdit(reading); }}>
                 Editar
               </Button>
@@ -264,13 +274,13 @@ export default function ReadingsPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Ponto</TableHead>
-              <TableHead>Rio</TableHead>
-              <TableHead>Cidade</TableHead>
-              <TableHead>Data da Medição</TableHead>
-              <TableHead>IQA</TableHead>
-              <TableHead>IET</TableHead>
-              <TableHead>Ações</TableHead>
+              <TableHead className="w-[200px]">Ponto</TableHead>
+              <TableHead className="w-[150px]">Rio</TableHead>
+              <TableHead className="w-[120px]">Cidade</TableHead>
+              <TableHead className="w-[180px]">Data da Medição</TableHead>
+              <TableHead className="w-[80px] text-center">IQA</TableHead>
+              <TableHead className="w-[80px] text-center">IET</TableHead>
+              <TableHead className="w-[120px] text-center">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

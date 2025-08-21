@@ -8,6 +8,7 @@ import { ConfirmDialog } from '@/components/admin/ConfirmDialog';
 
 const columns = [
   { key: 'code', label: 'Código' },
+  { key: 'nome', label: 'Nome', render: (volunteer: any) => volunteer.nome || '-' },
   { key: 'point_name', label: 'Ponto', render: (volunteer: any) => volunteer.point_name },
   { key: 'river_name', label: 'Rio', render: (volunteer: any) => volunteer.river_name },
   { key: 'city_name', label: 'Cidade', render: (volunteer: any) => volunteer.city_name },

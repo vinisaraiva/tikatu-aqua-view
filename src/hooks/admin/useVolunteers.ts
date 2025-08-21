@@ -5,6 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 export interface Volunteer {
   id: number;
   code: string;
+  nome?: string;
   point_id: number;
   is_active: boolean;
   created_at: string;
@@ -30,7 +31,7 @@ export const useCreateVolunteer = () => {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async (volunteerData: { point_id: number; password: string }) => {
+    mutationFn: async (volunteerData: { nome: string; point_id: number; password: string }) => {
       // Generate unique code
       const code = `VOL${Date.now().toString().slice(-6)}`;
       
@@ -41,6 +42,7 @@ export const useCreateVolunteer = () => {
         .from('volunteers')
         .insert([{
           code,
+          nome: volunteerData.nome,
           point_id: volunteerData.point_id,
           password_hash,
           is_active: true
@@ -76,11 +78,13 @@ export const useUpdateVolunteer = () => {
   return useMutation({
     mutationFn: async ({ id, ...volunteerData }: { 
       id: number; 
+      nome: string;
       point_id: number; 
       is_active: boolean;
       password?: string;
     }) => {
       const updateData: any = {
+        nome: volunteerData.nome,
         point_id: volunteerData.point_id,
         is_active: volunteerData.is_active
       };
