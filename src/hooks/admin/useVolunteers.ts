@@ -80,7 +80,7 @@ export const useCreateVolunteer = () => {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['admin-volunteers'] });
       toast({
         title: 'Sucesso',

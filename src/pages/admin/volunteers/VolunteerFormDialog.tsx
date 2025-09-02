@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -28,6 +28,7 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { useCreateVolunteer, useUpdateVolunteer } from '@/hooks/admin/useVolunteers';
 import { usePoints } from '@/hooks/admin/usePoints';
+import { ApiKeyDisplayDialog } from '@/components/admin/ApiKeyDisplayDialog';
 
 const volunteerSchema = z.object({
   nome: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
@@ -51,6 +52,8 @@ export function VolunteerFormDialog({ open, onClose, volunteer }: VolunteerFormD
   const { data: points } = usePoints();
   const createVolunteer = useCreateVolunteer();
   const updateVolunteer = useUpdateVolunteer();
+  const [showApiKeyDialog, setShowApiKeyDialog] = useState(false);
+  const [createdVolunteer, setCreatedVolunteer] = useState<any>(null);
 
   const form = useForm<VolunteerFormData>({
     resolver: zodResolver(volunteerSchema),
@@ -121,9 +124,15 @@ export function VolunteerFormDialog({ open, onClose, volunteer }: VolunteerFormD
         probe_model: data.probe_model,
         probe_serial: data.probe_serial
       }, {
-        onSuccess: () => {
+        onSuccess: (createdData) => {
           form.reset();
           onClose();
+          
+          // Se for uma sonda, mostrar o diálogo da API key
+          if (data.type === 'probe' && createdData.api_key) {
+            setCreatedVolunteer(createdData);
+            setShowApiKeyDialog(true);
+          }
         },
       });
     }
@@ -135,184 +144,197 @@ export function VolunteerFormDialog({ open, onClose, volunteer }: VolunteerFormD
   };
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>
-            {volunteer ? 'Editar Voluntário' : 'Novo Voluntário'}
-          </DialogTitle>
-        </DialogHeader>
+    <>
+      <Dialog open={open} onOpenChange={handleClose}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {volunteer ? 'Editar Voluntário' : 'Novo Voluntário'}
+            </DialogTitle>
+          </DialogHeader>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="nome"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nome do Voluntário</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Digite o nome do voluntário" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="point_id"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Ponto de Coleta</FormLabel>
-                  <Select
-                    value={field.value.toString()}
-                    onValueChange={(value) => field.onChange(parseInt(value))}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione um ponto" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {points?.map((point) => (
-                        <SelectItem key={point.id} value={point.id.toString()}>
-                          {point.name} - {point.rivers?.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {!volunteer && (
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
                 control={form.control}
-                name="type"
+                name="nome"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Tipo</FormLabel>
-                    <Select value={field.value} onValueChange={field.onChange}>
+                    <FormLabel>Nome do Voluntário</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Digite o nome do voluntário" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="point_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Ponto de Coleta</FormLabel>
+                    <Select
+                      value={field.value.toString()}
+                      onValueChange={(value) => field.onChange(parseInt(value))}
+                    >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Selecione o tipo" />
+                          <SelectValue placeholder="Selecione um ponto" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="manual">👤 Manual (Voluntário)</SelectItem>
-                        <SelectItem value="probe">🔧 Automático (Sonda)</SelectItem>
+                        {points?.map((point) => (
+                          <SelectItem key={point.id} value={point.id.toString()}>
+                            {point.name} - {point.rivers?.name}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-            )}
 
-            {form.watch('type') === 'probe' && (
-              <>
+              {!volunteer && (
                 <FormField
                   control={form.control}
-                  name="probe_model"
+                  name="type"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Modelo da Sonda</FormLabel>
+                      <FormLabel>Tipo</FormLabel>
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione o tipo" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="manual">👤 Manual (Voluntário)</SelectItem>
+                          <SelectItem value="probe">🔧 Automático (Sonda)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+
+              {form.watch('type') === 'probe' && (
+                <>
+                  <FormField
+                    control={form.control}
+                    name="probe_model"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Modelo da Sonda</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ex: AquaTech Pro 2000" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="probe_serial"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Número de Série</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ex: AT2000-001" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </>
+              )}
+
+              {form.watch('type') === 'manual' && (
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        {volunteer ? 'Nova Senha (deixe vazio para manter)' : 'Senha'}
+                      </FormLabel>
                       <FormControl>
-                        <Input placeholder="Ex: AquaTech Pro 2000" {...field} />
+                        <Input type="password" placeholder="Digite a senha" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+              )}
+
+              {volunteer && volunteer.type === 'manual' && (
                 <FormField
                   control={form.control}
-                  name="probe_serial"
+                  name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Número de Série</FormLabel>
+                      <FormLabel>Nova Senha (deixe vazio para manter)</FormLabel>
                       <FormControl>
-                        <Input placeholder="Ex: AT2000-001" {...field} />
+                        <Input type="password" placeholder="Digite a nova senha" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-              </>
-            )}
+              )}
 
-            {form.watch('type') === 'manual' && (
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      {volunteer ? 'Nova Senha (deixe vazio para manter)' : 'Senha'}
-                    </FormLabel>
-                    <FormControl>
-                      <Input type="password" placeholder="Digite a senha" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
-
-            {volunteer && volunteer.type === 'manual' && (
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nova Senha (deixe vazio para manter)</FormLabel>
-                    <FormControl>
-                      <Input type="password" placeholder="Digite a nova senha" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
-
-            {volunteer && (
-              <FormField
-                control={form.control}
-                name="is_active"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-base">Status Ativo</FormLabel>
-                      <div className="text-sm text-muted-foreground">
-                        Ative ou desative este voluntário
+              {volunteer && (
+                <FormField
+                  control={form.control}
+                  name="is_active"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-base">Status Ativo</FormLabel>
+                        <div className="text-sm text-muted-foreground">
+                          Ative ou desative este voluntário
+                        </div>
                       </div>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            )}
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              )}
 
-            <div className="flex justify-end space-x-2">
-              <Button type="button" variant="outline" onClick={handleClose}>
-                Cancelar
-              </Button>
-              <Button 
-                type="submit" 
-                disabled={createVolunteer.isPending || updateVolunteer.isPending}
-              >
-                {volunteer ? 'Atualizar' : 'Criar'}
-              </Button>
-            </div>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+              <div className="flex justify-end space-x-2">
+                <Button type="button" variant="outline" onClick={handleClose}>
+                  Cancelar
+                </Button>
+                <Button 
+                  type="submit" 
+                  disabled={createVolunteer.isPending || updateVolunteer.isPending}
+                >
+                  {volunteer ? 'Atualizar' : 'Criar'}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+      
+      {createdVolunteer && (
+        <ApiKeyDisplayDialog
+          open={showApiKeyDialog}
+          onClose={() => {
+            setShowApiKeyDialog(false);
+            setCreatedVolunteer(null);
+          }}
+          volunteer={createdVolunteer}
+        />
+      )}
+    </>
   );
 }
