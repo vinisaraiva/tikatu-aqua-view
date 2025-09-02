@@ -59,11 +59,6 @@ const navigationItems = [
     icon: Users,
   },
   {
-    title: 'API Sondas',
-    url: '/admin/probe-api-docs',
-    icon: FileText,
-  },
-  {
     title: 'Notícias',
     url: '/admin/news',
     icon: Newspaper,
