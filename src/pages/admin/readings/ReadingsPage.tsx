@@ -81,6 +81,13 @@ function ReadingRow({ reading, onEdit, onDelete }: {
           <TableCell className="w-[80px] text-center">
             <span className="font-mono text-sm">{reading.iet_score?.toFixed(2) || '-'}</span>
           </TableCell>
+          <TableCell className="w-[100px] text-center">
+            {reading.collection_type === 'automatic' ? (
+              <Badge variant="secondary">🔧 Auto</Badge>
+            ) : (
+              <Badge variant="outline">👤 Manual</Badge>
+            )}
+          </TableCell>
           <TableCell className="w-[120px]">
             <div className="flex gap-1 justify-center">
               <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); onEdit(reading); }}>
@@ -95,7 +102,7 @@ function ReadingRow({ reading, onEdit, onDelete }: {
       </CollapsibleTrigger>
       <CollapsibleContent asChild>
         <TableRow>
-          <TableCell colSpan={7} className="bg-muted/20">
+          <TableCell colSpan={8} className="bg-muted/20">
             <div className="space-y-4 p-4">
               {/* Todos os Parâmetros */}
               {reading.reading_values && reading.reading_values.length > 0 && (
@@ -280,13 +287,14 @@ export default function ReadingsPage() {
               <TableHead className="w-[180px]">Data da Medição</TableHead>
               <TableHead className="w-[80px] text-center">IQA</TableHead>
               <TableHead className="w-[80px] text-center">IET</TableHead>
+              <TableHead className="w-[100px] text-center">Tipo</TableHead>
               <TableHead className="w-[120px] text-center">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredReadings && filteredReadings.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                   {searchTerm ? 'Nenhuma leitura encontrada para o termo buscado' : 'Nenhuma leitura encontrada'}
                 </TableCell>
               </TableRow>

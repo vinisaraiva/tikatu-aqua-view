@@ -9,6 +9,11 @@ export interface Volunteer {
   point_id: number;
   is_active: boolean;
   created_at: string;
+  type: 'manual' | 'probe';
+  api_key?: string | null;
+  probe_model?: string | null;
+  probe_serial?: string | null;
+  last_communication?: string | null;
 }
 
 export const useVolunteers = () => {
@@ -31,12 +36,30 @@ export const useCreateVolunteer = () => {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async (volunteerData: { nome: string; point_id: number; password: string }) => {
+    mutationFn: async (volunteerData: { 
+      nome: string; 
+      point_id: number; 
+      password?: string;
+      type: 'manual' | 'probe';
+      probe_model?: string;
+      probe_serial?: string;
+    }) => {
       // Generate unique code
-      const code = `VOL${Date.now().toString().slice(-6)}`;
+      const prefix = volunteerData.type === 'probe' ? 'SND' : 'VOL';
+      const code = `${prefix}${Date.now().toString().slice(-6)}`;
       
-      // Hash password (simple approach - in production use bcrypt)
-      const password_hash = btoa(volunteerData.password);
+      let password_hash = null;
+      let api_key = null;
+
+      if (volunteerData.type === 'manual') {
+        if (!volunteerData.password) {
+          throw new Error('Password is required for manual volunteers');
+        }
+        password_hash = btoa(volunteerData.password);
+      } else {
+        // Generate API key for probes
+        api_key = crypto.randomUUID();
+      }
 
       const { data, error } = await supabase
         .from('volunteers')
@@ -45,6 +68,10 @@ export const useCreateVolunteer = () => {
           nome: volunteerData.nome,
           point_id: volunteerData.point_id,
           password_hash,
+          type: volunteerData.type,
+          api_key,
+          probe_model: volunteerData.probe_model,
+          probe_serial: volunteerData.probe_serial,
           is_active: true
         }])
         .select()
@@ -82,6 +109,8 @@ export const useUpdateVolunteer = () => {
       point_id: number; 
       is_active: boolean;
       password?: string;
+      probe_model?: string;
+      probe_serial?: string;
     }) => {
       const updateData: any = {
         nome: volunteerData.nome,
@@ -91,6 +120,13 @@ export const useUpdateVolunteer = () => {
 
       if (volunteerData.password) {
         updateData.password_hash = btoa(volunteerData.password);
+      }
+
+      if (volunteerData.probe_model !== undefined) {
+        updateData.probe_model = volunteerData.probe_model;
+      }
+      if (volunteerData.probe_serial !== undefined) {
+        updateData.probe_serial = volunteerData.probe_serial;
       }
 
       const { data, error } = await supabase

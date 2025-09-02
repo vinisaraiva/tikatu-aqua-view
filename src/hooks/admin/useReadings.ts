@@ -22,6 +22,8 @@ export interface Reading {
   measured_at: string;
   iqa_score: number | null;
   iet_score: number | null;
+  collection_type: string;
+  volunteer_id: number | null;
   cor_alterada: boolean | null;
   cheiro_alterado: boolean | null;
   chuva_48h: boolean | null;

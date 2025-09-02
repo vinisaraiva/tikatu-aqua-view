@@ -8,12 +8,19 @@ import { ConfirmDialog } from '@/components/admin/ConfirmDialog';
 
 const columns = [
   { key: 'code', label: 'Código' },
+  { key: 'type', label: 'Tipo', render: (volunteer: any) => 
+    volunteer.type === 'probe' ? '🔧 Automático' : '👤 Manual'
+  },
   { key: 'nome', label: 'Nome', render: (volunteer: any) => volunteer.nome || '-' },
   { key: 'point_name', label: 'Ponto', render: (volunteer: any) => volunteer.point_name },
   { key: 'river_name', label: 'Rio', render: (volunteer: any) => volunteer.river_name },
   { key: 'city_name', label: 'Cidade', render: (volunteer: any) => volunteer.city_name },
-  { key: 'state', label: 'Estado', render: (volunteer: any) => volunteer.state },
   { key: 'is_active', label: 'Status', render: (volunteer: any) => volunteer.is_active ? 'Ativo' : 'Inativo' },
+  { key: 'last_communication', label: 'Última Comunicação', render: (volunteer: any) => 
+    volunteer.type === 'probe' && volunteer.last_communication 
+      ? new Date(volunteer.last_communication).toLocaleString('pt-BR')
+      : volunteer.type === 'probe' ? 'Nunca' : '-'
+  },
   { key: 'created_at', label: 'Criado em', render: (volunteer: any) => new Date(volunteer.created_at).toLocaleDateString('pt-BR') }
 ];
 

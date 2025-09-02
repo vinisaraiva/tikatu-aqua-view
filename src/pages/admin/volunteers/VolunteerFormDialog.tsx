@@ -32,7 +32,10 @@ import { usePoints } from '@/hooks/admin/usePoints';
 const volunteerSchema = z.object({
   nome: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
   point_id: z.number().min(1, 'Ponto é obrigatório'),
+  type: z.enum(['manual', 'probe']),
   password: z.string().min(4, 'Senha deve ter pelo menos 4 caracteres').optional(),
+  probe_model: z.string().optional(),
+  probe_serial: z.string().optional(),
   is_active: z.boolean(),
 });
 
@@ -54,7 +57,10 @@ export function VolunteerFormDialog({ open, onClose, volunteer }: VolunteerFormD
     defaultValues: {
       nome: '',
       point_id: 0,
+      type: 'manual',
       password: '',
+      probe_model: '',
+      probe_serial: '',
       is_active: true,
     },
   });
@@ -64,14 +70,20 @@ export function VolunteerFormDialog({ open, onClose, volunteer }: VolunteerFormD
       form.reset({
         nome: volunteer.nome || '',
         point_id: volunteer.point_id,
+        type: volunteer.type || 'manual',
         password: '',
+        probe_model: volunteer.probe_model || '',
+        probe_serial: volunteer.probe_serial || '',
         is_active: volunteer.is_active,
       });
     } else {
       form.reset({
         nome: '',
         point_id: 0,
+        type: 'manual',
         password: '',
+        probe_model: '',
+        probe_serial: '',
         is_active: true,
       });
     }
@@ -85,7 +97,9 @@ export function VolunteerFormDialog({ open, onClose, volunteer }: VolunteerFormD
           nome: data.nome,
           point_id: data.point_id,
           is_active: data.is_active,
-          password: data.password
+          password: data.password,
+          probe_model: data.probe_model,
+          probe_serial: data.probe_serial
         },
         {
           onSuccess: () => {
@@ -95,11 +109,18 @@ export function VolunteerFormDialog({ open, onClose, volunteer }: VolunteerFormD
         }
       );
     } else {
-      if (!data.password) {
-        form.setError('password', { message: 'Senha é obrigatória para novos voluntários' });
+      if (data.type === 'manual' && !data.password) {
+        form.setError('password', { message: 'Senha é obrigatória para novos voluntários manuais' });
         return;
       }
-      createVolunteer.mutate({ nome: data.nome, point_id: data.point_id, password: data.password }, {
+      createVolunteer.mutate({ 
+        nome: data.nome, 
+        point_id: data.point_id, 
+        type: data.type,
+        password: data.password,
+        probe_model: data.probe_model,
+        probe_serial: data.probe_serial
+      }, {
         onSuccess: () => {
           form.reset();
           onClose();
@@ -166,21 +187,94 @@ export function VolunteerFormDialog({ open, onClose, volunteer }: VolunteerFormD
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    {volunteer ? 'Nova Senha (deixe vazio para manter)' : 'Senha'}
-                  </FormLabel>
-                  <FormControl>
-                    <Input type="password" placeholder="Digite a senha" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {!volunteer && (
+              <FormField
+                control={form.control}
+                name="type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tipo</FormLabel>
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione o tipo" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="manual">👤 Manual (Voluntário)</SelectItem>
+                        <SelectItem value="probe">🔧 Automático (Sonda)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
+            {form.watch('type') === 'probe' && (
+              <>
+                <FormField
+                  control={form.control}
+                  name="probe_model"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Modelo da Sonda</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Ex: AquaTech Pro 2000" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="probe_serial"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Número de Série</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Ex: AT2000-001" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </>
+            )}
+
+            {form.watch('type') === 'manual' && (
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      {volunteer ? 'Nova Senha (deixe vazio para manter)' : 'Senha'}
+                    </FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="Digite a senha" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
+            {volunteer && volunteer.type === 'manual' && (
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nova Senha (deixe vazio para manter)</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="Digite a nova senha" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
 
             {volunteer && (
               <FormField

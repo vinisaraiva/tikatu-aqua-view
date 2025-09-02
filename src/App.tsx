@@ -22,6 +22,7 @@ import ParametersPage from "./pages/admin/parameters/ParametersPage";
 import VolunteersPage from "./pages/admin/volunteers/VolunteersPage";
 import NewsPage from "./pages/admin/news/NewsPage";
 import ReadingsPage from "./pages/admin/readings/ReadingsPage";
+import ProbeApiDocs from "./pages/admin/ProbeApiDocs";
 import { AdminLayout } from "./components/admin/AdminLayout";
 
 const queryClient = new QueryClient({
@@ -59,6 +60,7 @@ const App = () => (
             <Route path="parameters" element={<ParametersPage />} />
             <Route path="readings" element={<ReadingsPage />} />
             <Route path="volunteers" element={<VolunteersPage />} />
+            <Route path="probe-api-docs" element={<ProbeApiDocs />} />
             <Route path="news" element={<NewsPage />} />
           </Route>
           
