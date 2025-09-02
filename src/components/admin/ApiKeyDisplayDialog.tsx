@@ -14,9 +14,10 @@ interface ApiKeyDisplayDialogProps {
     probe_model?: string;
     probe_serial?: string;
   };
+  mode?: 'initial' | 'view' | 'regenerate';
 }
 
-export const ApiKeyDisplayDialog = ({ open, onClose, volunteer }: ApiKeyDisplayDialogProps) => {
+export const ApiKeyDisplayDialog = ({ open, onClose, volunteer, mode = 'initial' }: ApiKeyDisplayDialogProps) => {
   const [showApiKey, setShowApiKey] = useState(false);
   const { toast } = useToast();
 
@@ -61,20 +62,53 @@ export const ApiKeyDisplayDialog = ({ open, onClose, volunteer }: ApiKeyDisplayD
 
   const maskedApiKey = volunteer.api_key.substring(0, 8) + '...' + volunteer.api_key.substring(volunteer.api_key.length - 8);
 
+  const getTitle = () => {
+    switch (mode) {
+      case 'view':
+        return '🔑 API Key da Sonda';
+      case 'regenerate':
+        return '🔄 Nova API Key Gerada';
+      default:
+        return '🔑 API Key da Nova Sonda';
+    }
+  };
+
+  const getWarningMessage = () => {
+    switch (mode) {
+      case 'view':
+        return '⚠️ Mantenha esta API key em segurança!';
+      case 'regenerate':
+        return '⚠️ API key anterior foi invalidada!';
+      default:
+        return '⚠️ Importante: Esta é a única vez que a API key será mostrada!';
+    }
+  };
+
+  const getWarningDescription = () => {
+    switch (mode) {
+      case 'view':
+        return 'Esta API key dá acesso ao sistema. Não a compartilhe.';
+      case 'regenerate':
+        return 'A API key anterior não funcionará mais. Atualize sua configuração.';
+      default:
+        return 'Salve-a em local seguro ou baixe o arquivo de configuração.';
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-center">🔑 API Key da Sonda</DialogTitle>
+          <DialogTitle className="text-center">{getTitle()}</DialogTitle>
         </DialogHeader>
         
         <div className="space-y-4">
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
             <p className="text-sm text-yellow-800 font-medium">
-              ⚠️ Importante: Esta é a única vez que a API key será mostrada!
+              {getWarningMessage()}
             </p>
             <p className="text-xs text-yellow-700 mt-1">
-              Salve-a em local seguro ou baixe o arquivo de configuração.
+              {getWarningDescription()}
             </p>
           </div>
 

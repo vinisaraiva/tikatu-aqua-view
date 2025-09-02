@@ -5,6 +5,7 @@ import { DataTable } from '@/components/admin/DataTable';
 import { VolunteerFormDialog } from './VolunteerFormDialog';
 import { useVolunteers, useDeleteVolunteer } from '@/hooks/admin/useVolunteers';
 import { ConfirmDialog } from '@/components/admin/ConfirmDialog';
+import { ApiKeyActions } from '@/components/admin/ApiKeyActions';
 
 const columns = [
   { key: 'code', label: 'Código' },
@@ -12,6 +13,11 @@ const columns = [
     volunteer.type === 'probe' ? '🔧 Automático' : '👤 Manual'
   },
   { key: 'nome', label: 'Nome', render: (volunteer: any) => volunteer.nome || '-' },
+  { key: 'api_key', label: 'API Key', render: (volunteer: any) => {
+    if (volunteer.type !== 'probe' || !volunteer.api_key) return '-';
+    const masked = volunteer.api_key.substring(0, 6) + '...' + volunteer.api_key.substring(volunteer.api_key.length - 6);
+    return <code className="text-xs bg-muted px-2 py-1 rounded">{masked}</code>;
+  }},
   { key: 'point_name', label: 'Ponto', render: (volunteer: any) => volunteer.point_name },
   { key: 'river_name', label: 'Rio', render: (volunteer: any) => volunteer.river_name },
   { key: 'city_name', label: 'Cidade', render: (volunteer: any) => volunteer.city_name },
@@ -75,6 +81,7 @@ export default function VolunteersPage() {
         searchKey="code"
         onEdit={handleEdit}
         onDelete={handleDelete}
+        customActions={(volunteer) => <ApiKeyActions volunteer={volunteer} />}
       />
 
       <VolunteerFormDialog

@@ -23,6 +23,7 @@ interface DataTableProps<T> {
   searchKey?: keyof T;
   onEdit?: (item: T) => void;
   onDelete?: (item: T) => void;
+  customActions?: (item: T) => React.ReactNode;
   loading?: boolean;
 }
 
@@ -32,6 +33,7 @@ export function DataTable<T extends { id: number | string }>({
   searchKey,
   onEdit,
   onDelete,
+  customActions,
   loading = false,
 }: DataTableProps<T>) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -57,9 +59,9 @@ export function DataTable<T extends { id: number | string }>({
     );
   }
 
-  // Auto-add actions column if edit/delete handlers are provided
+  // Auto-add actions column if edit/delete handlers or custom actions are provided
   const columnsWithActions = [...columns];
-  if ((onEdit || onDelete) && !columns.some(col => col.key === 'actions')) {
+  if ((onEdit || onDelete || customActions) && !columns.some(col => col.key === 'actions')) {
     columnsWithActions.push({ key: 'actions', label: 'Ações' } as Column<T>);
   }
 
@@ -102,6 +104,7 @@ export function DataTable<T extends { id: number | string }>({
                     <TableCell key={String(column.key)}>
                       {column.key === 'actions' ? (
                         <div className="flex gap-2">
+                          {customActions && customActions(item)}
                           {onEdit && (
                             <Button
                               variant="outline"
