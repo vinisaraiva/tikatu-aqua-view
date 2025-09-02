@@ -201,6 +201,13 @@ export type Database = {
             referencedRelation: "rivers"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "points_river_id_fkey"
+            columns: ["river_id"]
+            isOneToOne: false
+            referencedRelation: "volunteers_view"
+            referencedColumns: ["river_id"]
+          },
         ]
       }
       profiles: {
@@ -267,6 +274,7 @@ export type Database = {
         Row: {
           cheiro_alterado: boolean | null
           chuva_48h: boolean | null
+          collection_type: string
           context: Json | null
           cor_alterada: boolean | null
           created_at: string
@@ -277,10 +285,12 @@ export type Database = {
           point_id: number
           residuos_visiveis: boolean | null
           volume_reduzido: boolean | null
+          volunteer_id: number | null
         }
         Insert: {
           cheiro_alterado?: boolean | null
           chuva_48h?: boolean | null
+          collection_type?: string
           context?: Json | null
           cor_alterada?: boolean | null
           created_at?: string
@@ -291,10 +301,12 @@ export type Database = {
           point_id: number
           residuos_visiveis?: boolean | null
           volume_reduzido?: boolean | null
+          volunteer_id?: number | null
         }
         Update: {
           cheiro_alterado?: boolean | null
           chuva_48h?: boolean | null
+          collection_type?: string
           context?: Json | null
           cor_alterada?: boolean | null
           created_at?: string
@@ -305,6 +317,7 @@ export type Database = {
           point_id?: number
           residuos_visiveis?: boolean | null
           volume_reduzido?: boolean | null
+          volunteer_id?: number | null
         }
         Relationships: [
           {
@@ -312,6 +325,20 @@ export type Database = {
             columns: ["point_id"]
             isOneToOne: false
             referencedRelation: "points"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "readings_volunteer_id_fkey"
+            columns: ["volunteer_id"]
+            isOneToOne: false
+            referencedRelation: "volunteers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "readings_volunteer_id_fkey"
+            columns: ["volunteer_id"]
+            isOneToOne: false
+            referencedRelation: "volunteers_view"
             referencedColumns: ["id"]
           },
         ]
@@ -343,35 +370,57 @@ export type Database = {
             referencedRelation: "cities"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "rivers_city_id_fkey"
+            columns: ["city_id"]
+            isOneToOne: false
+            referencedRelation: "volunteers_view"
+            referencedColumns: ["city_id"]
+          },
         ]
       }
       volunteers: {
         Row: {
+          api_key: string | null
           code: string
           created_at: string | null
           id: number
           is_active: boolean
+          last_communication: string | null
           nome: string | null
           password_hash: string
           point_id: number
+          probe_model: string | null
+          probe_serial: string | null
+          type: string
         }
         Insert: {
+          api_key?: string | null
           code: string
           created_at?: string | null
           id?: number
           is_active?: boolean
+          last_communication?: string | null
           nome?: string | null
           password_hash: string
           point_id: number
+          probe_model?: string | null
+          probe_serial?: string | null
+          type?: string
         }
         Update: {
+          api_key?: string | null
           code?: string
           created_at?: string | null
           id?: number
           is_active?: boolean
+          last_communication?: string | null
           nome?: string | null
           password_hash?: string
           point_id?: number
+          probe_model?: string | null
+          probe_serial?: string | null
+          type?: string
         }
         Relationships: [
           {
@@ -393,28 +442,18 @@ export type Database = {
           created_at: string | null
           id: number | null
           is_active: boolean | null
+          last_communication: string | null
           nome: string | null
           point_id: number | null
           point_name: string | null
+          probe_model: string | null
+          probe_serial: string | null
           river_id: number | null
           river_name: string | null
           state: string | null
+          type: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "points_river_id_fkey"
-            columns: ["river_id"]
-            isOneToOne: false
-            referencedRelation: "rivers"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rivers_city_id_fkey"
-            columns: ["city_id"]
-            isOneToOne: false
-            referencedRelation: "cities"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "volunteers_point_id_fkey"
             columns: ["point_id"]
