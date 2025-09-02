@@ -148,6 +148,169 @@ else:
     print(f"Erro: {response.status_code}")
     print(response.text)`;
 
+  const cExample = `#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <curl/curl.h>
+#include <time.h>
+
+#define API_URL "${apiUrl}"
+#define API_KEY "SUA_API_KEY_AQUI"
+#define BUFFER_SIZE 2048
+
+typedef struct {
+    char *memory;
+    size_t size;
+} APIResponse;
+
+// Callback para capturar resposta da API
+static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, APIResponse *response) {
+    size_t realsize = size * nmemb;
+    char *ptr = realloc(response->memory, response->size + realsize + 1);
+    
+    if (!ptr) {
+        printf("Erro: Não foi possível realocar memória\\n");
+        return 0;
+    }
+    
+    response->memory = ptr;
+    memcpy(&(response->memory[response->size]), contents, realsize);
+    response->size += realsize;
+    response->memory[response->size] = 0;
+    
+    return realsize;
+}
+
+// Função para obter timestamp ISO 8601
+void get_iso_timestamp(char *buffer, size_t size) {
+    time_t now;
+    struct tm *tm_info;
+    
+    time(&now);
+    tm_info = gmtime(&now);
+    strftime(buffer, size, "%Y-%m-%dT%H:%M:%SZ", tm_info);
+}
+
+// Função para enviar dados da sonda
+int send_probe_data(int point_id, float temperature, float ph, 
+                   float dissolved_oxygen, float turbidity,
+                   int battery, int signal_strength, const char *firmware_version) {
+    CURL *curl;
+    CURLcode res;
+    APIResponse response = {0};
+    char json_data[BUFFER_SIZE];
+    char timestamp[32];
+    char auth_header[256];
+    
+    // Preparar timestamp
+    get_iso_timestamp(timestamp, sizeof(timestamp));
+    
+    // Preparar JSON
+    snprintf(json_data, sizeof(json_data),
+        "{"
+        "\\"point_id\\": %d,"
+        "\\"measured_at\\": \\"%s\\","
+        "\\"parameters\\": {"
+            "\\"temperature\\": %.1f,"
+            "\\"ph\\": %.1f,"
+            "\\"dissolved_oxygen\\": %.1f,"
+            "\\"turbidity\\": %.1f"
+        "},"
+        "\\"metadata\\": {"
+            "\\"probe_battery\\": %d,"
+            "\\"signal_strength\\": %d,"
+            "\\"firmware_version\\": \\"%s\\""
+        "}"
+        "}",
+        point_id, timestamp, temperature, ph, dissolved_oxygen, turbidity,
+        battery, signal_strength, firmware_version
+    );
+    
+    // Preparar header de autorização
+    snprintf(auth_header, sizeof(auth_header), "Authorization: Bearer %s", API_KEY);
+    
+    curl = curl_easy_init();
+    if(curl) {
+        // Headers HTTP
+        struct curl_slist *headers = NULL;
+        headers = curl_slist_append(headers, "Content-Type: application/json");
+        headers = curl_slist_append(headers, auth_header);
+        
+        // Configurar CURL
+        curl_easy_setopt(curl, CURLOPT_URL, API_URL);
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_data);
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&response);
+        curl_easy_setopt(curl, CURLOPT_TIMEOUT, 30L);
+        
+        // Executar requisição
+        res = curl_easy_perform(curl);
+        
+        if(res != CURLE_OK) {
+            printf("Erro ao enviar dados: %s\\n", curl_easy_strerror(res));
+            return -1;
+        } else {
+            long response_code;
+            curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
+            
+            if(response_code == 200) {
+                printf("Dados enviados com sucesso!\\n");
+                printf("Resposta: %s\\n", response.memory);
+                return 0;
+            } else {
+                printf("Erro HTTP: %ld\\n", response_code);
+                printf("Resposta: %s\\n", response.memory);
+                return -1;
+            }
+        }
+        
+        // Limpeza
+        curl_slist_free_all(headers);
+        curl_easy_cleanup(curl);
+    }
+    
+    if(response.memory) {
+        free(response.memory);
+    }
+    
+    return -1;
+}
+
+// Exemplo de uso
+int main() {
+    printf("Enviando dados da sonda...\\n");
+    
+    // Simular leitura dos sensores
+    float temperature = 25.3;
+    float ph = 7.2;
+    float dissolved_oxygen = 8.5;
+    float turbidity = 12.1;
+    
+    // Informações da sonda
+    int battery = 85;
+    int signal_strength = -65;
+    const char *firmware_version = "1.0.0";
+    
+    // Enviar dados para o ponto de coleta 1
+    int result = send_probe_data(1, temperature, ph, dissolved_oxygen, turbidity,
+                                battery, signal_strength, firmware_version);
+    
+    if(result == 0) {
+        printf("Sucesso: Dados enviados para a API\\n");
+    } else {
+        printf("Erro: Falha ao enviar dados\\n");
+    }
+    
+    return result;
+}
+
+// Para compilar:
+// gcc -o sonda sonda.c -lcurl
+// 
+// Para executar:
+// ./sonda`;
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -397,6 +560,26 @@ else:
                   <CardContent>
                     <pre className="bg-muted p-4 rounded text-sm overflow-x-auto">
                       {pythonExample}
+                    </pre>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center justify-between">
+                      Exemplo C (para Microcontroladores)
+                      <Button size="sm" variant="outline" onClick={() => copyToClipboard(cExample)}>
+                        <Copy className="h-4 w-4 mr-2" />
+                        Copiar
+                      </Button>
+                    </CardTitle>
+                    <CardDescription>
+                      Exemplo completo em C usando libcurl, ideal para microcontroladores e sistemas embarcados
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <pre className="bg-muted p-4 rounded text-sm overflow-x-auto">
+                      {cExample}
                     </pre>
                   </CardContent>
                 </Card>
