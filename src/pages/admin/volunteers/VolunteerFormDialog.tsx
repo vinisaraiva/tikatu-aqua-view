@@ -34,10 +34,22 @@ const volunteerSchema = z.object({
   nome: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
   point_id: z.number().min(1, 'Ponto é obrigatório'),
   type: z.enum(['manual', 'probe']),
-  password: z.string().min(4, 'Senha deve ter pelo menos 4 caracteres').optional(),
+  password: z.string().optional(),
   probe_model: z.string().optional(),
   probe_serial: z.string().optional(),
   is_active: z.boolean(),
+}).refine((data) => {
+  // Senha é obrigatória apenas para voluntários manuais
+  if (data.type === 'manual' && (!data.password || data.password.trim() === '')) {
+    return false;
+  }
+  if (data.type === 'manual' && data.password && data.password.length < 4) {
+    return false;
+  }
+  return true;
+}, {
+  message: 'Senha é obrigatória para voluntários manuais (mínimo 4 caracteres)',
+  path: ['password'],
 });
 
 type VolunteerFormData = z.infer<typeof volunteerSchema>;
@@ -112,10 +124,6 @@ export function VolunteerFormDialog({ open, onClose, volunteer }: VolunteerFormD
         }
       );
     } else {
-      if (data.type === 'manual' && !data.password) {
-        form.setError('password', { message: 'Senha é obrigatória para novos voluntários manuais' });
-        return;
-      }
       createVolunteer.mutate({ 
         nome: data.nome, 
         point_id: data.point_id, 
@@ -260,14 +268,31 @@ export function VolunteerFormDialog({ open, onClose, volunteer }: VolunteerFormD
                     <FormItem>
                       <FormLabel>
                         {volunteer ? 'Nova Senha (deixe vazio para manter)' : 'Senha'}
+                        {!volunteer && <span className="text-destructive"> *</span>}
                       </FormLabel>
                       <FormControl>
-                        <Input type="password" placeholder="Digite a senha" {...field} />
+                        <Input 
+                          type="password" 
+                          placeholder={volunteer ? "Digite a nova senha" : "Digite a senha (obrigatória)"}
+                          {...field} 
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+              )}
+
+              {form.watch('type') === 'probe' && (
+                <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
+                  <div className="flex items-start space-x-2">
+                    <div className="flex-shrink-0 text-blue-600">ℹ️</div>
+                    <div className="text-sm text-blue-800">
+                      <strong>Sondas automáticas</strong> não precisam de senha. 
+                      A autenticação é feita através de API key que será gerada automaticamente.
+                    </div>
+                  </div>
+                </div>
               )}
 
               {volunteer && volunteer.type === 'manual' && (

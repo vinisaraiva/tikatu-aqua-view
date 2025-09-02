@@ -388,7 +388,7 @@ export type Database = {
           is_active: boolean
           last_communication: string | null
           nome: string | null
-          password_hash: string
+          password_hash: string | null
           point_id: number
           probe_model: string | null
           probe_serial: string | null
@@ -402,7 +402,7 @@ export type Database = {
           is_active?: boolean
           last_communication?: string | null
           nome?: string | null
-          password_hash: string
+          password_hash?: string | null
           point_id: number
           probe_model?: string | null
           probe_serial?: string | null
@@ -416,7 +416,7 @@ export type Database = {
           is_active?: boolean
           last_communication?: string | null
           nome?: string | null
-          password_hash?: string
+          password_hash?: string | null
           point_id?: number
           probe_model?: string | null
           probe_serial?: string | null
