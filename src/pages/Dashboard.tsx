@@ -109,6 +109,46 @@ const Dashboard = () => {
     setEndDate(end);
   };
 
+  // Fetch readings data for report generation
+  const { data: cities } = useCities(selectedState);
+  const { data: rivers } = useRivers(
+    cities?.find(city => city.name === selectedCity)?.id
+  );
+  const { data: points } = usePoints(
+    rivers?.find(river => river.name === selectedRiver)?.id
+  );
+
+  // Get point IDs for selected points
+  const selectedPointsData = points?.filter(point => 
+    selectedPoints.includes(point.name)
+  ) || [];
+  const pointIds = selectedPointsData.map(point => point.id);
+
+  // Fetch readings data for report
+  const { data: reportReadings = [] } = useReadings(
+    pointIds, 
+    startDate, 
+    endDate
+  );
+  const { data: reportReadingValues = [] } = useReadingValues(
+    reportReadings.map(r => r.id)
+  );
+
+  // Transform data for report (filter by selected parameter)
+  const reportReadingsData = transformReadingsData({
+    readingValues: reportReadingValues,
+    readings: reportReadings,
+    selectedPointsData,
+    parameter: selectedParameter
+  }).map(reading => ({
+    pointName: reading.point,
+    value: reading.value,
+    unit: reading.unit,
+    conamaMin: reading.conamaMin,
+    conamaMax: reading.conamaMax,
+    date: reading.datetime
+  }));
+
   // Debug: Log current state
   console.log('Dashboard - Current state:', {
     selectedState,
@@ -233,6 +273,7 @@ const Dashboard = () => {
                 startDate={startDate}
                 endDate={endDate}
                 selectedParameter={selectedParameter}
+                readingsData={reportReadingsData}
               />
             </DialogContent>
           </Dialog>
