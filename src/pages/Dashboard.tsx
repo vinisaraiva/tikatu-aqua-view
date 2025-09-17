@@ -10,6 +10,87 @@ import FilterSection from '@/components/dashboard/FilterSection';
 import RecentReadings from '@/components/dashboard/RecentReadings';
 import AnomaliesChart from '@/components/dashboard/AnomaliesChart';
 import ReportSection from '@/components/dashboard/ReportSection';
+import PointView from '@/components/dashboard/point/PointView';
+import { useCities, useRivers, usePoints } from '@/hooks/useGeographicData';
+import { useReadings, useReadingValues } from '@/hooks/useReadingsData';
+import { transformReadingsData } from '@/components/dashboard/ReadingsDataTransformer';
+
+// Point View Wrapper Component
+const PointViewWrapper = ({ 
+  selectedState, 
+  selectedCity, 
+  selectedRiver, 
+  selectedPoints, 
+  selectedParameter,
+  startDate,
+  endDate 
+}: {
+  selectedState: string;
+  selectedCity: string;
+  selectedRiver: string;
+  selectedPoints: string[];
+  selectedParameter: string;
+  startDate?: Date;
+  endDate?: Date;
+}) => {
+  // Fetch geographic data
+  const { data: cities } = useCities(selectedState);
+  const { data: rivers } = useRivers(
+    cities?.find(city => city.name === selectedCity)?.id
+  );
+  const { data: points } = usePoints(
+    rivers?.find(river => river.name === selectedRiver)?.id
+  );
+
+  // Get point IDs for selected points
+  const selectedPointsData = points?.filter(point => 
+    selectedPoints.includes(point.name)
+  ) || [];
+  const pointIds = selectedPointsData.map(point => point.id);
+
+  // Fetch readings data
+  const { data: readings = [], isLoading: isLoadingReadings } = useReadings(
+    pointIds, 
+    startDate, 
+    endDate
+  );
+  const { data: readingValues = [], isLoading: isLoadingValues } = useReadingValues(
+    readings.map(r => r.id)
+  );
+
+  // Transform data
+  const transformedReadings = transformReadingsData({
+    readingValues,
+    readings,
+    selectedPointsData,
+    parameter: selectedParameter
+  });
+
+  if (!selectedCity || !selectedRiver || selectedPoints.length === 0) {
+    return (
+      <div className="text-center py-8 text-muted-foreground">
+        Selecione cidade, rio e pontos de coleta para visualizar os dados por ponto
+      </div>
+    );
+  }
+
+  if (isLoadingReadings || isLoadingValues) {
+    return (
+      <div className="text-center py-8 text-muted-foreground">
+        Carregando dados...
+      </div>
+    );
+  }
+
+  return (
+    <PointView
+      readings={transformedReadings}
+      selectedPoints={selectedPoints}
+      city={selectedCity}
+      river={selectedRiver}
+    />
+  );
+};
 
 const Dashboard = () => {
   const [selectedState, setSelectedState] = useState('');
@@ -80,21 +161,35 @@ const Dashboard = () => {
           onPointsChange={setSelectedPoints}
           onParameterChange={setSelectedParameter}
           onDateChange={handleDateChange}
+          showParametersFilter={true}
         />
 
         {/* Main Content */}
-        <Tabs defaultValue="readings" className="space-y-6">
-          <TabsList className="grid w-full lg:w-auto grid-cols-2">
-            <TabsTrigger value="readings">Leituras Recentes</TabsTrigger>
+        <Tabs defaultValue="by-parameter" className="space-y-6">
+          <TabsList className="grid w-full lg:w-auto grid-cols-3">
+            <TabsTrigger value="by-parameter">Por Parâmetro</TabsTrigger>
+            <TabsTrigger value="by-point">Por Ponto de Coleta</TabsTrigger>
             <TabsTrigger value="anomalies">Anomalias</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="readings" className="space-y-6">
+          <TabsContent value="by-parameter" className="space-y-6">
             <RecentReadings 
               city={selectedCity}
               river={selectedRiver}
               points={selectedPoints}
               parameter={selectedParameter}
+              startDate={startDate}
+              endDate={endDate}
+            />
+          </TabsContent>
+
+          <TabsContent value="by-point" className="space-y-6">
+            <PointViewWrapper 
+              selectedState={selectedState}
+              selectedCity={selectedCity}
+              selectedRiver={selectedRiver}
+              selectedPoints={selectedPoints}
+              selectedParameter={selectedParameter}
               startDate={startDate}
               endDate={endDate}
             />
