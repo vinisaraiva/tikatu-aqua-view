@@ -101,6 +101,7 @@ const Dashboard = () => {
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [endDate, setEndDate] = useState<Date | undefined>();
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('by-parameter');
 
   const handleDateChange = (start: Date | undefined, end: Date | undefined) => {
     console.log('Dashboard - Date change received:', { start, end });
@@ -161,11 +162,11 @@ const Dashboard = () => {
           onPointsChange={setSelectedPoints}
           onParameterChange={setSelectedParameter}
           onDateChange={handleDateChange}
-          showParametersFilter={false}
+          showParametersFilter={activeTab === 'by-parameter' || activeTab === 'anomalies'}
         />
 
         {/* Main Content */}
-        <Tabs defaultValue="by-parameter" className="space-y-6">
+        <Tabs defaultValue="by-parameter" onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full lg:w-auto grid-cols-3">
             <TabsTrigger value="by-parameter">Por Parâmetro</TabsTrigger>
             <TabsTrigger value="by-point">Por Ponto de Coleta</TabsTrigger>
