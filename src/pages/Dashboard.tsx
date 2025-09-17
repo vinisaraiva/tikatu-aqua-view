@@ -147,7 +147,9 @@ const Dashboard = () => {
     unit: reading.unit,
     conamaMin: reading.conamaMin,
     conamaMax: reading.conamaMax,
-    date: reading.datetime
+    date: reading.datetime,
+    parameterCode: reading.parameter,
+    parameterDescription: reading.parameter
   }));
 
   // Debug: Log current state

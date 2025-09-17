@@ -41,13 +41,13 @@ export function useWaterReport(): UseWaterReportReturn {
     try {
       console.log('Calling generate-water-report function with data:', data);
       
-      // Enriquecer dados com informações dos parâmetros se disponível
+      // Usar os dados dos parâmetros que já vêm nas readings
       const enrichedData = {
         ...data,
         readings: data.readings.map(reading => ({
           ...reading,
-          parameterCode: reading.parameterCode || data.parameter,
-          parameterDescription: reading.parameterDescription || data.parameter
+          parameterCode: reading.parameterCode || reading.unit || '',
+          parameterDescription: reading.parameterDescription || reading.unit || ''
         }))
       };
 

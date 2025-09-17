@@ -13,6 +13,8 @@ interface ReadingData {
   conamaMin?: number;
   conamaMax?: number;
   date: string;
+  parameterCode?: string;
+  parameterDescription?: string;
 }
 
 interface ReportSectionProps {
