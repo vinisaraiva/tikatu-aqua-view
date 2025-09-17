@@ -20,6 +20,7 @@ interface ReportData {
     date: string;
   }>;
   language: 'pt' | 'en';
+  analysisType?: string;
 }
 
 serve(async (req) => {
@@ -88,7 +89,7 @@ serve(async (req) => {
 });
 
 function createDataContext(data: ReportData): string {
-  const { city, river, points, parameter, readings, startDate, endDate } = data;
+  const { city, river, points, parameter, readings, startDate, endDate, analysisType } = data;
   
   if (readings.length === 0) {
     return data.language === 'pt' 
@@ -108,11 +109,16 @@ function createDataContext(data: ReportData): string {
   let context = '';
   
   if (data.language === 'pt') {
+    const analysisHeader = analysisType === 'by-point' ? 'Análise Completa por Ponto de Coleta' : 'Análise por Parâmetro';
+    const parameterText = analysisType === 'by-point' ? 'Todos os parâmetros' : parameter;
+    
     context = `
+TIPO DE ANÁLISE: ${analysisHeader}
+
 DADOS DA COLETA:
 - Localização: ${city} - ${river}
 - Pontos de coleta: ${points.join(', ')}
-- Parâmetro analisado: ${parameter}
+- Parâmetro analisado: ${parameterText}
 - Período: ${startDate && endDate ? `${new Date(startDate).toLocaleDateString('pt-BR')} a ${new Date(endDate).toLocaleDateString('pt-BR')}` : 'Período completo'}
 - Unidade: ${unit}
 
@@ -137,11 +143,16 @@ ${readings.map(r => {
 }).join('\n')}
     `;
   } else {
+    const analysisHeader = analysisType === 'by-point' ? 'Complete Analysis by Collection Point' : 'Analysis by Parameter';
+    const parameterText = analysisType === 'by-point' ? 'All parameters' : parameter;
+    
     context = `
+ANALYSIS TYPE: ${analysisHeader}
+
 COLLECTION DATA:
 - Location: ${city} - ${river}
 - Collection points: ${points.join(', ')}
-- Parameter analyzed: ${parameter}
+- Parameter analyzed: ${parameterText}
 - Period: ${startDate && endDate ? `${new Date(startDate).toLocaleDateString('en-US')} to ${new Date(endDate).toLocaleDateString('en-US')}` : 'Complete period'}
 - Unit: ${unit}
 
@@ -171,9 +182,17 @@ ${readings.map(r => {
 }
 
 function createReportPrompt(data: ReportData, context: string): string {
+  const isPointAnalysis = data.analysisType === 'by-point';
+  
   if (data.language === 'pt') {
+    const specificInstructions = isPointAnalysis 
+      ? 'Este é uma análise completa por ponto de coleta, considerando múltiplos parâmetros. Foque na análise integrada da qualidade da água em cada ponto.'
+      : 'Este é uma análise focada em um parâmetro específico. Concentre-se na análise detalhada deste parâmetro.';
+    
     return `
 Atue como um analista ambiental especialista em monitoramento da qualidade da água. Escreva um relatório estruturado e claro baseado nos dados fornecidos. Seu objetivo é usar linguagem técnica, mas acessível ao público geral. Evite jargões acadêmicos, explique termos quando necessário, e escreva com fluência e clareza. Siga o estilo usado em relatórios oficiais do governo.
+
+${specificInstructions}
 
 ${context}
 
@@ -192,8 +211,14 @@ Organize o relatório usando a seguinte estrutura:
 O relatório deve ser escrito em português do brasil, livre de redundâncias e repetições, estruturado e se for necessário pode juntar alguns tópicos. O texto deve ser formatado como parágrafos naturais, apenas os títulos e subtítulos devem estar em negrito, e você não deve em momento algum usar asteriscos, hashtags ou símbolos especiais para marcar títulos ou seções.
     `;
   } else {
+    const specificInstructions = isPointAnalysis 
+      ? 'This is a complete analysis by collection point, considering multiple parameters. Focus on the integrated analysis of water quality at each point.'
+      : 'This is an analysis focused on a specific parameter. Concentrate on the detailed analysis of this parameter.';
+    
     return `
 Act as an environmental analyst with expertise in water quality monitoring. Write a structured and clear report based on the data provided. Your goal is to use technical language, but make it accessible to a general audience. Avoid academic jargon, explain terms when needed, and write with fluency and clarity. Follow the style used in official government reports.
+
+${specificInstructions}
 
 ${context}
 

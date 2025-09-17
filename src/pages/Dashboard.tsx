@@ -134,12 +134,13 @@ const Dashboard = () => {
     reportReadings.map(r => r.id)
   );
 
-  // Transform data for report (filter by selected parameter)
+  // Transform data for report - conditional parameter based on active tab
+  const reportParameter = activeTab === 'by-point' ? '' : selectedParameter;
   const reportReadingsData = transformReadingsData({
     readingValues: reportReadingValues,
     readings: reportReadings,
     selectedPointsData,
-    parameter: selectedParameter
+    parameter: reportParameter
   }).map(reading => ({
     pointName: reading.point,
     value: reading.value,
@@ -272,8 +273,9 @@ const Dashboard = () => {
                 parameters={selectedParameter ? [selectedParameter] : []}
                 startDate={startDate}
                 endDate={endDate}
-                selectedParameter={selectedParameter}
+                selectedParameter={reportParameter}
                 readingsData={reportReadingsData}
+                activeTab={activeTab}
               />
             </DialogContent>
           </Dialog>

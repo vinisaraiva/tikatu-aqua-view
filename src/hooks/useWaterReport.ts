@@ -18,6 +18,7 @@ interface ReportData {
     date: string;
   }>;
   language: 'pt' | 'en';
+  analysisType?: string;
 }
 
 interface UseWaterReportReturn {

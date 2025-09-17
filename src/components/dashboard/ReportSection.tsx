@@ -24,6 +24,7 @@ interface ReportSectionProps {
   endDate?: Date;
   readingsData?: ReadingData[];
   selectedParameter?: string;
+  activeTab?: string;
 }
 
 const ReportSection = ({ 
@@ -34,15 +35,24 @@ const ReportSection = ({
   startDate, 
   endDate, 
   readingsData = [],
-  selectedParameter = ''
+  selectedParameter = '',
+  activeTab = 'by-parameter'
 }: ReportSectionProps) => {
   const { generateReport, isGenerating } = useWaterReport();
   const [generatedAnalysis, setGeneratedAnalysis] = useState<string | null>(null);
   const [language, setLanguage] = useState<'pt' | 'en'>('pt');
 
   const handleGenerateReport = async () => {
-    if (!selectedParameter || readingsData.length === 0) {
-      alert('Selecione um parâmetro e certifique-se de que há dados disponíveis');
+    // For "by-point" view, we don't require a selected parameter
+    const isValidForAnalysis = activeTab === 'by-point' 
+      ? readingsData.length > 0 
+      : selectedParameter && readingsData.length > 0;
+    
+    if (!isValidForAnalysis) {
+      const message = activeTab === 'by-point'
+        ? 'Certifique-se de que há dados disponíveis'
+        : 'Selecione um parâmetro e certifique-se de que há dados disponíveis';
+      alert(message);
       return;
     }
 
@@ -54,7 +64,8 @@ const ReportSection = ({
       startDate,
       endDate,
       readings: readingsData,
-      language
+      language,
+      analysisType: activeTab
     };
 
     const analysis = await generateReport(reportData);
@@ -109,7 +120,8 @@ const ReportSection = ({
     return `${parameters.slice(0, 3).join(', ')} e mais ${parameters.length - 3}`;
   };
 
-  const hasValidData = city && river && points.length > 0 && selectedParameter && readingsData.length > 0;
+  const hasValidData = city && river && points.length > 0 && 
+    (activeTab === 'by-point' || selectedParameter) && readingsData.length > 0;
 
   if (!hasValidData) {
     return (
@@ -123,7 +135,7 @@ const ReportSection = ({
             <p>
               {!city || !river || points.length === 0 
                 ? "Selecione uma cidade, rio e pelo menos um ponto de coleta"
-                : !selectedParameter 
+                : activeTab !== 'by-point' && !selectedParameter 
                 ? "Selecione um parâmetro para análise"
                 : "Nenhum dado disponível para os filtros selecionados"
               }
