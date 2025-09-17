@@ -16,6 +16,8 @@ interface ReportData {
     conamaMin?: number;
     conamaMax?: number;
     date: string;
+    parameterCode?: string;
+    parameterDescription?: string;
   }>;
   language: 'pt' | 'en';
   analysisType?: string;
@@ -39,10 +41,20 @@ export function useWaterReport(): UseWaterReportReturn {
     try {
       console.log('Calling generate-water-report function with data:', data);
       
+      // Enriquecer dados com informações dos parâmetros se disponível
+      const enrichedData = {
+        ...data,
+        readings: data.readings.map(reading => ({
+          ...reading,
+          parameterCode: reading.parameterCode || data.parameter,
+          parameterDescription: reading.parameterDescription || data.parameter
+        }))
+      };
+
       const { data: result, error: functionError } = await supabase.functions.invoke(
         'generate-water-report',
         {
-          body: data
+          body: enrichedData
         }
       );
 
