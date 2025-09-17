@@ -232,6 +232,7 @@ const Dashboard = () => {
                 parameters={selectedParameter ? [selectedParameter] : []}
                 startDate={startDate}
                 endDate={endDate}
+                selectedParameter={selectedParameter}
               />
             </DialogContent>
           </Dialog>
