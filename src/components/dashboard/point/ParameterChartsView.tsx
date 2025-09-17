@@ -38,6 +38,17 @@ const ParameterChartsView = ({ readings, selectedPoints, city, river }: Paramete
     return groups;
   }, [readings]);
 
+  // Check which selected points have data
+  const pointsWithData = useMemo(() => {
+    const pointsSet = new Set<string>();
+    readings.forEach(reading => pointsSet.add(reading.point));
+    return Array.from(pointsSet);
+  }, [readings]);
+
+  const pointsWithoutData = useMemo(() => {
+    return selectedPoints.filter(point => !pointsWithData.includes(point));
+  }, [selectedPoints, pointsWithData]);
+
   const hasData = Object.keys(parameterGroups).length > 0;
 
   if (!hasData) {
@@ -89,9 +100,35 @@ const ParameterChartsView = ({ readings, selectedPoints, city, river }: Paramete
         })}
       </div>
 
+      {/* Points without data info */}
+      {pointsWithoutData.length > 0 && (
+        <Card className="border-amber-200 bg-amber-50">
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-2 text-amber-800 mb-2">
+              <span className="text-sm font-medium">Pontos sem dados disponíveis:</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {pointsWithoutData.map(point => (
+                <span key={point} className="text-xs bg-amber-100 text-amber-800 px-2 py-1 rounded">
+                  {point}
+                </span>
+              ))}
+            </div>
+            <p className="text-xs text-amber-600 mt-2">
+              Estes pontos não possuem leituras registradas para o período e parâmetros selecionados.
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Summary info */}
       <div className="text-sm text-muted-foreground text-center border-t pt-4">
-        Mostrando {Object.keys(parameterGroups).length} parâmetro(s) para {selectedPoints.length} ponto(s) de coleta
+        Mostrando {Object.keys(parameterGroups).length} parâmetro(s) para {pointsWithData.length} de {selectedPoints.length} ponto(s) de coleta
+        {pointsWithoutData.length > 0 && (
+          <span className="text-amber-600 ml-2">
+            ({pointsWithoutData.length} sem dados)
+          </span>
+        )}
       </div>
     </div>
   );
