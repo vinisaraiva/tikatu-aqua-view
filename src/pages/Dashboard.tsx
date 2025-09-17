@@ -10,7 +10,7 @@ import FilterSection from '@/components/dashboard/FilterSection';
 import RecentReadings from '@/components/dashboard/RecentReadings';
 import AnomaliesChart from '@/components/dashboard/AnomaliesChart';
 import ReportSection from '@/components/dashboard/ReportSection';
-import PointView from '@/components/dashboard/point/PointView';
+import ParameterChartsView from '@/components/dashboard/point/ParameterChartsView';
 import { useCities, useRivers, usePoints } from '@/hooks/useGeographicData';
 import { useReadings, useReadingValues } from '@/hooks/useReadingsData';
 import { transformReadingsData } from '@/components/dashboard/ReadingsDataTransformer';
@@ -58,12 +58,12 @@ const PointViewWrapper = ({
     readings.map(r => r.id)
   );
 
-  // Transform data
+  // Transform data - for point view, we don't filter by parameter, we want all parameters
   const transformedReadings = transformReadingsData({
     readingValues,
     readings,
     selectedPointsData,
-    parameter: selectedParameter
+    parameter: '' // Empty parameter to get all parameters
   });
 
   if (!selectedCity || !selectedRiver || selectedPoints.length === 0) {
@@ -83,7 +83,7 @@ const PointViewWrapper = ({
   }
 
   return (
-    <PointView
+    <ParameterChartsView
       readings={transformedReadings}
       selectedPoints={selectedPoints}
       city={selectedCity}
@@ -161,7 +161,7 @@ const Dashboard = () => {
           onPointsChange={setSelectedPoints}
           onParameterChange={setSelectedParameter}
           onDateChange={handleDateChange}
-          showParametersFilter={true}
+          showParametersFilter={false}
         />
 
         {/* Main Content */}
