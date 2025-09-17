@@ -106,7 +106,7 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false }: M
       'Brasília': [-48.1297, -15.7975]
     };
     
-    return cityCenters[city] || [-46.6333, -23.5505];
+    return cityCenters[city] || [-39.2778, -15.6014]; // Sul da Bahia como padrão
   };
 
   // Initialize map
