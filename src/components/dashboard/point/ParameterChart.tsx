@@ -10,7 +10,7 @@ interface Reading {
   value: number;
   unit: string;
   datetime: string;
-  conamaStatus: string;
+  conamaStatus: 'normal' | 'attention' | 'critical';
   hasAnomaly: boolean;
   point: string;
   conamaMin?: number | null;
@@ -40,6 +40,8 @@ const ParameterChart = ({
       // Set color based on CONAMA status
       if (reading.conamaStatus === 'normal') {
         barColor = '#22c55e'; // Green
+      } else if (reading.conamaStatus === 'attention') {
+        barColor = '#f59e0b'; // Yellow/amber
       } else if (reading.conamaStatus === 'critical') {
         barColor = '#ef4444'; // Red
       }

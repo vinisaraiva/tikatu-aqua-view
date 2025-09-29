@@ -8,7 +8,7 @@ interface Reading {
   value: number;
   unit: string;
   datetime: string;
-  conamaStatus: 'normal' | 'critical';
+  conamaStatus: 'normal' | 'attention' | 'critical';
   hasAnomaly: boolean;
   point: string;
   conamaMin?: number | null;
@@ -21,6 +21,68 @@ interface TransformReadingsParams {
   selectedPointsData: any[];
   parameter: string; // This is now expected to be a parameter CODE
 }
+
+// Function to calculate intelligent CONAMA status with attention zones
+const calculateConamaStatus = (
+  value: number, 
+  conamaMin: number | null, 
+  conamaMax: number | null, 
+  parameterCode: string
+): { status: 'normal' | 'attention' | 'critical'; hasAnomaly: boolean } => {
+  // If no CONAMA limits, consider as normal
+  if (conamaMin === null && conamaMax === null) {
+    return { status: 'normal', hasAnomaly: false };
+  }
+
+  // Define attention zone percentage (10% margin)
+  const attentionZonePercent = 0.10;
+  
+  // Handle parameters with only maximum limit (DBO, TDS, TEMP, etc.)
+  if (conamaMin === null && conamaMax !== null) {
+    const attentionThreshold = conamaMax * (1 - attentionZonePercent); // 90% of max
+    const criticalThreshold = conamaMax * (1 + attentionZonePercent); // 110% of max
+    
+    if (value > criticalThreshold) {
+      return { status: 'critical', hasAnomaly: true };
+    } else if (value > attentionThreshold) {
+      return { status: 'attention', hasAnomaly: false };
+    } else {
+      return { status: 'normal', hasAnomaly: false };
+    }
+  }
+  
+  // Handle parameters with only minimum limit (OD)
+  if (conamaMax === null && conamaMin !== null) {
+    const attentionThreshold = conamaMin * (1 + attentionZonePercent); // 110% of min
+    const criticalThreshold = conamaMin * (1 - attentionZonePercent); // 90% of min
+    
+    if (value < criticalThreshold) {
+      return { status: 'critical', hasAnomaly: true };
+    } else if (value < attentionThreshold) {
+      return { status: 'attention', hasAnomaly: false };
+    } else {
+      return { status: 'normal', hasAnomaly: false };
+    }
+  }
+  
+  // Handle parameters with both min and max limits (pH: 6.0-9.0)
+  if (conamaMin !== null && conamaMax !== null) {
+    const minAttentionThreshold = conamaMin * (1 + attentionZonePercent); // 110% of min (6.6 for pH)
+    const minCriticalThreshold = conamaMin * (1 - attentionZonePercent); // 90% of min (5.4 for pH)
+    const maxAttentionThreshold = conamaMax * (1 - attentionZonePercent); // 90% of max (8.1 for pH)
+    const maxCriticalThreshold = conamaMax * (1 + attentionZonePercent); // 110% of max (9.9 for pH)
+    
+    if (value < minCriticalThreshold || value > maxCriticalThreshold) {
+      return { status: 'critical', hasAnomaly: true };
+    } else if (value < minAttentionThreshold || value > maxAttentionThreshold) {
+      return { status: 'attention', hasAnomaly: false };
+    } else {
+      return { status: 'normal', hasAnomaly: false };
+    }
+  }
+  
+  return { status: 'normal', hasAnomaly: false };
+};
 
 export const transformReadingsData = ({ 
   readingValues, 
@@ -89,8 +151,8 @@ export const transformReadingsData = ({
     const conamaMin = value.parameter?.conama_min || null;
     const conamaMax = value.parameter?.conama_max || null;
 
-    // Determine CONAMA status based on parameter limits (simplified logic)
-    let conamaStatus: 'normal' | 'critical' = 'normal';
+    // Determine CONAMA status with intelligent attention zones
+    let conamaStatus: 'normal' | 'attention' | 'critical' = 'normal';
     let hasAnomaly = false;
 
     if (value.parameter) {
@@ -103,14 +165,12 @@ export const transformReadingsData = ({
         conama_max
       });
       
-      if ((conama_min !== null && value.value < conama_min) || 
-          (conama_max !== null && value.value > conama_max)) {
-        conamaStatus = 'critical';
-        hasAnomaly = true;
-        console.log('Classificado como CRÍTICO');
-      } else {
-        console.log('Classificado como NORMAL');
-      }
+      // Calculate intelligent attention zones
+      const classificationResult = calculateConamaStatus(value.value, conama_min, conama_max, value.parameter.code);
+      conamaStatus = classificationResult.status;
+      hasAnomaly = classificationResult.hasAnomaly;
+      
+      console.log('Classificado como:', conamaStatus.toUpperCase(), 'Anomalia:', hasAnomaly);
     }
 
     const transformedReading = {

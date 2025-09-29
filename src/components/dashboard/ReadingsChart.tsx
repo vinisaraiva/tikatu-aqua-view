@@ -11,7 +11,7 @@ interface Reading {
   value: number;
   unit: string;
   datetime: string;
-  conamaStatus: 'normal' | 'critical';
+  conamaStatus: 'normal' | 'attention' | 'critical';
   hasAnomaly: boolean;
   point: string;
   conamaMin?: number | null;
@@ -100,9 +100,11 @@ const ReadingsChart = ({ readings, selectedParameter }: ReadingsChartProps) => {
     
     if (!existingPoint) {
       // Determine color based on CONAMA status
-      let barColor = '#10b981'; // Default green
-      if (reading.conamaStatus === 'critical') {
-        barColor = '#ef4444'; // Red
+      let barColor = '#10b981'; // Default green for normal
+      if (reading.conamaStatus === 'attention') {
+        barColor = '#f59e0b'; // Yellow/amber for attention
+      } else if (reading.conamaStatus === 'critical') {
+        barColor = '#ef4444'; // Red for critical
       }
 
       acc.push({

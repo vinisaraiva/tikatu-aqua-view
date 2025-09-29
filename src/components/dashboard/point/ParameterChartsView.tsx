@@ -10,7 +10,7 @@ interface Reading {
   value: number;
   unit: string;
   datetime: string;
-  conamaStatus: string;
+  conamaStatus: 'normal' | 'attention' | 'critical';
   hasAnomaly: boolean;
   point: string;
   conamaMin?: number | null;
