@@ -6,6 +6,7 @@ import ChartLegend from '../chart/ChartLegend';
 interface Reading {
   id: string;
   parameter: string;
+  parameterCode: string;
   value: number;
   unit: string;
   datetime: string;
@@ -39,8 +40,6 @@ const ParameterChart = ({
       // Set color based on CONAMA status
       if (reading.conamaStatus === 'normal') {
         barColor = '#22c55e'; // Green
-      } else if (reading.conamaStatus === 'attention') {
-        barColor = '#f59e0b'; // Yellow/Orange
       } else if (reading.conamaStatus === 'critical') {
         barColor = '#ef4444'; // Red
       }

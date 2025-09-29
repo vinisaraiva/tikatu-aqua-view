@@ -7,10 +7,11 @@ import ConamaLegend from './chart/ConamaLegend';
 interface Reading {
   id: string;
   parameter: string;
+  parameterCode: string;
   value: number;
   unit: string;
   datetime: string;
-  conamaStatus: 'normal' | 'attention' | 'critical';
+  conamaStatus: 'normal' | 'critical';
   hasAnomaly: boolean;
   point: string;
   conamaMin?: number | null;
@@ -98,17 +99,10 @@ const ReadingsChart = ({ readings, selectedParameter }: ReadingsChartProps) => {
     const existingPoint = acc.find(item => item.point === reading.point);
     
     if (!existingPoint) {
-      // Determine color based on CONAMA limits
+      // Determine color based on CONAMA status
       let barColor = '#10b981'; // Default green
-      if (reading.conamaMin !== undefined && reading.conamaMin !== null || 
-          reading.conamaMax !== undefined && reading.conamaMax !== null) {
-        if (reading.conamaMin !== undefined && reading.conamaMin !== null && reading.value < reading.conamaMin) {
-          barColor = '#ef4444'; // Red - below minimum
-        } else if (reading.conamaMax !== undefined && reading.conamaMax !== null && reading.value > reading.conamaMax) {
-          barColor = '#ef4444'; // Red - above maximum
-        } else if (reading.conamaMax !== undefined && reading.conamaMax !== null && reading.value > reading.conamaMax * 0.8) {
-          barColor = '#f59e0b'; // Yellow - approaching limit (80% of max)
-        }
+      if (reading.conamaStatus === 'critical') {
+        barColor = '#ef4444'; // Red
       }
 
       acc.push({

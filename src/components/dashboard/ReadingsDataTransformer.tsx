@@ -4,10 +4,11 @@ import { ReadingValue } from '@/hooks/useReadingsData';
 interface Reading {
   id: string;
   parameter: string;
+  parameterCode: string;
   value: number;
   unit: string;
   datetime: string;
-  conamaStatus: 'normal' | 'attention' | 'critical';
+  conamaStatus: 'normal' | 'critical';
   hasAnomaly: boolean;
   point: string;
   conamaMin?: number | null;
@@ -88,31 +89,34 @@ export const transformReadingsData = ({
     const conamaMin = value.parameter?.conama_min || null;
     const conamaMax = value.parameter?.conama_max || null;
 
-    // Determine CONAMA status based on parameter limits
-    let conamaStatus: 'normal' | 'attention' | 'critical' = 'normal';
+    // Determine CONAMA status based on parameter limits (simplified logic)
+    let conamaStatus: 'normal' | 'critical' = 'normal';
     let hasAnomaly = false;
 
     if (value.parameter) {
       const { conama_min, conama_max } = value.parameter;
       
-      if (conama_min !== null && value.value < conama_min) {
+      console.log('CONAMA Classification Debug:', {
+        parameter: value.parameter.code,
+        value: value.value,
+        conama_min,
+        conama_max
+      });
+      
+      if ((conama_min !== null && value.value < conama_min) || 
+          (conama_max !== null && value.value > conama_max)) {
         conamaStatus = 'critical';
         hasAnomaly = true;
-      } else if (conama_max !== null && value.value > conama_max) {
-        conamaStatus = 'critical';
-        hasAnomaly = true;
-      } else if (conama_min !== null && value.value < conama_min * 1.2) {
-        conamaStatus = 'attention';
-        hasAnomaly = true;
-      } else if (conama_max !== null && value.value > conama_max * 0.8) {
-        conamaStatus = 'attention';
-        hasAnomaly = true;
+        console.log('Classificado como CRÍTICO');
+      } else {
+        console.log('Classificado como NORMAL');
       }
     }
 
     const transformedReading = {
       id: `${reading.id}-${value.parameter_id}`,
       parameter: value.parameter?.description || 'Parâmetro Desconhecido', // Still display description in UI
+      parameterCode: value.parameter?.code || '',
       value: value.value,
       unit: value.parameter?.unit || '',
       datetime: reading.measured_at,

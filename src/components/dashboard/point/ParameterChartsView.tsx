@@ -6,6 +6,7 @@ import ReadingsFilters from '../ReadingsFilters';
 interface Reading {
   id: string;
   parameter: string;
+  parameterCode: string;
   value: number;
   unit: string;
   datetime: string;
@@ -83,7 +84,7 @@ const ParameterChartsView = ({ readings, selectedPoints, city, river }: Paramete
             <Card key={parameter} className="p-0">
               <CardHeader className="pb-4">
                 <CardTitle className="text-lg font-semibold">
-                  {parameter} {unit && `(${unit})`}
+                  {firstReading?.parameterCode && <span className="font-bold text-primary">{firstReading.parameterCode}</span>} - {parameter} {unit && `(${unit})`}
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-0">
