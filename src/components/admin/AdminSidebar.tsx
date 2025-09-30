@@ -19,7 +19,8 @@ import {
   FileText,
   Users,
   Activity,
-  Newspaper
+  Newspaper,
+  Settings
 } from 'lucide-react';
 
 const navigationItems = [
@@ -62,6 +63,11 @@ const navigationItems = [
     title: 'Notícias',
     url: '/admin/news',
     icon: Newspaper,
+  },
+  {
+    title: 'Configurações',
+    url: '/admin/settings',
+    icon: Settings,
   },
 ];
 

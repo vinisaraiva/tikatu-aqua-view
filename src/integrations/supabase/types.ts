@@ -75,6 +75,33 @@ export type Database = {
           },
         ]
       }
+      app_settings: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          key: string
+          updated_at: string
+          value: boolean
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          key: string
+          updated_at?: string
+          value?: boolean
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          key?: string
+          updated_at?: string
+          value?: boolean
+        }
+        Relationships: []
+      }
       cities: {
         Row: {
           created_at: string

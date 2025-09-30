@@ -24,6 +24,7 @@ import NewsPage from "./pages/admin/news/NewsPage";
 import ReadingsPage from "./pages/admin/readings/ReadingsPage";
 import ProbeApiDocumentation from "./pages/ProbeApiDocumentation";
 import { AdminLayout } from "./components/admin/AdminLayout";
+import { SettingsPage } from "./pages/admin/settings/SettingsPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -62,6 +63,7 @@ const App = () => (
             <Route path="readings" element={<ReadingsPage />} />
             <Route path="volunteers" element={<VolunteersPage />} />
             <Route path="news" element={<NewsPage />} />
+            <Route path="settings" element={<SettingsPage />} />
           </Route>
           
           <Route path="*" element={<NotFound />} />

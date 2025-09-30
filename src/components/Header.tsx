@@ -3,9 +3,11 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { MenuIcon, XIcon } from 'lucide-react';
+import { useAppSetting } from '@/hooks/useAppSettings';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { data: educationSetting } = useAppSetting('show_education_menu');
 
   return (
     <header className="bg-white shadow-sm border-b">
@@ -30,9 +32,11 @@ const Header = () => {
             <Link to="/indices" className="text-gray-700 hover:text-teal-600 transition-colors">
               Índices
             </Link>
-            <Link to="/education" className="text-gray-700 hover:text-teal-600 transition-colors">
-              Educação
-            </Link>
+            {educationSetting?.value && (
+              <Link to="/education" className="text-gray-700 hover:text-teal-600 transition-colors">
+                Educação
+              </Link>
+            )}
             <Link to="/agenda-2030" className="text-gray-700 hover:text-teal-600 transition-colors">
               Tikatu e a Agenda 2030
             </Link>
@@ -83,13 +87,15 @@ const Header = () => {
               >
                 Índices
               </Link>
-              <Link 
-                to="/education" 
-                className="text-gray-700 hover:text-teal-600 py-2 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Educação
-              </Link>
+              {educationSetting?.value && (
+                <Link 
+                  to="/education" 
+                  className="text-gray-700 hover:text-teal-600 py-2 transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Educação
+                </Link>
+              )}
               <Link 
                 to="/agenda-2030" 
                 className="text-gray-700 hover:text-teal-600 py-2 transition-colors"
