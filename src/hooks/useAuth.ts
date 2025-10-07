@@ -66,7 +66,28 @@ export const useAuth = () => {
     return { error };
   };
 
-  const isAdmin = profile?.role === 'admin';
+  // Check if user is admin using user_roles table
+  const [isAdmin, setIsAdmin] = useState(false);
+  
+  useEffect(() => {
+    const checkAdminRole = async () => {
+      if (!user?.id) {
+        setIsAdmin(false);
+        return;
+      }
+      
+      const { data } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin')
+        .maybeSingle();
+      
+      setIsAdmin(!!data);
+    };
+    
+    checkAdminRole();
+  }, [user?.id]);
 
   return {
     user,
