@@ -40,8 +40,8 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
     ? (mapCache?.points || []).map(p => ({
         id: p.id,
         name: p.name,
-        latitude: p.latitude,
-        longitude: p.longitude,
+        latitude: Number(p.latitude),
+        longitude: Number(p.longitude),
         river_id: p.river_id,
       }))
     : selectedPoints.length > 0 
@@ -229,6 +229,15 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
 
     console.log('Adding markers for points:', displayPoints.map(p => ({ name: p.name, river_id: p.river_id })));
     console.log('Using cache mode:', shouldUseCache);
+    console.log('📍 Coordenadas dos pontos:', displayPoints.map(p => ({
+      name: p.name,
+      lat: p.latitude,
+      lng: p.longitude,
+      types: {
+        lat: typeof p.latitude,
+        lng: typeof p.longitude
+      }
+    })));
 
     // Clear existing markers
     clearMarkers();
@@ -257,8 +266,21 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
         </div>
       `);
 
-      // Create and add marker with explicit type casting
-      const coordinates: [number, number] = [Number(point.longitude), Number(point.latitude)];
+      // Validate coordinates before creating marker
+      const lat = Number(point.latitude);
+      const lng = Number(point.longitude);
+      
+      if (isNaN(lat) || isNaN(lng)) {
+        console.error(`❌ Coordenadas inválidas para ponto ${point.name}:`, { 
+          lat, 
+          lng, 
+          original: point 
+        });
+        return;
+      }
+
+      // Create and add marker with validated coordinates
+      const coordinates: [number, number] = [lng, lat];
       const marker = new mapboxgl.Marker(markerElement)
         .setLngLat(coordinates)
         .setPopup(popup)
