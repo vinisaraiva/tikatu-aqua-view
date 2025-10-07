@@ -44,7 +44,9 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
         longitude: p.longitude,
         river_id: p.river_id,
       }))
-    : allPoints.filter(point => selectedPoints.includes(point.name));
+    : selectedPoints.length > 0 
+      ? allPoints.filter(point => selectedPoints.includes(point.name))
+      : allPoints; // Show all points from filtered river
   
   // For cache mode, we need city and river names from cache
   const getPointMetadata = (pointName: string) => {
@@ -219,7 +221,7 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
         map.current = null;
       }
     };
-  }, [city, river, hideBusinessNames]); // Re-initialize map when city, river, or hideBusinessNames changes
+  }, [city, river, hideBusinessNames, shouldUseCache, mapCache]); // Re-initialize map when filters or cache changes
 
   // Add markers when map is loaded and points are available
   useEffect(() => {
@@ -283,10 +285,11 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
         bounds.extend(coordinates);
       });
       
-      // Add padding and ensure minimum zoom
+      // Add padding and adjust zoom based on number of points
+      const maxZoom = displayPoints.length === 1 ? 15 : displayPoints.length <= 3 ? 14 : shouldUseCache ? 10 : 13;
       map.current.fitBounds(bounds, { 
         padding: 50,
-        maxZoom: shouldUseCache ? 10 : 15
+        maxZoom
       });
     }
   }, [selectedPoints, isMapLoaded, city, river, displayPoints, shouldUseCache]);
@@ -314,40 +317,6 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
             ref={mapContainer} 
             className="w-full h-80 rounded-lg overflow-hidden border"
           />
-        )}
-        
-        {displayPoints.length > 0 && (
-          <div className="mt-4">
-            <h4 className="font-medium mb-2">
-              {shouldUseCache ? 'Todos os Pontos Cadastrados:' : 'Pontos no Mapa:'}
-            </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {displayPoints.map((point) => {
-                const metadata = getPointMetadata(point.name);
-                return (
-                  <div key={point.id} className="flex items-center text-sm">
-                    <div 
-                      className="w-4 h-5 mr-2 relative flex-shrink-0"
-                      style={{
-                        background: 'linear-gradient(135deg, #06b6d4, #0891b2)',
-                        borderRadius: '50% 50% 50% 0',
-                        transform: 'rotate(-45deg)',
-                        border: '1px solid white'
-                      }}
-                    />
-                    <div>
-                      <span className="font-medium">{point.name}</span>
-                      {shouldUseCache && (
-                        <span className="text-xs text-muted-foreground ml-1">
-                          ({metadata.city} - {metadata.river})
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
         )}
       </CardContent>
     </Card>
