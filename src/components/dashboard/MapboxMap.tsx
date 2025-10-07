@@ -5,37 +5,63 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MapIcon } from 'lucide-react';
 import { usePoints, useRivers, useCities } from '@/hooks/useGeographicData';
+import { useMapCache } from '@/hooks/useMapCache';
 
 interface MapboxMapProps {
   selectedPoints: string[];
   city: string;
   river: string;
   hideBusinessNames?: boolean;
+  useCache?: boolean;
 }
 
-const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false }: MapboxMapProps) => {
+const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, useCache = true }: MapboxMapProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [mapError, setMapError] = useState<string | null>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
 
-  // Fetch data with proper filtering
+  // Load cache data
+  const { data: mapCache } = useMapCache();
+  
+  // Determine if we should use cache: only if cache is enabled AND no filters are active
+  const shouldUseCache = useCache && !city && !river && selectedPoints.length === 0;
+  
+  // Fetch data with proper filtering (only when not using cache)
   const { data: cities = [] } = useCities();
   const selectedCityData = cities.find(c => c.name === city);
   const { data: rivers = [] } = useRivers(selectedCityData?.id);
   const selectedRiverData = rivers.find(r => r.name === river);
   const { data: allPoints = [] } = usePoints(selectedRiverData?.id);
   
-  // Filter points based on selected points AND river
-  const selectedPointsData = allPoints.filter(point => 
-    selectedPoints.includes(point.name)
-  );
+  // Determine which points to display
+  const displayPoints = shouldUseCache 
+    ? (mapCache?.points || []).map(p => ({
+        id: p.id,
+        name: p.name,
+        latitude: p.latitude,
+        longitude: p.longitude,
+        river_id: p.river_id,
+      }))
+    : allPoints.filter(point => selectedPoints.includes(point.name));
+  
+  // For cache mode, we need city and river names from cache
+  const getPointMetadata = (pointName: string) => {
+    if (shouldUseCache && mapCache) {
+      const cachePoint = mapCache.points.find(p => p.name === pointName);
+      return {
+        city: cachePoint?.city_name || 'Desconhecido',
+        river: cachePoint?.river_name || 'Desconhecido'
+      };
+    }
+    return { city, river };
+  };
 
   console.log('MapboxMap - City:', city, 'River:', river, 'Selected Points:', selectedPoints);
   console.log('MapboxMap - River ID:', selectedRiverData?.id);
   console.log('MapboxMap - Available Points for this river:', allPoints.map(p => ({ name: p.name, river_id: p.river_id })));
-  console.log('MapboxMap - Selected Points Data:', selectedPointsData.map(p => ({ name: p.name, river_id: p.river_id })));
+  console.log('MapboxMap - Display Points:', displayPoints.map(p => ({ name: p.name, river_id: p.river_id })));
 
   // Create droplet-style marker element
   const createDropletMarker = () => {
@@ -90,11 +116,18 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false }: M
 
   // Get center coordinates for the selected city/river
   const getCenterCoordinates = (): [number, number] => {
-    if (selectedPointsData.length > 0) {
-      // Calculate center from all selected points
-      const avgLat = selectedPointsData.reduce((sum, point) => sum + Number(point.latitude), 0) / selectedPointsData.length;
-      const avgLng = selectedPointsData.reduce((sum, point) => sum + Number(point.longitude), 0) / selectedPointsData.length;
+    if (displayPoints.length > 0) {
+      // Calculate center from all display points
+      const avgLat = displayPoints.reduce((sum, point) => sum + Number(point.latitude), 0) / displayPoints.length;
+      const avgLng = displayPoints.reduce((sum, point) => sum + Number(point.longitude), 0) / displayPoints.length;
       return [avgLng, avgLat];
+    }
+    
+    // If using cache and bounds available, use center of bounds
+    if (shouldUseCache && mapCache?.bounds) {
+      const centerLng = (mapCache.bounds.east + mapCache.bounds.west) / 2;
+      const centerLat = (mapCache.bounds.north + mapCache.bounds.south) / 2;
+      return [centerLng, centerLat];
     }
     
     // Default city centers for fallback
@@ -132,12 +165,14 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false }: M
         ? 'mapbox://styles/mapbox/outdoors-v12' 
         : 'mapbox://styles/mapbox/outdoors-v12';
 
-      // Create new map with dynamic center based on city
+      // Create new map with dynamic center based on city or cache
+      const initialZoom = shouldUseCache && mapCache?.bounds ? 10 : 12;
+      
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
         style: mapStyle,
         center: getCenterCoordinates(),
-        zoom: 12,
+        zoom: initialZoom,
         preserveDrawingBuffer: true,
         antialias: true
       });
@@ -186,19 +221,23 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false }: M
     };
   }, [city, river, hideBusinessNames]); // Re-initialize map when city, river, or hideBusinessNames changes
 
-  // Add markers when map is loaded and points are selected
+  // Add markers when map is loaded and points are available
   useEffect(() => {
-    if (!map.current || !isMapLoaded || selectedPointsData.length === 0) return;
+    if (!map.current || !isMapLoaded || displayPoints.length === 0) return;
 
-    console.log('Adding markers for points:', selectedPointsData.map(p => ({ name: p.name, river_id: p.river_id })));
+    console.log('Adding markers for points:', displayPoints.map(p => ({ name: p.name, river_id: p.river_id })));
+    console.log('Using cache mode:', shouldUseCache);
 
     // Clear existing markers
     clearMarkers();
 
-    // Add markers for selected points
-    selectedPointsData.forEach((point) => {
+    // Add markers for display points
+    displayPoints.forEach((point) => {
       // Create droplet marker element
       const markerElement = createDropletMarker();
+
+      // Get metadata for this point
+      const metadata = getPointMetadata(point.name);
 
       // Create popup
       const popup = new mapboxgl.Popup({
@@ -211,7 +250,7 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false }: M
           <div style="color: #64748b; font-size: 12px;">
             <div>Lat: ${Number(point.latitude).toFixed(4)}</div>
             <div>Lng: ${Number(point.longitude).toFixed(4)}</div>
-            <div style="margin-top: 4px; color: #3b82f6;">${city} - ${river}</div>
+            <div style="margin-top: 4px; color: #3b82f6;">${metadata.city} - ${metadata.river}</div>
           </div>
         </div>
       `);
@@ -237,9 +276,9 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false }: M
     });
 
     // Fit bounds to show all points
-    if (selectedPointsData.length > 0) {
+    if (displayPoints.length > 0) {
       const bounds = new mapboxgl.LngLatBounds();
-      selectedPointsData.forEach(point => {
+      displayPoints.forEach(point => {
         const coordinates: [number, number] = [Number(point.longitude), Number(point.latitude)];
         bounds.extend(coordinates);
       });
@@ -247,10 +286,10 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false }: M
       // Add padding and ensure minimum zoom
       map.current.fitBounds(bounds, { 
         padding: 50,
-        maxZoom: 15
+        maxZoom: shouldUseCache ? 10 : 15
       });
     }
-  }, [selectedPoints, isMapLoaded, city, river, selectedPointsData]);
+  }, [selectedPoints, isMapLoaded, city, river, displayPoints, shouldUseCache]);
 
   return (
     <Card className="w-full">
@@ -277,24 +316,36 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false }: M
           />
         )}
         
-        {selectedPoints.length > 0 && (
+        {displayPoints.length > 0 && (
           <div className="mt-4">
-            <h4 className="font-medium mb-2">Pontos no Mapa:</h4>
+            <h4 className="font-medium mb-2">
+              {shouldUseCache ? 'Todos os Pontos Cadastrados:' : 'Pontos no Mapa:'}
+            </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {selectedPointsData.map((point) => (
-                <div key={point.id} className="flex items-center text-sm">
-                  <div 
-                    className="w-4 h-5 mr-2 relative flex-shrink-0"
-                    style={{
-                      background: 'linear-gradient(135deg, #06b6d4, #0891b2)',
-                      borderRadius: '50% 50% 50% 0',
-                      transform: 'rotate(-45deg)',
-                      border: '1px solid white'
-                    }}
-                  />
-                  <span className="font-medium">{point.name}</span>
-                </div>
-              ))}
+              {displayPoints.map((point) => {
+                const metadata = getPointMetadata(point.name);
+                return (
+                  <div key={point.id} className="flex items-center text-sm">
+                    <div 
+                      className="w-4 h-5 mr-2 relative flex-shrink-0"
+                      style={{
+                        background: 'linear-gradient(135deg, #06b6d4, #0891b2)',
+                        borderRadius: '50% 50% 50% 0',
+                        transform: 'rotate(-45deg)',
+                        border: '1px solid white'
+                      }}
+                    />
+                    <div>
+                      <span className="font-medium">{point.name}</span>
+                      {shouldUseCache && (
+                        <span className="text-xs text-muted-foreground ml-1">
+                          ({metadata.city} - {metadata.river})
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
