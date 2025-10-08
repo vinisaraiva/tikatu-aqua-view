@@ -124,7 +124,6 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
       height: 38px;
       position: relative;
       cursor: pointer;
-      transform: translate(-50%, -100%);
     `;
 
     // Create the pin shape
@@ -134,10 +133,10 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
       height: 28px;
       background: #0284c7;
       border-radius: 50% 50% 50% 0;
-      transform: rotate(-45deg);
+      transform: translateX(-50%) rotate(-45deg);
       position: absolute;
-      top: 8px;
-      left: 0;
+      left: 50%;
+      bottom: 0;
       box-shadow: 0 3px 8px rgba(0,0,0,0.4);
       border: 2px solid white;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -147,12 +146,12 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
 
     // Add hover effect
     markerElement.addEventListener('mouseenter', () => {
-      pin.style.transform = 'rotate(-45deg) scale(1.15)';
+      pin.style.transform = 'translateX(-50%) rotate(-45deg) scale(1.15)';
       pin.style.boxShadow = '0 5px 12px rgba(0,0,0,0.5)';
     });
 
     markerElement.addEventListener('mouseleave', () => {
-      pin.style.transform = 'rotate(-45deg) scale(1)';
+      pin.style.transform = 'translateX(-50%) rotate(-45deg) scale(1)';
       pin.style.boxShadow = '0 3px 8px rgba(0,0,0,0.4)';
     });
 
@@ -448,7 +447,10 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
         .setLngLat(coordinates)
         .addTo(map.current!);
       
-      const marker = new mapboxgl.Marker(markerElement)
+      const marker = new mapboxgl.Marker(markerElement, {
+        anchor: 'bottom',
+        offset: [0, 0]
+      })
         .setLngLat(coordinates)
         .setPopup(popup)
         .addTo(map.current!);
