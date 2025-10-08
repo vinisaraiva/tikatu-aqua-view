@@ -237,7 +237,7 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
       const mapStyle = 'mapbox://styles/mapbox/outdoors-v12';
 
       // Create new map with dynamic center based on city or cache
-      const initialZoom = pointsToUse.length === 1 ? 15 : pointsToUse.length <= 3 ? 14 : 10;
+      const initialZoom = pointsToUse.length === 1 ? 13.5 : pointsToUse.length <= 3 ? 12 : 10.5;
       
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
@@ -490,7 +490,15 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
         });
         
         // Add padding and adjust zoom based on number of points
-        const maxZoom = pointsToRender.length === 1 ? 15 : pointsToRender.length <= 3 ? 14 : shouldUseCache ? 10 : 13;
+        const padding = pointsToRender.length === 1 
+          ? 140
+          : pointsToRender.length <= 3
+          ? 110
+          : shouldUseCache 
+          ? 60
+          : 90;
+        
+        const maxZoom = pointsToRender.length === 1 ? 14 : pointsToRender.length <= 3 ? 13 : shouldUseCache ? 10 : 12;
         
         if (map.current) {
           const boundsData = {
@@ -503,12 +511,13 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
           console.log('🎯 Ajustando bounds do mapa:', {
             totalPontos: pointsToRender.length,
             bounds: boundsData,
+            padding: padding,
             maxZoom: maxZoom,
             estadoSelecionado: selectedState
           });
           
           map.current.fitBounds(bounds, { 
-            padding: 80,
+            padding,
             maxZoom,
             duration: 1000
           });
