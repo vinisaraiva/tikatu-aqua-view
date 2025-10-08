@@ -95,15 +95,16 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
   }, [displayPoints, selectedState, statesInPoints]);
   
   // For cache mode, we need city and river names from cache
-  const getPointMetadata = (pointName: string) => {
+  const getPointMetadata = (pointId: number) => {
     if (shouldUseCache && mapCache) {
-      const cachePoint = mapCache.points.find(p => p.name === pointName);
+      const cachePoint = mapCache.points.find(p => p.id === pointId);
       return {
         city: cachePoint?.city_name || 'Desconhecido',
-        river: cachePoint?.river_name || 'Desconhecido'
+        river: cachePoint?.river_name || 'Desconhecido',
+        state: cachePoint?.state || 'Desconhecido'
       };
     }
-    return { city, river };
+    return { city, river, state: 'Desconhecido' };
   };
 
   console.log('MapboxMap - City:', city, 'River:', river, 'Selected Points:', selectedPoints);
@@ -311,7 +312,7 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
       const markerElement = createDropletMarker();
 
       // Get metadata for this point
-      const metadata = getPointMetadata(point.name);
+      const metadata = getPointMetadata(point.id);
 
       // Create popup
       const popup = new mapboxgl.Popup({
