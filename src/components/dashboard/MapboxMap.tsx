@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState, useMemo } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MapIcon } from 'lucide-react';
 import { usePoints, useRivers, useCities } from '@/hooks/useGeographicData';
 import { useMapCache } from '@/hooks/useMapCache';
@@ -20,6 +21,7 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
   const [mapError, setMapError] = useState<string | null>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
+  const [selectedState, setSelectedState] = useState<string | null>(null);
 
   // Load cache data
   const { data: mapCache } = useMapCache();
@@ -43,6 +45,7 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
           latitude: Number(p.latitude),
           longitude: Number(p.longitude),
           river_id: p.river_id,
+          state: p.state,
         }))
       : (selectedPoints.length > 0 
         ? allPoints.filter(point => selectedPoints.includes(point.name))
@@ -53,8 +56,35 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
           latitude: Number(p.latitude),
           longitude: Number(p.longitude),
           river_id: p.river_id,
+          state: undefined,
         }));
   }, [shouldUseCache, mapCache?.points, selectedPoints, allPoints]);
+
+  // Detectar estados diferentes nos pontos
+  const statesInPoints = useMemo(() => {
+    const states = displayPoints
+      .map(p => p.state)
+      .filter((state): state is string => state !== undefined && state !== null);
+    return [...new Set(states)];
+  }, [displayPoints]);
+
+  // Auto-selecionar o primeiro estado se houver múltiplos e nenhum selecionado
+  useEffect(() => {
+    if (statesInPoints.length > 1 && !selectedState) {
+      setSelectedState(statesInPoints[0]);
+    } else if (statesInPoints.length === 1) {
+      setSelectedState(null); // Reset if only one state
+    }
+  }, [statesInPoints, selectedState]);
+
+  // Filtrar pontos pelo estado selecionado
+  const filteredDisplayPoints = useMemo(() => {
+    if (!selectedState || statesInPoints.length <= 1) {
+      return displayPoints;
+    }
+    
+    return displayPoints.filter(p => p.state === selectedState);
+  }, [displayPoints, selectedState, statesInPoints]);
   
   // For cache mode, we need city and river names from cache
   const getPointMetadata = (pointName: string) => {
@@ -72,6 +102,9 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
   console.log('MapboxMap - River ID:', selectedRiverData?.id);
   console.log('MapboxMap - Available Points for this river:', allPoints.map(p => ({ name: p.name, river_id: p.river_id })));
   console.log('MapboxMap - Display Points:', displayPoints.map(p => ({ name: p.name, river_id: p.river_id })));
+  console.log('MapboxMap - States in points:', statesInPoints);
+  console.log('MapboxMap - Selected state:', selectedState);
+  console.log('MapboxMap - Filtered Display Points:', filteredDisplayPoints.map(p => ({ name: p.name, state: p.state })));
 
   // Create droplet-style marker element
   const createDropletMarker = () => {
@@ -126,18 +159,20 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
 
   // Get center coordinates for the selected city/river
   const getCenterCoordinates = (): [number, number] => {
-    console.log('🎯 getCenterCoordinates chamado. displayPoints.length:', displayPoints.length);
+    const pointsToUse = filteredDisplayPoints.length > 0 ? filteredDisplayPoints : displayPoints;
+    console.log('🎯 getCenterCoordinates chamado. pointsToUse.length:', pointsToUse.length);
     
-    if (displayPoints.length > 0) {
+    if (pointsToUse.length > 0) {
       // Calculate center from all display points
-      const avgLat = displayPoints.reduce((sum, point) => sum + Number(point.latitude), 0) / displayPoints.length;
-      const avgLng = displayPoints.reduce((sum, point) => sum + Number(point.longitude), 0) / displayPoints.length;
+      const avgLat = pointsToUse.reduce((sum, point) => sum + Number(point.latitude), 0) / pointsToUse.length;
+      const avgLng = pointsToUse.reduce((sum, point) => sum + Number(point.longitude), 0) / pointsToUse.length;
       
       console.log('📍 Centro calculado dos pontos:', { avgLng, avgLat, coordinates: [avgLng, avgLat] });
-      console.log('📊 Pontos usados para cálculo:', displayPoints.map(p => ({
+      console.log('📊 Pontos usados para cálculo:', pointsToUse.map(p => ({
         name: p.name,
         lat: Number(p.latitude),
-        lng: Number(p.longitude)
+        lng: Number(p.longitude),
+        state: p.state
       })));
       
       return [avgLng, avgLat];
@@ -167,8 +202,9 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
       return;
     }
 
-    // Wait for displayPoints to be available
-    if (displayPoints.length === 0) {
+    // Wait for points to be available (use filtered if multiple states)
+    const pointsToCheck = statesInPoints.length > 1 ? filteredDisplayPoints : displayPoints;
+    if (pointsToCheck.length === 0) {
       console.log('⏳ Aguardando pontos disponíveis...');
       return;
     }
@@ -185,7 +221,8 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
       // Set Mapbox access token
       mapboxgl.accessToken = 'pk.eyJ1IjoidmluaXNhcmFpdmEiLCJhIjoiY20wb25ocG9hMGF1ZTJrbzlmZm5haWFlcyJ9.XnczMEcsq_NTNTOFeCxzxA';
 
-      console.log('✅ Criando mapa com', displayPoints.length, 'pontos disponíveis');
+      const pointsToUse = filteredDisplayPoints.length > 0 ? filteredDisplayPoints : displayPoints;
+      console.log('✅ Criando mapa com', pointsToUse.length, 'pontos disponíveis (filtrados)');
       console.log('Centro do mapa:', getCenterCoordinates());
 
       // Choose map style based on hideBusinessNames prop
@@ -194,7 +231,7 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
         : 'mapbox://styles/mapbox/outdoors-v12';
 
       // Create new map with dynamic center based on city or cache
-      const initialZoom = displayPoints.length === 1 ? 15 : displayPoints.length <= 3 ? 14 : 10;
+      const initialZoom = pointsToUse.length === 1 ? 15 : pointsToUse.length <= 3 ? 14 : 10;
       
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
@@ -247,35 +284,21 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
         map.current = null;
       }
     };
-  }, [city, river, hideBusinessNames, shouldUseCache, mapCache]); // Re-initialize map when filters or cache changes
+  }, [city, river, hideBusinessNames, shouldUseCache, mapCache, selectedState, filteredDisplayPoints]); // Re-initialize map when filters or cache changes
 
   // Add markers when map is loaded and points are available
   useEffect(() => {
-    if (!map.current || !isMapLoaded || displayPoints.length === 0) return;
+    const pointsToRender = filteredDisplayPoints.length > 0 ? filteredDisplayPoints : displayPoints;
+    if (!map.current || !isMapLoaded || pointsToRender.length === 0) return;
 
-    console.log('Adding markers for points:', displayPoints.map(p => ({ name: p.name, river_id: p.river_id })));
+    console.log('Adding markers for points:', pointsToRender.map(p => ({ name: p.name, river_id: p.river_id, state: p.state })));
     console.log('Using cache mode:', shouldUseCache);
-    
-    // LOG CRÍTICO: Mostrar TODOS os valores de coordenadas
-    console.log('🔴 COORDENADAS DETALHADAS DE CADA PONTO:');
-    displayPoints.forEach(p => {
-      console.log(`  ${p.name}:`, {
-        latitude_original: p.latitude,
-        longitude_original: p.longitude,
-        latitude_number: Number(p.latitude),
-        longitude_number: Number(p.longitude),
-        tipos: {
-          lat_type: typeof p.latitude,
-          lng_type: typeof p.longitude
-        }
-      });
-    });
 
     // Clear existing markers
     clearMarkers();
 
     // Add markers for display points
-    displayPoints.forEach((point) => {
+    pointsToRender.forEach((point) => {
       // Create droplet marker element
       const markerElement = createDropletMarker();
 
@@ -351,12 +374,12 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
     });
 
     // Fit bounds to show all points with a slight delay to ensure markers are rendered
-    if (displayPoints.length > 0) {
+    if (pointsToRender.length > 0) {
       setTimeout(() => {
         const bounds = new mapboxgl.LngLatBounds();
         
         console.log('📐 Calculando bounds para os pontos:');
-        displayPoints.forEach(point => {
+        pointsToRender.forEach(point => {
           const lng = Number(point.longitude);
           const lat = Number(point.latitude);
           const coordinates: [number, number] = [lng, lat];
@@ -365,14 +388,15 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
             name: point.name,
             lng: lng,
             lat: lat,
-            coordinates: coordinates
+            coordinates: coordinates,
+            state: point.state
           });
           
           bounds.extend(coordinates);
         });
         
         // Add padding and adjust zoom based on number of points
-        const maxZoom = displayPoints.length === 1 ? 15 : displayPoints.length <= 3 ? 14 : shouldUseCache ? 10 : 13;
+        const maxZoom = pointsToRender.length === 1 ? 15 : pointsToRender.length <= 3 ? 14 : shouldUseCache ? 10 : 13;
         
         if (map.current) {
           const boundsData = {
@@ -383,9 +407,10 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
           };
           
           console.log('🎯 Ajustando bounds do mapa:', {
-            totalPontos: displayPoints.length,
+            totalPontos: pointsToRender.length,
             bounds: boundsData,
-            maxZoom: maxZoom
+            maxZoom: maxZoom,
+            estadoSelecionado: selectedState
           });
           
           map.current.fitBounds(bounds, { 
@@ -396,7 +421,7 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
         }
       }, 100);
     }
-  }, [selectedPoints, isMapLoaded, city, river, displayPoints, shouldUseCache]);
+  }, [selectedPoints, isMapLoaded, city, river, displayPoints, filteredDisplayPoints, shouldUseCache]);
 
   return (
     <Card className="w-full">
@@ -406,15 +431,34 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
           Mapa dos Pontos de Coleta
         </CardTitle>
         {city && river && (
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted-foreground">
             {city} → {river}
           </p>
+        )}
+        {statesInPoints.length > 1 && (
+          <div className="mt-4">
+            <Select value={selectedState || ''} onValueChange={setSelectedState}>
+              <SelectTrigger className="w-[200px]">
+                <SelectValue placeholder="Selecione o estado" />
+              </SelectTrigger>
+              <SelectContent>
+                {statesInPoints.map(state => (
+                  <SelectItem key={state} value={state}>
+                    {state}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground mt-2">
+              Pontos em múltiplos estados detectados. Selecione para filtrar.
+            </p>
+          </div>
         )}
       </CardHeader>
       <CardContent>
         {mapError ? (
-          <div className="w-full h-80 rounded-lg border flex items-center justify-center bg-gray-100">
-            <p className="text-red-600">{mapError}</p>
+          <div className="w-full h-80 rounded-lg border flex items-center justify-center bg-muted">
+            <p className="text-destructive">{mapError}</p>
           </div>
         ) : (
           <div 
