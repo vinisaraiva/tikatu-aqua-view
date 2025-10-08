@@ -22,6 +22,7 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
   const [selectedState, setSelectedState] = useState<string | null>(null);
+  const hasAutoSelected = useRef(false);
 
   // Load cache data
   const { data: mapCache } = useMapCache();
@@ -70,12 +71,14 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
 
   // Auto-selecionar o primeiro estado se houver múltiplos e nenhum selecionado
   useEffect(() => {
-    if (statesInPoints.length > 1 && !selectedState) {
+    if (statesInPoints.length > 1 && !selectedState && !hasAutoSelected.current) {
       setSelectedState(statesInPoints[0]);
-    } else if (statesInPoints.length === 1) {
-      setSelectedState(null); // Reset if only one state
+      hasAutoSelected.current = true;
+    } else if (statesInPoints.length <= 1) {
+      setSelectedState(null);
+      hasAutoSelected.current = false;
     }
-  }, [statesInPoints, selectedState]);
+  }, [statesInPoints]);
 
   // Filtrar pontos pelo estado selecionado
   const filteredDisplayPoints = useMemo(() => {
@@ -284,7 +287,7 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
         map.current = null;
       }
     };
-  }, [city, river, hideBusinessNames, shouldUseCache, mapCache, selectedState, filteredDisplayPoints]); // Re-initialize map when filters or cache changes
+  }, [city, river, hideBusinessNames, shouldUseCache, mapCache, selectedState, displayPoints]);
 
   // Add markers when map is loaded and points are available
   useEffect(() => {
@@ -421,7 +424,7 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
         }
       }, 100);
     }
-  }, [selectedPoints, isMapLoaded, city, river, displayPoints, filteredDisplayPoints, shouldUseCache]);
+  }, [selectedPoints, isMapLoaded, city, river, displayPoints, selectedState, shouldUseCache]);
 
   return (
     <Card className="w-full">
