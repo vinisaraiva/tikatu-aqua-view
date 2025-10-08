@@ -80,9 +80,9 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
     if (statesInPoints.length > 1 && !hasAutoSelected.current) {
       setSelectedState(statesInPoints[0]);
       hasAutoSelected.current = true;
-    } else if (statesInPoints.length <= 1) {
-      setSelectedState(null);
     }
+    // Não fazer nada se statesInPoints.length <= 1 para evitar loop
+    // O reset já é feito pelo useEffect acima quando os filtros mudam
   }, [statesInPoints]);
 
   // Filtrar pontos pelo estado selecionado
