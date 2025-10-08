@@ -292,7 +292,7 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
         map.current = null;
       }
     };
-  }, [city, river, hideBusinessNames, shouldUseCache, mapCache, selectedState, displayPoints]);
+  }, [city, river, hideBusinessNames, shouldUseCache, selectedState]);
 
   // Add markers when map is loaded and points are available
   useEffect(() => {
