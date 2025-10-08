@@ -148,6 +148,18 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
   useEffect(() => {
     if (!mapContainer.current) return;
 
+    // Wait for cache to load if we're using it
+    if (shouldUseCache && !mapCache) {
+      console.log('⏳ Aguardando carregamento do cache...');
+      return;
+    }
+
+    // Wait for displayPoints to be available
+    if (displayPoints.length === 0) {
+      console.log('⏳ Aguardando pontos disponíveis...');
+      return;
+    }
+
     // Clean up existing map
     if (map.current) {
       map.current.remove();
@@ -160,7 +172,8 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
       // Set Mapbox access token
       mapboxgl.accessToken = 'pk.eyJ1IjoidmluaXNhcmFpdmEiLCJhIjoiY20wb25ocG9hMGF1ZTJrbzlmZm5haWFlcyJ9.XnczMEcsq_NTNTOFeCxzxA';
 
-      console.log('Creating new map for city:', city, 'with center:', getCenterCoordinates());
+      console.log('✅ Criando mapa com', displayPoints.length, 'pontos disponíveis');
+      console.log('Centro do mapa:', getCenterCoordinates());
 
       // Choose map style based on hideBusinessNames prop
       const mapStyle = hideBusinessNames 
@@ -168,7 +181,7 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
         : 'mapbox://styles/mapbox/outdoors-v12';
 
       // Create new map with dynamic center based on city or cache
-      const initialZoom = shouldUseCache && mapCache?.bounds ? 10 : 12;
+      const initialZoom = displayPoints.length === 1 ? 15 : displayPoints.length <= 3 ? 14 : 10;
       
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
@@ -184,7 +197,7 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
 
       // Map load event
       map.current.on('load', () => {
-        console.log('Map loaded successfully for city:', city);
+        console.log('🗺️ Mapa carregado com sucesso');
         
         // Hide business labels if requested
         if (hideBusinessNames && map.current) {
@@ -221,7 +234,7 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
         map.current = null;
       }
     };
-  }, [city, river, hideBusinessNames, shouldUseCache, mapCache]); // Re-initialize map when filters or cache changes
+  }, [city, river, hideBusinessNames, shouldUseCache, mapCache, displayPoints]); // Re-initialize map when filters or cache changes
 
   // Add markers when map is loaded and points are available
   useEffect(() => {
@@ -299,20 +312,27 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
       markersRef.current.push(marker);
     });
 
-    // Fit bounds to show all points
+    // Fit bounds to show all points with a slight delay to ensure markers are rendered
     if (displayPoints.length > 0) {
-      const bounds = new mapboxgl.LngLatBounds();
-      displayPoints.forEach(point => {
-        const coordinates: [number, number] = [Number(point.longitude), Number(point.latitude)];
-        bounds.extend(coordinates);
-      });
-      
-      // Add padding and adjust zoom based on number of points
-      const maxZoom = displayPoints.length === 1 ? 15 : displayPoints.length <= 3 ? 14 : shouldUseCache ? 10 : 13;
-      map.current.fitBounds(bounds, { 
-        padding: 50,
-        maxZoom
-      });
+      setTimeout(() => {
+        const bounds = new mapboxgl.LngLatBounds();
+        displayPoints.forEach(point => {
+          const coordinates: [number, number] = [Number(point.longitude), Number(point.latitude)];
+          bounds.extend(coordinates);
+        });
+        
+        // Add padding and adjust zoom based on number of points
+        const maxZoom = displayPoints.length === 1 ? 15 : displayPoints.length <= 3 ? 14 : shouldUseCache ? 10 : 13;
+        
+        if (map.current) {
+          console.log('🎯 Ajustando bounds do mapa para', displayPoints.length, 'pontos');
+          map.current.fitBounds(bounds, { 
+            padding: 80,
+            maxZoom,
+            duration: 1000
+          });
+        }
+      }, 100);
     }
   }, [selectedPoints, isMapLoaded, city, river, displayPoints, shouldUseCache]);
 
