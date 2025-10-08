@@ -268,23 +268,66 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
           });
         }
 
-        // Highlight rivers and water bodies in blue
-        if (map.current?.getLayer('water')) {
-          map.current.setPaintProperty('water', 'fill-color', '#0284c7');
-          map.current.setPaintProperty('water', 'fill-opacity', 0.6);
+        // Log all available layers for debugging
+        if (map.current) {
+          const allLayers = map.current.getStyle().layers;
+          console.log('🔍 Camadas disponíveis no mapa:', allLayers?.map(l => l.id));
+          
+          // Find water-related layers
+          const waterLayers = allLayers?.filter(l => 
+            l.id.includes('water') || 
+            l.id.includes('river') || 
+            l.id.includes('stream') ||
+            l.id.includes('canal')
+          );
+          console.log('💧 Camadas relacionadas à água:', waterLayers?.map(l => ({ id: l.id, type: l.type })));
         }
 
-        if (map.current?.getLayer('waterway')) {
-          map.current.setPaintProperty('waterway', 'line-color', '#0284c7');
-          map.current.setPaintProperty('waterway', 'line-width', [
-            'interpolate',
-            ['exponential', 1.5],
-            ['zoom'],
-            10, 2,
-            15, 5,
-            18, 8
-          ]);
-        }
+        // Highlight rivers and water bodies in blue - try multiple layer names
+        const waterLayerNames = ['water', 'water-shadow', 'waterway'];
+        const waterwayLayerNames = ['waterway', 'waterway-label', 'waterway-shadow'];
+
+        waterLayerNames.forEach(layerName => {
+          if (map.current?.getLayer(layerName)) {
+            console.log(`✅ Modificando camada: ${layerName}`);
+            try {
+              map.current.setPaintProperty(layerName, 'fill-color', '#0284c7');
+              map.current.setPaintProperty(layerName, 'fill-opacity', 0.7);
+            } catch (e) {
+              console.warn(`⚠️ Não foi possível modificar fill properties de ${layerName}:`, e);
+              try {
+                map.current.setPaintProperty(layerName, 'line-color', '#0284c7');
+                map.current.setPaintProperty(layerName, 'line-opacity', 0.8);
+              } catch (e2) {
+                console.warn(`⚠️ Não foi possível modificar line properties de ${layerName}:`, e2);
+              }
+            }
+          } else {
+            console.log(`❌ Camada ${layerName} não encontrada`);
+          }
+        });
+
+        waterwayLayerNames.forEach(layerName => {
+          if (map.current?.getLayer(layerName)) {
+            console.log(`✅ Modificando camada de rio: ${layerName}`);
+            try {
+              map.current.setPaintProperty(layerName, 'line-color', '#0284c7');
+              map.current.setPaintProperty(layerName, 'line-width', [
+                'interpolate',
+                ['exponential', 1.5],
+                ['zoom'],
+                10, 3,
+                15, 6,
+                18, 10
+              ]);
+              map.current.setPaintProperty(layerName, 'line-opacity', 0.9);
+            } catch (e) {
+              console.warn(`⚠️ Erro ao modificar ${layerName}:`, e);
+            }
+          } else {
+            console.log(`❌ Camada ${layerName} não encontrada`);
+          }
+        });
         
         setIsMapLoaded(true);
         setMapError(null);
