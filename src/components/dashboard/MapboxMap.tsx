@@ -115,47 +115,46 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
   console.log('MapboxMap - Selected state:', selectedState);
   console.log('MapboxMap - Filtered Display Points:', filteredDisplayPoints.map(p => ({ name: p.name, state: p.state })));
 
-  // Create droplet-style marker element
+  // Create red pin-style marker element
   const createDropletMarker = () => {
     const markerElement = document.createElement('div');
-    markerElement.className = 'droplet-marker';
+    markerElement.className = 'pin-marker';
     markerElement.style.cssText = `
-      width: 30px;
-      height: 40px;
+      width: 28px;
+      height: 38px;
       position: relative;
       cursor: pointer;
       transform: translate(-50%, -100%);
     `;
 
-    // Create the droplet shape using CSS
-    const droplet = document.createElement('div');
-    droplet.style.cssText = `
-      width: 30px;
-      height: 30px;
-      background: linear-gradient(135deg, #06b6d4, #0891b2);
+    // Create the pin shape
+    const pin = document.createElement('div');
+    pin.style.cssText = `
+      width: 28px;
+      height: 28px;
+      background: #dc2626;
       border-radius: 50% 50% 50% 0;
       transform: rotate(-45deg);
       position: absolute;
       top: 8px;
       left: 0;
-      box-shadow: 0 4px 12px rgba(6, 182, 212, 0.4);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.4);
       border: 2px solid white;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
     `;
 
-    // Create inner highlight
-    const highlight = document.createElement('div');
-    highlight.style.cssText = `
-      width: 8px;
-      height: 8px;
-      background: rgba(255, 255, 255, 0.7);
-      border-radius: 50%;
-      position: absolute;
-      top: 6px;
-      left: 6px;
-    `;
+    markerElement.appendChild(pin);
 
-    droplet.appendChild(highlight);
-    markerElement.appendChild(droplet);
+    // Add hover effect
+    markerElement.addEventListener('mouseenter', () => {
+      pin.style.transform = 'rotate(-45deg) scale(1.15)';
+      pin.style.boxShadow = '0 5px 12px rgba(0,0,0,0.5)';
+    });
+
+    markerElement.addEventListener('mouseleave', () => {
+      pin.style.transform = 'rotate(-45deg) scale(1)';
+      pin.style.boxShadow = '0 3px 8px rgba(0,0,0,0.4)';
+    });
 
     return markerElement;
   };
@@ -234,10 +233,8 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
       console.log('✅ Criando mapa com', pointsToUse.length, 'pontos disponíveis (filtrados)');
       console.log('Centro do mapa:', getCenterCoordinates());
 
-      // Choose map style based on hideBusinessNames prop
-      const mapStyle = hideBusinessNames 
-        ? 'mapbox://styles/mapbox/outdoors-v12' 
-        : 'mapbox://styles/mapbox/outdoors-v12';
+      // Use satellite-streets style for hybrid view
+      const mapStyle = 'mapbox://styles/mapbox/satellite-streets-v12';
 
       // Create new map with dynamic center based on city or cache
       const initialZoom = pointsToUse.length === 1 ? 15 : pointsToUse.length <= 3 ? 14 : 10;
@@ -363,6 +360,31 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
         coordinates: coordinates,
         original: { latitude: point.latitude, longitude: point.longitude }
       });
+
+      // Create permanent label
+      const labelEl = document.createElement('div');
+      labelEl.className = 'map-label';
+      labelEl.style.cssText = `
+        background: rgba(0, 0, 0, 0.85);
+        color: white;
+        padding: 4px 10px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+        pointer-events: none;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      `;
+      labelEl.textContent = point.name;
+
+      // Add label marker (offset to the right of the pin)
+      const label = new mapboxgl.Marker(labelEl, { 
+        anchor: 'left', 
+        offset: [12, -20] 
+      })
+        .setLngLat(coordinates)
+        .addTo(map.current!);
       
       const marker = new mapboxgl.Marker(markerElement)
         .setLngLat(coordinates)
@@ -378,8 +400,9 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
         popup.remove();
       });
 
-      // Store marker reference
+      // Store marker references
       markersRef.current.push(marker);
+      markersRef.current.push(label);
     });
 
     // Fit bounds to show all points with a slight delay to ensure markers are rendered
