@@ -267,6 +267,24 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
             }
           });
         }
+
+        // Highlight rivers and water bodies in blue
+        if (map.current?.getLayer('water')) {
+          map.current.setPaintProperty('water', 'fill-color', '#0284c7');
+          map.current.setPaintProperty('water', 'fill-opacity', 0.6);
+        }
+
+        if (map.current?.getLayer('waterway')) {
+          map.current.setPaintProperty('waterway', 'line-color', '#0284c7');
+          map.current.setPaintProperty('waterway', 'line-width', [
+            'interpolate',
+            ['exponential', 1.5],
+            ['zoom'],
+            10, 2,
+            15, 5,
+            18, 8
+          ]);
+        }
         
         setIsMapLoaded(true);
         setMapError(null);
