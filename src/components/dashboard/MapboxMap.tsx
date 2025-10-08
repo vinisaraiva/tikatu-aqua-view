@@ -132,7 +132,7 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
     pin.style.cssText = `
       width: 28px;
       height: 28px;
-      background: #dc2626;
+      background: #0284c7;
       border-radius: 50% 50% 50% 0;
       transform: rotate(-45deg);
       position: absolute;
