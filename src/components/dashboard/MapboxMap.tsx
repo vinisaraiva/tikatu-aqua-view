@@ -132,14 +132,7 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
       return [avgLng, avgLat];
     }
     
-    // If using cache and bounds available, use center of bounds
-    if (shouldUseCache && mapCache?.bounds) {
-      const centerLng = (mapCache.bounds.east + mapCache.bounds.west) / 2;
-      const centerLat = (mapCache.bounds.north + mapCache.bounds.south) / 2;
-      return [centerLng, centerLat];
-    }
-    
-    // Default city centers for fallback
+    // Default city centers for fallback (when no points available)
     const cityCenters: { [key: string]: [number, number] } = {
       'PORTO SEGURO': [-39.05, -16.40],
       'São Paulo': [-46.6333, -23.5505],
