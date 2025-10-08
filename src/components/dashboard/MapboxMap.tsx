@@ -126,10 +126,20 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
 
   // Get center coordinates for the selected city/river
   const getCenterCoordinates = (): [number, number] => {
+    console.log('🎯 getCenterCoordinates chamado. displayPoints.length:', displayPoints.length);
+    
     if (displayPoints.length > 0) {
       // Calculate center from all display points
       const avgLat = displayPoints.reduce((sum, point) => sum + Number(point.latitude), 0) / displayPoints.length;
       const avgLng = displayPoints.reduce((sum, point) => sum + Number(point.longitude), 0) / displayPoints.length;
+      
+      console.log('📍 Centro calculado dos pontos:', { avgLng, avgLat, coordinates: [avgLng, avgLat] });
+      console.log('📊 Pontos usados para cálculo:', displayPoints.map(p => ({
+        name: p.name,
+        lat: Number(p.latitude),
+        lng: Number(p.longitude)
+      })));
+      
       return [avgLng, avgLat];
     }
     
@@ -142,7 +152,9 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
       'Brasília': [-48.1297, -15.7975]
     };
     
-    return cityCenters[city] || [-39.2778, -15.6014]; // Sul da Bahia como padrão
+    const defaultCenter = cityCenters[city] || [-39.05, -16.40]; // Porto Seguro como padrão
+    console.log('⚠️ Nenhum ponto disponível, usando centro padrão:', defaultCenter);
+    return defaultCenter;
   };
 
   // Initialize map
@@ -293,8 +305,27 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
         return;
       }
 
+      // Additional validation for reasonable coordinate ranges
+      if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+        console.error(`❌ Coordenadas fora do range válido para ponto ${point.name}:`, { 
+          lat, 
+          lng,
+          validRange: 'lat: -90 a 90, lng: -180 a 180'
+        });
+        return;
+      }
+
       // Create and add marker with validated coordinates
       const coordinates: [number, number] = [lng, lat];
+      
+      console.log(`🔵 Criando marker para ${point.name}:`, {
+        name: point.name,
+        lat: lat,
+        lng: lng,
+        coordinates: coordinates,
+        original: { latitude: point.latitude, longitude: point.longitude }
+      });
+      
       const marker = new mapboxgl.Marker(markerElement)
         .setLngLat(coordinates)
         .setPopup(popup)
@@ -317,8 +348,20 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
     if (displayPoints.length > 0) {
       setTimeout(() => {
         const bounds = new mapboxgl.LngLatBounds();
+        
+        console.log('📐 Calculando bounds para os pontos:');
         displayPoints.forEach(point => {
-          const coordinates: [number, number] = [Number(point.longitude), Number(point.latitude)];
+          const lng = Number(point.longitude);
+          const lat = Number(point.latitude);
+          const coordinates: [number, number] = [lng, lat];
+          
+          console.log(`📐 Bounds coordinate para ${point.name}:`, {
+            name: point.name,
+            lng: lng,
+            lat: lat,
+            coordinates: coordinates
+          });
+          
           bounds.extend(coordinates);
         });
         
@@ -326,7 +369,19 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
         const maxZoom = displayPoints.length === 1 ? 15 : displayPoints.length <= 3 ? 14 : shouldUseCache ? 10 : 13;
         
         if (map.current) {
-          console.log('🎯 Ajustando bounds do mapa para', displayPoints.length, 'pontos');
+          const boundsData = {
+            north: bounds.getNorth(),
+            south: bounds.getSouth(),
+            east: bounds.getEast(),
+            west: bounds.getWest()
+          };
+          
+          console.log('🎯 Ajustando bounds do mapa:', {
+            totalPontos: displayPoints.length,
+            bounds: boundsData,
+            maxZoom: maxZoom
+          });
+          
           map.current.fitBounds(bounds, { 
             padding: 80,
             maxZoom,
