@@ -233,8 +233,8 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
       console.log('✅ Criando mapa com', pointsToUse.length, 'pontos disponíveis (filtrados)');
       console.log('Centro do mapa:', getCenterCoordinates());
 
-      // Use satellite-streets style for hybrid view
-      const mapStyle = 'mapbox://styles/mapbox/satellite-streets-v12';
+      // Use outdoors style for better water feature visibility
+      const mapStyle = 'mapbox://styles/mapbox/outdoors-v12';
 
       // Create new map with dynamic center based on city or cache
       const initialZoom = pointsToUse.length === 1 ? 15 : pointsToUse.length <= 3 ? 14 : 10;
@@ -268,56 +268,66 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
           });
         }
 
-        // CRITICAL: Highlight water features in blue
+        // CRITICAL: Highlight water features in vibrant blue
         if (map.current) {
           const style = map.current.getStyle();
           const layers = style.layers;
           
           console.log('🔍 Total de camadas:', layers?.length);
           
-          // List all water-related layers
-          const waterRelated = layers?.filter(l => 
-            l.id.toLowerCase().includes('water') || 
-            l.id.toLowerCase().includes('river') || 
-            l.id.toLowerCase().includes('stream') ||
-            l.id.toLowerCase().includes('ocean') ||
-            l.id.toLowerCase().includes('lake')
-          );
+          // List all layers for debugging
+          console.log('📋 Todas as camadas:', layers?.map(l => l.id));
+          
+          // Find water-related layers (broader search)
+          const waterRelated = layers?.filter(l => {
+            const id = l.id.toLowerCase();
+            return id.includes('water') || 
+                   id.includes('river') || 
+                   id.includes('stream') ||
+                   id.includes('ocean') ||
+                   id.includes('lake') ||
+                   id.includes('canal');
+          });
           
           console.log('💧 Camadas de água encontradas:', waterRelated?.map(l => ({ 
             id: l.id, 
-            type: l.type,
-            source: 'source' in l ? l.source : 'N/A'
+            type: l.type
           })));
 
-          // Try to modify all water-related layers
+          // Modify ALL water layers with vibrant blue
           waterRelated?.forEach(layer => {
-            console.log(`🎨 Tentando modificar camada: ${layer.id} (tipo: ${layer.type})`);
+            console.log(`🎨 Modificando: ${layer.id} (${layer.type})`);
             
             try {
               if (layer.type === 'fill') {
-                map.current?.setPaintProperty(layer.id, 'fill-color', '#0284c7');
-                map.current?.setPaintProperty(layer.id, 'fill-opacity', 0.8);
-                console.log(`✅ Camada ${layer.id} modificada (fill)`);
+                map.current?.setPaintProperty(layer.id, 'fill-color', '#0ea5e9');
+                map.current?.setPaintProperty(layer.id, 'fill-opacity', 0.85);
+                console.log(`✅ ${layer.id} → azul vibrante (fill)`);
               } else if (layer.type === 'line') {
-                map.current?.setPaintProperty(layer.id, 'line-color', '#0284c7');
-                map.current?.setPaintProperty(layer.id, 'line-opacity', 0.9);
+                map.current?.setPaintProperty(layer.id, 'line-color', '#0ea5e9');
+                map.current?.setPaintProperty(layer.id, 'line-opacity', 1);
                 map.current?.setPaintProperty(layer.id, 'line-width', [
                   'interpolate',
                   ['exponential', 1.5],
                   ['zoom'],
+                  6, 0.5,
                   8, 1,
                   10, 2,
-                  12, 3,
-                  15, 6,
-                  18, 10
+                  12, 4,
+                  15, 8,
+                  18, 12
                 ]);
-                console.log(`✅ Camada ${layer.id} modificada (line)`);
+                console.log(`✅ ${layer.id} → azul vibrante (line)`);
               }
             } catch (error) {
-              console.error(`❌ Erro ao modificar ${layer.id}:`, error);
+              console.error(`❌ Erro em ${layer.id}:`, error);
             }
           });
+          
+          // If no water layers found, log warning
+          if (!waterRelated || waterRelated.length === 0) {
+            console.warn('⚠️ NENHUMA camada de água foi encontrada!');
+          }
         }
         
         setIsMapLoaded(true);
