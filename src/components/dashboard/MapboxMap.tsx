@@ -1,5 +1,4 @@
-
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -35,25 +34,27 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
   const selectedRiverData = rivers.find(r => r.name === river);
   const { data: allPoints = [] } = usePoints(selectedRiverData?.id);
   
-  // Determine which points to display and ensure coordinates are always numbers
-  const displayPoints = shouldUseCache 
-    ? (mapCache?.points || []).map(p => ({
-        id: p.id,
-        name: p.name,
-        latitude: Number(p.latitude),
-        longitude: Number(p.longitude),
-        river_id: p.river_id,
-      }))
-    : (selectedPoints.length > 0 
-      ? allPoints.filter(point => selectedPoints.includes(point.name))
-      : allPoints
-    ).map(p => ({
-        id: p.id,
-        name: p.name,
-        latitude: Number(p.latitude),
-        longitude: Number(p.longitude),
-        river_id: p.river_id,
-      }));
+  // Memoize displayPoints to prevent recalculation on every render
+  const displayPoints = useMemo(() => {
+    return shouldUseCache 
+      ? (mapCache?.points || []).map(p => ({
+          id: p.id,
+          name: p.name,
+          latitude: Number(p.latitude),
+          longitude: Number(p.longitude),
+          river_id: p.river_id,
+        }))
+      : (selectedPoints.length > 0 
+        ? allPoints.filter(point => selectedPoints.includes(point.name))
+        : allPoints
+      ).map(p => ({
+          id: p.id,
+          name: p.name,
+          latitude: Number(p.latitude),
+          longitude: Number(p.longitude),
+          river_id: p.river_id,
+        }));
+  }, [shouldUseCache, mapCache?.points, selectedPoints, allPoints]);
   
   // For cache mode, we need city and river names from cache
   const getPointMetadata = (pointName: string) => {
@@ -234,7 +235,7 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
         map.current = null;
       }
     };
-  }, [city, river, hideBusinessNames, shouldUseCache, mapCache, displayPoints]); // Re-initialize map when filters or cache changes
+  }, [city, river, hideBusinessNames, shouldUseCache, mapCache]); // Re-initialize map when filters or cache changes
 
   // Add markers when map is loaded and points are available
   useEffect(() => {
