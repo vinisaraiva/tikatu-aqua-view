@@ -69,20 +69,21 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
     return [...new Set(states)];
   }, [displayPoints]);
 
-  // Auto-selecionar o primeiro estado se houver múltiplos e nenhum selecionado
-  useEffect(() => {
-    if (statesInPoints.length > 1 && !selectedState && !hasAutoSelected.current) {
-      setSelectedState(statesInPoints[0]);
-      hasAutoSelected.current = true;
-    } else if (statesInPoints.length <= 1 && selectedState !== null) {
-      setSelectedState(null);
-    }
-  }, [statesInPoints, selectedState]);
-
   // Resetar auto-select quando os filtros mudarem
   useEffect(() => {
     hasAutoSelected.current = false;
+    setSelectedState(null);
   }, [city, river, shouldUseCache]);
+
+  // Auto-selecionar o primeiro estado se houver múltiplos e nenhum selecionado
+  useEffect(() => {
+    if (statesInPoints.length > 1 && !hasAutoSelected.current) {
+      setSelectedState(statesInPoints[0]);
+      hasAutoSelected.current = true;
+    } else if (statesInPoints.length <= 1) {
+      setSelectedState(null);
+    }
+  }, [statesInPoints]);
 
   // Filtrar pontos pelo estado selecionado
   const filteredDisplayPoints = useMemo(() => {
