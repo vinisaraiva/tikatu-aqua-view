@@ -97,7 +97,7 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
   // For cache mode, we need city and river names from cache
   const getPointMetadata = (pointId: number) => {
     if (shouldUseCache && mapCache) {
-      const cachePoint = mapCache.points.find(p => p.id === pointId);
+      const cachePoint = mapCache.points.find(p => Number(p.id) === Number(pointId));
       return {
         city: cachePoint?.city_name || 'Desconhecido',
         river: cachePoint?.river_name || 'Desconhecido',
