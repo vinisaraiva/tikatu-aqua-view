@@ -255,15 +255,21 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
 
     console.log('Adding markers for points:', displayPoints.map(p => ({ name: p.name, river_id: p.river_id })));
     console.log('Using cache mode:', shouldUseCache);
-    console.log('📍 Coordenadas dos pontos:', displayPoints.map(p => ({
-      name: p.name,
-      lat: p.latitude,
-      lng: p.longitude,
-      types: {
-        lat: typeof p.latitude,
-        lng: typeof p.longitude
-      }
-    })));
+    
+    // LOG CRÍTICO: Mostrar TODOS os valores de coordenadas
+    console.log('🔴 COORDENADAS DETALHADAS DE CADA PONTO:');
+    displayPoints.forEach(p => {
+      console.log(`  ${p.name}:`, {
+        latitude_original: p.latitude,
+        longitude_original: p.longitude,
+        latitude_number: Number(p.latitude),
+        longitude_number: Number(p.longitude),
+        tipos: {
+          lat_type: typeof p.latitude,
+          lng_type: typeof p.longitude
+        }
+      });
+    });
 
     // Clear existing markers
     clearMarkers();
