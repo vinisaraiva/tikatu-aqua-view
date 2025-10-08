@@ -74,11 +74,15 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
     if (statesInPoints.length > 1 && !selectedState && !hasAutoSelected.current) {
       setSelectedState(statesInPoints[0]);
       hasAutoSelected.current = true;
-    } else if (statesInPoints.length <= 1) {
+    } else if (statesInPoints.length <= 1 && selectedState !== null) {
       setSelectedState(null);
-      hasAutoSelected.current = false;
     }
-  }, [statesInPoints]);
+  }, [statesInPoints, selectedState]);
+
+  // Resetar auto-select quando os filtros mudarem
+  useEffect(() => {
+    hasAutoSelected.current = false;
+  }, [city, river, shouldUseCache]);
 
   // Filtrar pontos pelo estado selecionado
   const filteredDisplayPoints = useMemo(() => {
