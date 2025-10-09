@@ -1,5 +1,5 @@
 
-import MapboxMap from './MapboxMap';
+import LeafletMap from './LeafletMap';
 
 interface CollectionPointsMapProps {
   selectedPoints: string[];
@@ -9,7 +9,7 @@ interface CollectionPointsMapProps {
 
 const CollectionPointsMap = ({ selectedPoints, city, river }: CollectionPointsMapProps) => {
   return (
-    <MapboxMap 
+    <LeafletMap 
       selectedPoints={selectedPoints} 
       city={city} 
       river={river} 

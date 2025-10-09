@@ -1,6 +1,6 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import MapboxMap from '@/components/dashboard/MapboxMap';
+import LeafletMap from '@/components/dashboard/LeafletMap';
 
 interface PointData {
   id: string;
@@ -38,7 +38,7 @@ const IndicesMap = ({ pointsData, city, river }: IndicesMapProps) => {
       </CardHeader>
       <CardContent>
         <div className="h-80 rounded-lg overflow-hidden">
-          <MapboxMap 
+          <LeafletMap 
             selectedPoints={pointNames}
             city={city || ""}
             river={river || ""}
