@@ -17,6 +17,15 @@ const ReadingsBarChart = ({
   conamaMin, 
   conamaMax 
 }: ReadingsBarChartProps) => {
+  // CRÍTICO: Não renderizar gráfico com dados vazios
+  if (!chartData || chartData.length === 0) {
+    return (
+      <div className="h-80 flex items-center justify-center text-muted-foreground">
+        Nenhum dado disponível para exibir o gráfico
+      </div>
+    );
+  }
+  
   console.log('ReadingsBarChart - CONAMA values received:', { conamaMin, conamaMax });
   
   return (

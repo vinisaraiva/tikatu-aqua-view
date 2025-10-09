@@ -123,6 +123,22 @@ const ReadingsChart = ({ readings, selectedParameter }: ReadingsChartProps) => {
 
   console.log('ReadingsChart - Chart data prepared:', chartData);
 
+  // CRÍTICO: Validar se há dados após transformação
+  if (chartData.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-xl">Valores de {parameterDescription} em cada ponto de coleta</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8 text-muted-foreground">
+            Nenhum dado encontrado para exibir o gráfico
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>

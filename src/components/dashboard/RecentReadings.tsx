@@ -82,7 +82,16 @@ const RecentReadings = ({ city, river, points, parameter, startDate, endDate }: 
         </Card>
         
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-          <ReadingsChart readings={[]} selectedParameter={parameter} />
+          <Card>
+            <CardHeader>
+              <CardTitle>Valores de Parâmetros</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-8 text-muted-foreground">
+                Selecione filtros para visualizar o gráfico
+              </div>
+            </CardContent>
+          </Card>
           <CollectionPointsMap selectedPoints={[]} city="" river="" />
         </div>
       </div>
