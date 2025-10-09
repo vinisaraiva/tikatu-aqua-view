@@ -171,13 +171,13 @@ const LeafletMap = ({
   // Criar ícone customizado (pin azul em formato de gota)
   const createCustomIcon = () => {
     const svgIcon = `
-      <svg width="28" height="38" viewBox="0 0 28 38" xmlns="http://www.w3.org/2000/svg">
+      <svg width="32" height="42" viewBox="0 0 32 42" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+          <filter id="shadow-${Math.random()}" x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
-            <feOffset dx="0" dy="2" result="offsetblur"/>
+            <feOffset dx="0" dy="3" result="offsetblur"/>
             <feComponentTransfer>
-              <feFuncA type="linear" slope="0.5"/>
+              <feFuncA type="linear" slope="0.4"/>
             </feComponentTransfer>
             <feMerge>
               <feMergeNode/>
@@ -185,20 +185,36 @@ const LeafletMap = ({
             </feMerge>
           </filter>
         </defs>
-        <g transform="translate(14, 28)">
-          <circle r="14" fill="white" stroke="#0284c7" stroke-width="2" filter="url(#shadow)" transform="rotate(-45) translate(0, -7)"/>
-          <circle r="11" fill="#0284c7" transform="rotate(-45) translate(0, -7)"/>
-        </g>
-        <circle cx="14" cy="28" r="2" fill="white"/>
+        
+        <!-- Formato de gota (droplet shape) -->
+        <path 
+          d="M16,3 C16,3 6,14 6,22 C6,29.18 10.82,35 16,35 C21.18,35 26,29.18 26,22 C26,14 16,3 16,3 Z" 
+          fill="#0284c7" 
+          stroke="#ffffff" 
+          stroke-width="2.5"
+          filter="url(#shadow-${Math.random()})"
+        />
+        
+        <!-- Brilho interno (highlight) -->
+        <ellipse 
+          cx="13" 
+          cy="14" 
+          rx="4" 
+          ry="6" 
+          fill="rgba(255, 255, 255, 0.4)"
+        />
+        
+        <!-- Ponto inferior (fixação no chão) -->
+        <circle cx="16" cy="35" r="1.5" fill="#ffffff" opacity="0.8"/>
       </svg>
     `;
 
     return L.divIcon({
       className: 'custom-marker-icon',
       html: svgIcon,
-      iconSize: [28, 38],
-      iconAnchor: [14, 38],
-      popupAnchor: [0, -40]
+      iconSize: [32, 42],
+      iconAnchor: [16, 42],
+      popupAnchor: [0, -42]
     });
   };
 
@@ -253,15 +269,6 @@ const LeafletMap = ({
               zIndex={1}
             />
 
-            {/* Camada de destaque de rios: Mapa Físico Esri (azul ciano) */}
-            <TileLayer
-              url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}"
-              attribution='&copy; Esri'
-              maxZoom={19}
-              opacity={0.6}
-              className="water-highlight-layer"
-              zIndex={2}
-            />
 
             {/* Camada de labels de referência (se não estiver oculto) */}
             {!hideBusinessNames && (
