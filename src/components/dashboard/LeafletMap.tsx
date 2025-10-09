@@ -209,33 +209,29 @@ const LeafletMap = ({ selectedPoints, city, river, hideBusinessName = false, use
             
             <MapBoundsUpdater points={filteredDisplayPoints} />
 
-            {filteredDisplayPoints.map((point: any) => {
-              // Validate coordinates
-              if (!isFinite(point.latitude) || !isFinite(point.longitude)) {
-                console.error('Invalid coordinates for point:', point);
-                return null;
-              }
+            {filteredDisplayPoints
+              .filter((point: any) => isFinite(point.latitude) && isFinite(point.longitude))
+              .map((point: any) => {
+                const riverName = useCache ? point.river_name : river;
+                const cityName = useCache ? point.city_name : city;
 
-              const riverName = useCache ? point.river_name : river;
-              const cityName = useCache ? point.city_name : city;
-
-              return (
-                <Marker
-                  key={point.id}
-                  position={[point.latitude, point.longitude]}
-                  icon={customIcon}
-                >
-                  <Popup>
-                    <div className="text-sm">
-                      <strong className="block mb-1">{point.name}</strong>
-                      <span className="text-muted-foreground">Rio: {riverName}</span>
-                      <br />
-                      <span className="text-muted-foreground">Cidade: {cityName}</span>
-                    </div>
-                  </Popup>
-                </Marker>
-              );
-            })}
+                return (
+                  <Marker
+                    key={point.id}
+                    position={[point.latitude, point.longitude]}
+                    icon={customIcon}
+                  >
+                    <Popup>
+                      <div className="text-sm">
+                        <strong className="block mb-1">{point.name}</strong>
+                        <span className="text-muted-foreground">Rio: {riverName}</span>
+                        <br />
+                        <span className="text-muted-foreground">Cidade: {cityName}</span>
+                      </div>
+                    </Popup>
+                  </Marker>
+                );
+              })}
           </MapContainer>
         </div>
       </CardContent>
