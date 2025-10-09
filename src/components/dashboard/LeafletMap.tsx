@@ -170,13 +170,32 @@ const LeafletMap = ({
 
   // Criar ícone customizado (pin azul em formato de gota)
   const createCustomIcon = () => {
+    const svgIcon = `
+      <svg width="28" height="38" viewBox="0 0 28 38" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+            <feOffset dx="0" dy="2" result="offsetblur"/>
+            <feComponentTransfer>
+              <feFuncA type="linear" slope="0.5"/>
+            </feComponentTransfer>
+            <feMerge>
+              <feMergeNode/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
+        <g transform="translate(14, 28)">
+          <circle r="14" fill="white" stroke="#0284c7" stroke-width="2" filter="url(#shadow)" transform="rotate(-45) translate(0, -7)"/>
+          <circle r="11" fill="#0284c7" transform="rotate(-45) translate(0, -7)"/>
+        </g>
+        <circle cx="14" cy="28" r="2" fill="white"/>
+      </svg>
+    `;
+
     return L.divIcon({
-      className: 'custom-leaflet-pin',
-      html: `
-        <div class="pin-wrapper">
-          <div class="pin-droplet"></div>
-        </div>
-      `,
+      className: 'custom-marker-icon',
+      html: svgIcon,
       iconSize: [28, 38],
       iconAnchor: [14, 38],
       popupAnchor: [0, -40]
@@ -239,7 +258,7 @@ const LeafletMap = ({
               url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}"
               attribution='&copy; Esri'
               maxZoom={19}
-              opacity={0.35}
+              opacity={0.6}
               className="water-highlight-layer"
               zIndex={2}
             />

@@ -184,42 +184,27 @@
    LEAFLET MAP CUSTOMIZATIONS
    =================================== */
 
-/* Pin marker em formato de gota (azul) */
-.custom-leaflet-pin {
-  background: transparent;
+/* Pin marker SVG customizado (azul) */
+.custom-marker-icon {
+  background: transparent !important;
+  border: none !important;
 }
 
-.pin-wrapper {
-  width: 28px;
-  height: 38px;
-  position: relative;
-}
-
-.pin-droplet {
-  width: 28px;
-  height: 28px;
-  background: #0284c7;
-  border-radius: 50% 50% 50% 0;
-  transform: translateX(-50%) rotate(-45deg);
-  position: absolute;
-  left: 50%;
-  bottom: 0;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
-  border: 2px solid white;
+.custom-marker-icon svg {
+  filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.4));
   transition: all 0.2s ease;
   cursor: pointer;
 }
 
-.custom-leaflet-pin:hover .pin-droplet {
-  transform: translateX(-50%) rotate(-45deg) scale(1.15);
-  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.5);
-  background: #0369a1;
+.custom-marker-icon:hover svg {
+  filter: drop-shadow(0 5px 12px rgba(0, 0, 0, 0.5));
+  transform: scale(1.15);
 }
 
 /* Destaque de rios em azul ciano vibrante */
 .water-highlight-layer {
-  filter: hue-rotate(180deg) saturate(3) brightness(1.2);
-  mix-blend-mode: multiply;
+  filter: hue-rotate(200deg) saturate(5) brightness(1.5) contrast(1.3);
+  mix-blend-mode: screen;
 }
 
 /* Labels permanentes ao lado dos marcadores */
