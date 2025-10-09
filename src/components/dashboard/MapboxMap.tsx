@@ -280,12 +280,21 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
           // Find water-related layers (broader search)
           const waterRelated = layers?.filter(l => {
             const id = l.id.toLowerCase();
+            const sourceLayer = (l as any)['source-layer']?.toLowerCase() || '';
+            
             return id.includes('water') || 
                    id.includes('river') || 
                    id.includes('stream') ||
                    id.includes('ocean') ||
                    id.includes('lake') ||
-                   id.includes('canal');
+                   id.includes('canal') ||
+                   id.includes('waterway') ||
+                   id.includes('bathymetry') ||
+                   id.includes('marine') ||
+                   id.includes('hydro') ||
+                   id.includes('aqua') ||
+                   sourceLayer.includes('water') ||
+                   sourceLayer.includes('river');
           });
           
           console.log('💧 Camadas de água encontradas:', waterRelated?.map(l => ({ 
@@ -299,24 +308,24 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
             
             try {
               if (layer.type === 'fill') {
-                map.current?.setPaintProperty(layer.id, 'fill-color', '#0ea5e9');
-                map.current?.setPaintProperty(layer.id, 'fill-opacity', 0.85);
-                console.log(`✅ ${layer.id} → azul vibrante (fill)`);
+                map.current?.setPaintProperty(layer.id, 'fill-color', '#00FFFF');
+                map.current?.setPaintProperty(layer.id, 'fill-opacity', 0.7);
+                console.log(`✅ ${layer.id} → ciano elétrico (fill)`);
               } else if (layer.type === 'line') {
-                map.current?.setPaintProperty(layer.id, 'line-color', '#0ea5e9');
+                map.current?.setPaintProperty(layer.id, 'line-color', '#00FFFF');
                 map.current?.setPaintProperty(layer.id, 'line-opacity', 1);
                 map.current?.setPaintProperty(layer.id, 'line-width', [
                   'interpolate',
                   ['exponential', 1.5],
                   ['zoom'],
-                  6, 0.5,
-                  8, 1,
-                  10, 2,
-                  12, 4,
-                  15, 8,
-                  18, 12
+                  6, 1,
+                  8, 2,
+                  10, 4,
+                  12, 6,
+                  15, 10,
+                  18, 16
                 ]);
-                console.log(`✅ ${layer.id} → azul vibrante (line)`);
+                console.log(`✅ ${layer.id} → ciano elétrico (line)`);
               }
             } catch (error) {
               console.error(`❌ Erro em ${layer.id}:`, error);
