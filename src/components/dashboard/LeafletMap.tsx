@@ -165,25 +165,6 @@ const LeafletMap = ({ selectedPoints, city, river, hideBusinessName = false, use
     return cityDefaults[city] || [-1.4558, -48.4902];
   };
 
-  // Early return if no points to display
-  if (filteredDisplayPoints.length === 0) {
-    return (
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle className="text-xl">
-            {!hideBusinessName && 'Tikatuar - '}
-            Mapa de Pontos de Coleta
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-8 text-muted-foreground">
-            Selecione pontos para visualizar no mapa
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
   const center = getCenterCoordinates();
   const customIcon = createCustomIcon();
 
@@ -210,7 +191,11 @@ const LeafletMap = ({ selectedPoints, city, river, hideBusinessName = false, use
             </Select>
           )}
         </div>
-        {city && river && (
+        {filteredDisplayPoints.length === 0 ? (
+          <p className="text-sm text-muted-foreground">
+            Selecione estado, cidade e rio para visualizar os pontos de coleta
+          </p>
+        ) : (
           <p className="text-sm text-muted-foreground">
             {city} → {river} → {filteredDisplayPoints.length} ponto(s)
           </p>
@@ -219,7 +204,7 @@ const LeafletMap = ({ selectedPoints, city, river, hideBusinessName = false, use
       <CardContent>
         <div className="h-[500px] w-full rounded-lg overflow-hidden border shadow-sm">
           <MapContainer
-            key={`${city}-${river}-${filteredDisplayPoints.length}`}
+            key={`${city}-${river}`}
             center={center}
             zoom={12}
             style={{ height: '100%', width: '100%' }}
