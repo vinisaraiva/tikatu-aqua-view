@@ -48,24 +48,27 @@ const MapBoundsUpdater = ({ points }: { points: Array<{ latitude: number; longit
   const map = useMap();
 
   useEffect(() => {
-    if (points.length > 0) {
-      const validPoints = points.filter(
-        p => isFinite(p.latitude) && isFinite(p.longitude)
+    // CRITICAL: Don't execute if no valid points
+    if (!points || points.length === 0) {
+      return;
+    }
+
+    const validPoints = points.filter(
+      p => p && isFinite(p.latitude) && isFinite(p.longitude)
+    );
+
+    if (validPoints.length > 0) {
+      const bounds = L.latLngBounds(
+        validPoints.map(p => [p.latitude, p.longitude] as [number, number])
       );
 
-      if (validPoints.length > 0) {
-        const bounds = L.latLngBounds(
-          validPoints.map(p => [p.latitude, p.longitude] as [number, number])
-        );
+      const padding = validPoints.length === 1 ? [100, 100] : [50, 50];
+      const maxZoom = validPoints.length === 1 ? 14 : 12;
 
-        const padding = validPoints.length === 1 ? [100, 100] : [50, 50];
-        const maxZoom = validPoints.length === 1 ? 14 : 12;
-
-        map.fitBounds(bounds, {
-          padding: padding as [number, number],
-          maxZoom: maxZoom
-        });
-      }
+      map.fitBounds(bounds, {
+        padding: padding as [number, number],
+        maxZoom: maxZoom
+      });
     }
   }, [points, map]);
 
@@ -162,6 +165,25 @@ const LeafletMap = ({ selectedPoints, city, river, hideBusinessName = false, use
     return cityDefaults[city] || [-1.4558, -48.4902];
   };
 
+  // Early return if no points to display
+  if (filteredDisplayPoints.length === 0) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="text-xl">
+            {!hideBusinessName && 'Tikatuar - '}
+            Mapa de Pontos de Coleta
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8 text-muted-foreground">
+            Selecione pontos para visualizar no mapa
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   const center = getCenterCoordinates();
   const customIcon = createCustomIcon();
 
@@ -197,6 +219,7 @@ const LeafletMap = ({ selectedPoints, city, river, hideBusinessName = false, use
       <CardContent>
         <div className="h-[500px] w-full rounded-lg overflow-hidden border shadow-sm">
           <MapContainer
+            key={`${city}-${river}-${filteredDisplayPoints.length}`}
             center={center}
             zoom={12}
             style={{ height: '100%', width: '100%' }}
