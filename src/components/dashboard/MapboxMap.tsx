@@ -332,9 +332,61 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
             }
           });
           
-          // If no water layers found, log warning
+          // If no water layers found, add custom waterway layer as fallback
           if (!waterRelated || waterRelated.length === 0) {
-            console.warn('⚠️ NENHUMA camada de água foi encontrada!');
+            console.warn('⚠️ NENHUMA camada de água encontrada - adicionando camada customizada');
+            
+            try {
+              // Add custom water source from Mapbox Streets
+              if (!map.current?.getSource('osm-water')) {
+                map.current?.addSource('osm-water', {
+                  type: 'vector',
+                  url: 'mapbox://mapbox.mapbox-streets-v8'
+                });
+              }
+              
+              // Add custom waterway layer for rivers
+              if (!map.current?.getLayer('custom-waterway')) {
+                map.current?.addLayer({
+                  id: 'custom-waterway',
+                  type: 'line',
+                  source: 'osm-water',
+                  'source-layer': 'waterway',
+                  paint: {
+                    'line-color': '#00FFFF',
+                    'line-width': [
+                      'interpolate',
+                      ['exponential', 1.5],
+                      ['zoom'],
+                      8, 2,
+                      10, 4,
+                      12, 6,
+                      15, 10,
+                      18, 16
+                    ],
+                    'line-opacity': 1
+                  }
+                });
+                console.log('✅ Camada customizada de rios adicionada (custom-waterway)');
+              }
+              
+              // Add custom water bodies layer
+              if (!map.current?.getLayer('custom-water')) {
+                map.current?.addLayer({
+                  id: 'custom-water',
+                  type: 'fill',
+                  source: 'osm-water',
+                  'source-layer': 'water',
+                  paint: {
+                    'fill-color': '#00FFFF',
+                    'fill-opacity': 0.7
+                  }
+                });
+                console.log('✅ Camada customizada de corpos d\'água adicionada (custom-water)');
+              }
+            } catch (error) {
+              console.error('❌ Erro ao adicionar camadas customizadas:', error);
+            }
           }
         }
         
