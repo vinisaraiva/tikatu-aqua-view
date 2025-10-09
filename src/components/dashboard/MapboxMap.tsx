@@ -232,8 +232,8 @@ const MapboxMap = ({ selectedPoints, city, river, hideBusinessNames = false, use
       console.log('✅ Criando mapa com', pointsToUse.length, 'pontos disponíveis (filtrados)');
       console.log('Centro do mapa:', getCenterCoordinates());
 
-      // Use outdoors style for better water feature visibility
-      const mapStyle = 'mapbox://styles/mapbox/outdoors-v12';
+      // Use satellite-streets style for realistic visual context
+      const mapStyle = 'mapbox://styles/mapbox/satellite-streets-v12';
 
       // Create new map with dynamic center based on city or cache
       const initialZoom = pointsToUse.length === 1 ? 13.5 : pointsToUse.length <= 3 ? 12 : 10.5;
