@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { FileTextIcon } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -229,52 +228,26 @@ const Dashboard = () => {
           </TabsContent>
 
           <TabsContent value="by-point" className="space-y-6">
-            {selectedCity && selectedRiver && selectedPoints.length > 0 ? (
-              <PointViewWrapper 
-                selectedState={selectedState}
-                selectedCity={selectedCity}
-                selectedRiver={selectedRiver}
-                selectedPoints={selectedPoints}
-                selectedParameter={selectedParameter}
-                startDate={startDate}
-                endDate={endDate}
-              />
-            ) : (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Visualização por Ponto de Coleta</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-center py-8 text-muted-foreground">
-                    Selecione cidade, rio e pontos de coleta para visualizar os dados
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+            <PointViewWrapper 
+              selectedState={selectedState}
+              selectedCity={selectedCity}
+              selectedRiver={selectedRiver}
+              selectedPoints={selectedPoints}
+              selectedParameter={selectedParameter}
+              startDate={startDate}
+              endDate={endDate}
+            />
           </TabsContent>
 
           <TabsContent value="anomalies" className="space-y-6">
-            {selectedCity && selectedRiver && selectedPoints.length > 0 ? (
-              <AnomaliesChart 
-                city={selectedCity}
-                river={selectedRiver}
-                point={selectedPoints[0] || ''}
-                parameters={selectedParameter ? [selectedParameter] : []}
-                startDate={startDate}
-                endDate={endDate}
-              />
-            ) : (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Análise de Anomalias</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-center py-8 text-muted-foreground">
-                    Selecione cidade, rio e pontos de coleta para visualizar anomalias
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+            <AnomaliesChart 
+              city={selectedCity}
+              river={selectedRiver}
+              point={selectedPoints[0] || ''}
+              parameters={selectedParameter ? [selectedParameter] : []}
+              startDate={startDate}
+              endDate={endDate}
+            />
           </TabsContent>
         </Tabs>
 
