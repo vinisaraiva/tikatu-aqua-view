@@ -215,9 +215,7 @@ const LeafletMap = ({ selectedPoints, city, river, hideBusinessName = false, use
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
             
-            <MapBoundsUpdater points={filteredDisplayPoints} />
-
-            {filteredDisplayPoints
+            {filteredDisplayPoints.length > 0 && filteredDisplayPoints
               .filter((point: any) => isFinite(point.latitude) && isFinite(point.longitude))
               .map((point: any) => {
                 const riverName = useCache ? point.river_name : river;
@@ -240,6 +238,8 @@ const LeafletMap = ({ selectedPoints, city, river, hideBusinessName = false, use
                   </Marker>
                 );
               })}
+            
+            <MapBoundsUpdater points={filteredDisplayPoints} />
           </MapContainer>
         </div>
       </CardContent>
