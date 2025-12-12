@@ -8,6 +8,7 @@ import { useAppSetting } from '@/hooks/useAppSettings';
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { data: educationSetting } = useAppSetting('show_education_menu');
+  const { data: apiSondasSetting } = useAppSetting('show_api_sondas_menu');
 
   return (
     <header className="bg-white shadow-sm border-b">
@@ -43,9 +44,11 @@ const Header = () => {
             <Link to="/about" className="text-gray-700 hover:text-teal-600 transition-colors">
               Sobre
             </Link>
-            <Link to="/api-sondas" className="text-gray-700 hover:text-teal-600 transition-colors">
-              API Sondas
-            </Link>
+            {apiSondasSetting?.value && (
+              <Link to="/api-sondas" className="text-gray-700 hover:text-teal-600 transition-colors">
+                API Sondas
+              </Link>
+            )}
             <Link to="/admin/login" className="text-gray-700 hover:text-teal-600 transition-colors">
               Admin
             </Link>
@@ -110,13 +113,15 @@ const Header = () => {
               >
                 Sobre
               </Link>
-              <Link 
-                to="/api-sondas" 
-                className="text-gray-700 hover:text-teal-600 py-2 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                API Sondas
-              </Link>
+              {apiSondasSetting?.value && (
+                <Link 
+                  to="/api-sondas" 
+                  className="text-gray-700 hover:text-teal-600 py-2 transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  API Sondas
+                </Link>
+              )}
               <Link 
                 to="/admin/login" 
                 className="text-gray-700 hover:text-teal-600 py-2 transition-colors"
