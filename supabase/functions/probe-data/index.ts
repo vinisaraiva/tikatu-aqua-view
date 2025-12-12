@@ -38,7 +38,7 @@ Deno.serve(async (req) => {
     // Validate API key and get probe info
     const { data: probe, error: probeError } = await supabase
       .from('volunteers')
-      .select('id, point_id, is_active, type')
+      .select('id, is_active, type')
       .eq('api_key', apiKey)
       .eq('type', 'probe')
       .single()
@@ -71,8 +71,16 @@ Deno.serve(async (req) => {
       )
     }
 
-    // Verify probe has access to this point
-    if (body.point_id !== probe.point_id) {
+    // Verify probe has access to this point via volunteer_points table
+    const { data: authorizedPoint, error: pointError } = await supabase
+      .from('volunteer_points')
+      .select('point_id')
+      .eq('volunteer_id', probe.id)
+      .eq('point_id', body.point_id)
+      .single()
+
+    if (pointError || !authorizedPoint) {
+      console.error('Probe access denied for point:', body.point_id, pointError)
       return new Response(
         JSON.stringify({ 
           error: 'Probe does not have access to this collection point' 

@@ -14,7 +14,6 @@ export interface Volunteer {
   id: number;
   code: string;
   nome?: string;
-  point_id: number;
   is_active: boolean;
   created_at: string;
   type: 'manual' | 'probe';
@@ -80,13 +79,12 @@ export const useCreateVolunteer = () => {
         api_key = crypto.randomUUID();
       }
 
-      // Criar voluntário (point_id ainda existe para compatibilidade)
+      // Criar voluntário
       const { data: volunteer, error: volunteerError } = await supabase
         .from('volunteers')
         .insert([{
           code,
           nome: volunteerData.nome,
-          point_id: volunteerData.primary_point_id,
           password_hash,
           type: volunteerData.type,
           api_key,
@@ -149,7 +147,6 @@ export const useUpdateVolunteer = () => {
     }) => {
       const updateData: any = {
         nome: volunteerData.nome,
-        point_id: volunteerData.primary_point_id,
         is_active: volunteerData.is_active
       };
 
