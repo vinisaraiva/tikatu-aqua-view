@@ -13,12 +13,14 @@ import { ptBR } from 'date-fns/locale';
 import { useMapCache } from '@/hooks/useMapCache';
 
 export const SettingsPage = () => {
-  const { data: educationSetting, isLoading } = useAppSetting('show_education_menu');
+  const { data: educationSetting, isLoading: isLoadingEducation } = useAppSetting('show_education_menu');
+  const { data: apiSondasSetting, isLoading: isLoadingApiSondas } = useAppSetting('show_api_sondas_menu');
   const { data: mapCache } = useMapCache();
   const updateSetting = useUpdateAppSetting();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isUpdatingCache, setIsUpdatingCache] = useState(false);
+  const isLoading = isLoadingEducation || isLoadingApiSondas;
 
   const handleEducationToggle = async (checked: boolean) => {
     try {
@@ -29,6 +31,25 @@ export const SettingsPage = () => {
       toast({
         title: 'Configuração atualizada',
         description: `Link da área educacional ${checked ? 'ativado' : 'desativado'} no menu.`,
+      });
+    } catch (error) {
+      toast({
+        title: 'Erro',
+        description: 'Falha ao atualizar configuração.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleApiSondasToggle = async (checked: boolean) => {
+    try {
+      await updateSetting.mutateAsync({
+        key: 'show_api_sondas_menu',
+        value: checked,
+      });
+      toast({
+        title: 'Configuração atualizada',
+        description: `Link API Sondas ${checked ? 'ativado' : 'desativado'} no menu.`,
       });
     } catch (error) {
       toast({
@@ -123,9 +144,21 @@ export const SettingsPage = () => {
               Mostrar link "Educação" no menu
             </Label>
           </div>
+          
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="api-sondas-menu"
+              checked={apiSondasSetting?.value ?? true}
+              onCheckedChange={handleApiSondasToggle}
+              disabled={updateSetting.isPending}
+            />
+            <Label htmlFor="api-sondas-menu" className="cursor-pointer">
+              Mostrar link "API Sondas" no menu
+            </Label>
+          </div>
+
           <p className="text-sm text-muted-foreground">
-            Quando ativado, o link para a área educacional aparece no menu principal.
-            Desative para ocultar esta seção quando não estiver em uso.
+            Configure a visibilidade dos links no menu principal do site.
           </p>
         </CardContent>
       </Card>
