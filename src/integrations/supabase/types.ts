@@ -483,7 +483,6 @@ export type Database = {
           last_communication: string | null
           nome: string | null
           password_hash: string | null
-          point_id: number
           probe_model: string | null
           probe_serial: string | null
           type: string
@@ -497,7 +496,6 @@ export type Database = {
           last_communication?: string | null
           nome?: string | null
           password_hash?: string | null
-          point_id: number
           probe_model?: string | null
           probe_serial?: string | null
           type?: string
@@ -511,25 +509,17 @@ export type Database = {
           last_communication?: string | null
           nome?: string | null
           password_hash?: string | null
-          point_id?: number
           probe_model?: string | null
           probe_serial?: string | null
           type?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "volunteers_point_id_fkey"
-            columns: ["point_id"]
-            isOneToOne: false
-            referencedRelation: "points"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
     }
     Views: {
       volunteers_view: {
         Row: {
+          api_key: string | null
           city_id: number | null
           city_name: string | null
           code: string | null
