@@ -2,6 +2,14 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
+export interface VolunteerPoint {
+  point_id: number;
+  point_name: string;
+  river_name: string;
+  city_name: string;
+  is_primary: boolean;
+}
+
 export interface Volunteer {
   id: number;
   code: string;
@@ -14,6 +22,11 @@ export interface Volunteer {
   probe_model?: string | null;
   probe_serial?: string | null;
   last_communication?: string | null;
+  point_name?: string;
+  river_name?: string;
+  city_name?: string;
+  state?: string;
+  points?: VolunteerPoint[];
 }
 
 export const useVolunteers = () => {
@@ -26,7 +39,12 @@ export const useVolunteers = () => {
         .order('code');
 
       if (error) throw error;
-      return data;
+      
+      // Parse points JSON se necessário
+      return (data || []).map((v: any) => ({
+        ...v,
+        points: typeof v.points === 'string' ? JSON.parse(v.points) : v.points || []
+      }));
     },
   });
 };
@@ -38,7 +56,8 @@ export const useCreateVolunteer = () => {
   return useMutation({
     mutationFn: async (volunteerData: { 
       nome: string; 
-      point_id: number; 
+      point_ids: number[];
+      primary_point_id: number;
       password?: string;
       type: 'manual' | 'probe';
       probe_model?: string;
@@ -61,12 +80,13 @@ export const useCreateVolunteer = () => {
         api_key = crypto.randomUUID();
       }
 
-      const { data, error } = await supabase
+      // Criar voluntário (point_id ainda existe para compatibilidade)
+      const { data: volunteer, error: volunteerError } = await supabase
         .from('volunteers')
         .insert([{
           code,
           nome: volunteerData.nome,
-          point_id: volunteerData.point_id,
+          point_id: volunteerData.primary_point_id,
           password_hash,
           type: volunteerData.type,
           api_key,
@@ -77,10 +97,24 @@ export const useCreateVolunteer = () => {
         .select()
         .single();
 
-      if (error) throw error;
-      return data;
+      if (volunteerError) throw volunteerError;
+
+      // Criar relacionamentos na tabela volunteer_points
+      const volunteerPoints = volunteerData.point_ids.map(pointId => ({
+        volunteer_id: volunteer.id,
+        point_id: pointId,
+        is_primary: pointId === volunteerData.primary_point_id
+      }));
+
+      const { error: pointsError } = await supabase
+        .from('volunteer_points')
+        .insert(volunteerPoints);
+
+      if (pointsError) throw pointsError;
+
+      return volunteer;
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-volunteers'] });
       toast({
         title: 'Sucesso',
@@ -106,7 +140,8 @@ export const useUpdateVolunteer = () => {
     mutationFn: async ({ id, ...volunteerData }: { 
       id: number; 
       nome: string;
-      point_id: number; 
+      point_ids: number[];
+      primary_point_id: number;
       is_active: boolean;
       password?: string;
       probe_model?: string;
@@ -114,7 +149,7 @@ export const useUpdateVolunteer = () => {
     }) => {
       const updateData: any = {
         nome: volunteerData.nome,
-        point_id: volunteerData.point_id,
+        point_id: volunteerData.primary_point_id,
         is_active: volunteerData.is_active
       };
 
@@ -129,6 +164,7 @@ export const useUpdateVolunteer = () => {
         updateData.probe_serial = volunteerData.probe_serial;
       }
 
+      // Atualizar voluntário
       const { data, error } = await supabase
         .from('volunteers')
         .update(updateData)
@@ -137,6 +173,28 @@ export const useUpdateVolunteer = () => {
         .single();
 
       if (error) throw error;
+
+      // Remover pontos antigos
+      const { error: deleteError } = await supabase
+        .from('volunteer_points')
+        .delete()
+        .eq('volunteer_id', id);
+
+      if (deleteError) throw deleteError;
+
+      // Inserir novos pontos
+      const volunteerPoints = volunteerData.point_ids.map(pointId => ({
+        volunteer_id: id,
+        point_id: pointId,
+        is_primary: pointId === volunteerData.primary_point_id
+      }));
+
+      const { error: insertError } = await supabase
+        .from('volunteer_points')
+        .insert(volunteerPoints);
+
+      if (insertError) throw insertError;
+
       return data;
     },
     onSuccess: () => {
