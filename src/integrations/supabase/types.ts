@@ -529,7 +529,7 @@ export type Database = {
         Returns: boolean
       }
       list_admins: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           created_at: string
           email: string
