@@ -427,6 +427,52 @@ export type Database = {
         }
         Relationships: []
       }
+      volunteer_points: {
+        Row: {
+          created_at: string
+          id: string
+          is_primary: boolean
+          point_id: number
+          volunteer_id: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_primary?: boolean
+          point_id: number
+          volunteer_id: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_primary?: boolean
+          point_id?: number
+          volunteer_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "volunteer_points_point_id_fkey"
+            columns: ["point_id"]
+            isOneToOne: false
+            referencedRelation: "points"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "volunteer_points_volunteer_id_fkey"
+            columns: ["volunteer_id"]
+            isOneToOne: false
+            referencedRelation: "volunteers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "volunteer_points_volunteer_id_fkey"
+            columns: ["volunteer_id"]
+            isOneToOne: false
+            referencedRelation: "volunteers_view"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       volunteers: {
         Row: {
           api_key: string | null
@@ -494,6 +540,7 @@ export type Database = {
           nome: string | null
           point_id: number | null
           point_name: string | null
+          points: Json | null
           probe_model: string | null
           probe_serial: string | null
           river_id: number | null
@@ -503,7 +550,7 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "volunteers_point_id_fkey"
+            foreignKeyName: "volunteer_points_point_id_fkey"
             columns: ["point_id"]
             isOneToOne: false
             referencedRelation: "points"

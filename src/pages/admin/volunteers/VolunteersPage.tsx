@@ -1,11 +1,57 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, Star, MapPin } from 'lucide-react';
 import { DataTable } from '@/components/admin/DataTable';
 import { VolunteerFormDialog } from './VolunteerFormDialog';
-import { useVolunteers, useDeleteVolunteer } from '@/hooks/admin/useVolunteers';
+import { useVolunteers, useDeleteVolunteer, VolunteerPoint } from '@/hooks/admin/useVolunteers';
 import { ConfirmDialog } from '@/components/admin/ConfirmDialog';
 import { ApiKeyActions } from '@/components/admin/ApiKeyActions';
+import { Badge } from '@/components/ui/badge';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+
+const PointsBadges = ({ points }: { points: VolunteerPoint[] }) => {
+  if (!points || points.length === 0) return <span className="text-muted-foreground">-</span>;
+  
+  const primaryPoint = points.find(p => p.is_primary);
+  const otherPoints = points.filter(p => !p.is_primary);
+  
+  return (
+    <TooltipProvider>
+      <div className="flex flex-wrap gap-1 max-w-xs">
+        {primaryPoint && (
+          <Tooltip>
+            <TooltipTrigger>
+              <Badge variant="default" className="gap-1 text-xs">
+                <Star className="h-3 w-3 fill-current" />
+                {primaryPoint.point_name}
+              </Badge>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p><strong>Ponto Principal</strong></p>
+              <p>{primaryPoint.river_name} - {primaryPoint.city_name}</p>
+            </TooltipContent>
+          </Tooltip>
+        )}
+        {otherPoints.length > 0 && (
+          <Tooltip>
+            <TooltipTrigger>
+              <Badge variant="secondary" className="gap-1 text-xs">
+                <MapPin className="h-3 w-3" />
+                +{otherPoints.length}
+              </Badge>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p><strong>Outros pontos:</strong></p>
+              {otherPoints.map((p, i) => (
+                <p key={i}>{p.point_name} ({p.river_name})</p>
+              ))}
+            </TooltipContent>
+          </Tooltip>
+        )}
+      </div>
+    </TooltipProvider>
+  );
+};
 
 const columns = [
   { key: 'code', label: 'Código' },
@@ -18,9 +64,7 @@ const columns = [
     const masked = volunteer.api_key.substring(0, 6) + '...' + volunteer.api_key.substring(volunteer.api_key.length - 6);
     return <code className="text-xs bg-muted px-2 py-1 rounded">{masked}</code>;
   }},
-  { key: 'point_name', label: 'Ponto', render: (volunteer: any) => volunteer.point_name },
-  { key: 'river_name', label: 'Rio', render: (volunteer: any) => volunteer.river_name },
-  { key: 'city_name', label: 'Cidade', render: (volunteer: any) => volunteer.city_name },
+  { key: 'points', label: 'Pontos', render: (volunteer: any) => <PointsBadges points={volunteer.points} /> },
   { key: 'is_active', label: 'Status', render: (volunteer: any) => volunteer.is_active ? 'Ativo' : 'Inativo' },
   { key: 'last_communication', label: 'Última Comunicação', render: (volunteer: any) => 
     volunteer.type === 'probe' && volunteer.last_communication 
