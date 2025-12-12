@@ -79,19 +79,21 @@ export const useCreateVolunteer = () => {
         api_key = crypto.randomUUID();
       }
 
-      // Criar voluntário
+      // Criar voluntário (sem point_id - relacionamento via volunteer_points)
+      const volunteerInsert = {
+        code,
+        nome: volunteerData.nome,
+        password_hash,
+        type: volunteerData.type,
+        api_key,
+        probe_model: volunteerData.probe_model,
+        probe_serial: volunteerData.probe_serial,
+        is_active: true
+      };
+
       const { data: volunteer, error: volunteerError } = await supabase
         .from('volunteers')
-        .insert([{
-          code,
-          nome: volunteerData.nome,
-          password_hash,
-          type: volunteerData.type,
-          api_key,
-          probe_model: volunteerData.probe_model,
-          probe_serial: volunteerData.probe_serial,
-          is_active: true
-        }])
+        .insert([volunteerInsert as any])
         .select()
         .single();
 

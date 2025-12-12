@@ -118,9 +118,9 @@ export const useDeletePoint = () => {
       
       if (readingsError) throw readingsError;
       
-      // Check for related volunteers
+      // Check for related volunteers via volunteer_points
       const { data: volunteersCount, error: volunteersError } = await supabase
-        .from('volunteers')
+        .from('volunteer_points')
         .select('id', { count: 'exact' })
         .eq('point_id', id);
       
