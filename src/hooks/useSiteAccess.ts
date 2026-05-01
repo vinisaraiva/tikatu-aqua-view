@@ -48,22 +48,38 @@ export const useSiteAccess = () => {
   }, [validate]);
 
   const login = useCallback(async (password: string): Promise<LoginResult> => {
+    const friendlyFor = (code?: string): string => {
+      switch (code) {
+        case 'INVALID_PASSWORD':
+          return 'Senha incorreta. Tente novamente.';
+        case 'RATE_LIMITED':
+          return 'Muitas tentativas. Aguarde alguns minutos e tente novamente.';
+        case 'INVALID_INPUT':
+          return 'Senha inválida.';
+        case 'SERVER_MISCONFIGURED':
+          return 'Servidor indisponível no momento. Tente novamente mais tarde.';
+        default:
+          return 'Não foi possível validar a senha. Tente novamente.';
+      }
+    };
+
     try {
       const { data, error } = await supabase.functions.invoke('verify-site-access', {
         body: { password },
       });
 
+      // Real network/server failure (non-2xx, fetch error, etc.)
       if (error) {
-        // Try to extract message from edge function response
-        const msg =
-          (error as any)?.context?.error ||
-          (error as any)?.message ||
-          'Senha incorreta';
-        return { success: false, error: typeof msg === 'string' ? msg : 'Senha incorreta' };
+        return { success: false, error: friendlyFor() };
       }
 
-      if (!data?.token || !data?.expiresAt) {
-        return { success: false, error: 'Senha incorreta' };
+      // Standardized contract: { success, error?, message?, token?, expiresAt? }
+      if (!data?.success) {
+        return { success: false, error: friendlyFor(data?.error) };
+      }
+
+      if (!data.token || !data.expiresAt) {
+        return { success: false, error: friendlyFor() };
       }
 
       sessionStorage.setItem(STORAGE_KEY, data.token);

@@ -4,6 +4,9 @@
 // - Tokens are HMAC-SHA256 signed with SITE_ACCESS_TOKEN_SECRET.
 // - Constant-time comparison is used to prevent timing attacks.
 // - In-memory rate limiting per IP (best-effort; resets on cold start).
+// - Standardized response contract: expected errors return HTTP 200 with
+//   { success: false, error: CODE, message }. HTTP 5xx is reserved for real
+//   server failures. Never logs the request body, password, or hash.
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -74,41 +77,52 @@ async function signToken(payload: object, secret: string): Promise<string> {
   return `${payloadB64}.${sigB64}`;
 }
 
+function jsonResponse(status: number, body: unknown): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  });
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
 
   if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
-      status: 405,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    return jsonResponse(200, {
+      success: false,
+      error: 'METHOD_NOT_ALLOWED',
+      message: 'Método não permitido',
     });
   }
 
   const ip = getClientIp(req);
   if (!checkRateLimit(ip)) {
-    return new Response(
-      JSON.stringify({ error: 'Muitas tentativas. Tente novamente mais tarde.' }),
-      { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    return jsonResponse(200, {
+      success: false,
+      error: 'RATE_LIMITED',
+      message: 'Muitas tentativas. Aguarde alguns minutos e tente novamente.',
+    });
   }
 
   let body: { password?: unknown };
   try {
     body = await req.json();
   } catch {
-    return new Response(JSON.stringify({ error: 'Invalid JSON' }), {
-      status: 400,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    return jsonResponse(200, {
+      success: false,
+      error: 'INVALID_INPUT',
+      message: 'Senha inválida.',
     });
   }
 
   const password = body.password;
   if (typeof password !== 'string' || password.length < 1 || password.length > 200) {
-    return new Response(JSON.stringify({ error: 'Senha inválida' }), {
-      status: 400,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    return jsonResponse(200, {
+      success: false,
+      error: 'INVALID_INPUT',
+      message: 'Senha inválida.',
     });
   }
 
@@ -116,19 +130,22 @@ Deno.serve(async (req) => {
   const tokenSecret = Deno.env.get('SITE_ACCESS_TOKEN_SECRET') || '';
 
   if (!expectedHash || !tokenSecret) {
-    console.error('Missing SITE_ACCESS_HASH or SITE_ACCESS_TOKEN_SECRET');
-    return new Response(JSON.stringify({ error: 'Servidor mal configurado' }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    // Real server failure — keep 5xx; do not log secrets or request body.
+    console.error('Configuração ausente: SITE_ACCESS_HASH ou SITE_ACCESS_TOKEN_SECRET');
+    return jsonResponse(500, {
+      success: false,
+      error: 'SERVER_MISCONFIGURED',
+      message: 'Servidor mal configurado. Tente novamente mais tarde.',
     });
   }
 
   const providedHash = await sha256Hex(password);
 
   if (!timingSafeEqual(providedHash, expectedHash)) {
-    return new Response(JSON.stringify({ error: 'Senha incorreta' }), {
-      status: 401,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    return jsonResponse(200, {
+      success: false,
+      error: 'INVALID_PASSWORD',
+      message: 'Senha incorreta. Tente novamente.',
     });
   }
 
@@ -139,8 +156,9 @@ Deno.serve(async (req) => {
   // Reset attempts on success
   attempts.delete(ip);
 
-  return new Response(JSON.stringify({ token, expiresAt: exp }), {
-    status: 200,
-    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  return jsonResponse(200, {
+    success: true,
+    token,
+    expiresAt: exp,
   });
 });
