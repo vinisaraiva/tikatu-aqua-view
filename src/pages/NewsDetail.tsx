@@ -1,5 +1,6 @@
 
 import { useParams, Link } from 'react-router-dom';
+import DOMPurify from 'isomorphic-dompurify';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeftIcon, CalendarIcon, TagIcon, UserIcon, LoaderIcon, AlertCircleIcon } from 'lucide-react';
