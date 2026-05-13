@@ -1,5 +1,6 @@
 
 import { useParams, Link } from 'react-router-dom';
+import DOMPurify from 'isomorphic-dompurify';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeftIcon, CalendarIcon, TagIcon, UserIcon, LoaderIcon, AlertCircleIcon } from 'lucide-react';
@@ -126,7 +127,10 @@ const NewsDetail = () => {
               
               <div 
                 className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-li:text-gray-700"
-                dangerouslySetInnerHTML={{ __html: article.content }}
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(article.content, {
+                  ALLOWED_TAGS: ['p','br','strong','em','u','h1','h2','h3','h4','ul','ol','li','a','blockquote','code','pre','img','figure','figcaption'],
+                  ALLOWED_ATTR: ['href','target','rel','src','alt','title']
+                }) }}
               />
             </CardContent>
           </Card>
