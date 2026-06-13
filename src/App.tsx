@@ -50,6 +50,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <PageTracker />
         <Routes>
           {/* Public access gate */}
           <Route path="/acesso" element={<SiteAccess />} />
