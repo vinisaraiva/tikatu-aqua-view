@@ -11,6 +11,7 @@ import { useState } from 'react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useMapCache } from '@/hooks/useMapCache';
+import { SiteAccessCodesCard } from '@/components/admin/settings/SiteAccessCodesCard';
 
 export const SettingsPage = () => {
   const { data: educationSetting, isLoading: isLoadingEducation } = useAppSetting('show_education_menu');
