@@ -20,7 +20,8 @@ import {
   Users,
   Activity,
   Newspaper,
-  Settings
+  Settings,
+  BarChart3
 } from 'lucide-react';
 
 const navigationItems = [
