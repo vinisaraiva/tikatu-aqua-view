@@ -20,7 +20,8 @@ import {
   Users,
   Activity,
   Newspaper,
-  Settings
+  Settings,
+  BarChart3
 } from 'lucide-react';
 
 const navigationItems = [
@@ -63,6 +64,11 @@ const navigationItems = [
     title: 'Notícias',
     url: '/admin/news',
     icon: Newspaper,
+  },
+  {
+    title: 'Relatório de Acessos',
+    url: '/admin/analytics',
+    icon: BarChart3,
   },
   {
     title: 'Configurações',
