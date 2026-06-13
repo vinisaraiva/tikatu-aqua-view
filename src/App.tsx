@@ -27,6 +27,13 @@ import ProbeApiDocumentation from "./pages/ProbeApiDocumentation";
 import { AdminLayout } from "./components/admin/AdminLayout";
 import { AccessGate } from "./components/AccessGate";
 import { SettingsPage } from "./pages/admin/settings/SettingsPage";
+import AnalyticsPage from "./pages/admin/analytics/AnalyticsPage";
+import { usePageTracking } from "./hooks/usePageTracking";
+
+const PageTracker = () => {
+  usePageTracking();
+  return null;
+};
 
 const queryClient = new QueryClient({
   defaultOptions: {
