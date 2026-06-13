@@ -41,14 +41,7 @@ function checkRateLimit(ip: string): boolean {
   return entry.count <= MAX_ATTEMPTS;
 }
 
-function timingSafeEqual(a: string, b: string): boolean {
-  if (a.length !== b.length) return false;
-  let result = 0;
-  for (let i = 0; i < a.length; i++) {
-    result |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  }
-  return result === 0;
-}
+
 
 async function sha256Hex(input: string): Promise<string> {
   const data = new TextEncoder().encode(input);
