@@ -125,6 +125,10 @@ export const SettingsPage = () => {
         <Settings className="h-6 w-6" />
         <h1 className="text-2xl font-bold">Configurações do Sistema</h1>
       </div>
+
+      <SiteAccessCodesCard />
+
+
       
       <Card>
         <CardHeader>
