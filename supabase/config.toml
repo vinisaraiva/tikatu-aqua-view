@@ -34,3 +34,6 @@ verify_jwt = false
 
 [functions.verify-site-token]
 verify_jwt = false
+
+[functions.track-visit]
+verify_jwt = false
