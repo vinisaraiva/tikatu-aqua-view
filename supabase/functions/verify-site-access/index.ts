@@ -1,12 +1,14 @@
-// Edge function: validates the shared site password and returns a signed HMAC session token.
+// Edge function: validates an individual site access password against the
+// site_access_codes table and returns a signed HMAC session token.
 // SECURITY:
-// - The expected password hash is stored as a secret (SITE_ACCESS_HASH = sha256 hex of password).
+// - Each password is stored only as a sha256 hex hash in site_access_codes.
 // - Tokens are HMAC-SHA256 signed with SITE_ACCESS_TOKEN_SECRET.
-// - Constant-time comparison is used to prevent timing attacks.
 // - In-memory rate limiting per IP (best-effort; resets on cold start).
 // - Standardized response contract: expected errors return HTTP 200 with
 //   { success: false, error: CODE, message }. HTTP 5xx is reserved for real
 //   server failures. Never logs the request body, password, or hash.
+
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
