@@ -66,6 +66,11 @@ const navigationItems = [
     icon: Newspaper,
   },
   {
+    title: 'Relatório de Acessos',
+    url: '/admin/analytics',
+    icon: BarChart3,
+  },
+  {
     title: 'Configurações',
     url: '/admin/settings',
     icon: Settings,
