@@ -67,6 +67,7 @@ const App = () => (
             <Route path="volunteers" element={<VolunteersPage />} />
             <Route path="news" element={<NewsPage />} />
             <Route path="settings" element={<SettingsPage />} />
+            <Route path="analytics" element={<AnalyticsPage />} />
           </Route>
 
           {/* All public site routes are gated */}
