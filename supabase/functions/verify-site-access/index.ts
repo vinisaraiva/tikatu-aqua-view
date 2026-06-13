@@ -128,12 +128,13 @@ Deno.serve(async (req) => {
     });
   }
 
-  const expectedHash = (Deno.env.get('SITE_ACCESS_HASH') || '').trim().toLowerCase();
   const tokenSecret = Deno.env.get('SITE_ACCESS_TOKEN_SECRET') || '';
+  const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
+  const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
 
-  if (!expectedHash || !tokenSecret) {
+  if (!tokenSecret || !supabaseUrl || !serviceRoleKey) {
     // Real server failure — keep 5xx; do not log secrets or request body.
-    console.error('Configuração ausente: SITE_ACCESS_HASH ou SITE_ACCESS_TOKEN_SECRET');
+    console.error('Configuração ausente: SITE_ACCESS_TOKEN_SECRET ou credenciais do Supabase');
     return jsonResponse(500, {
       success: false,
       error: 'SERVER_MISCONFIGURED',
@@ -143,13 +144,55 @@ Deno.serve(async (req) => {
 
   const providedHash = await sha256Hex(password);
 
-  if (!timingSafeEqual(providedHash, expectedHash)) {
+  const supabase = createClient(supabaseUrl, serviceRoleKey);
+
+  let record: { id: string; expires_at: string | null } | null = null;
+  try {
+    const { data, error } = await supabase
+      .from('site_access_codes')
+      .select('id, expires_at')
+      .eq('password_hash', providedHash)
+      .eq('is_active', true)
+      .maybeSingle();
+
+    if (error) {
+      console.error('Erro ao consultar site_access_codes:', error.message);
+      return jsonResponse(500, {
+        success: false,
+        error: 'SERVER_ERROR',
+        message: 'Não foi possível validar a senha. Tente novamente mais tarde.',
+      });
+    }
+    record = data;
+  } catch (e) {
+    console.error('Falha inesperada ao validar acesso:', e);
+    return jsonResponse(500, {
+      success: false,
+      error: 'SERVER_ERROR',
+      message: 'Não foi possível validar a senha. Tente novamente mais tarde.',
+    });
+  }
+
+  // Senha não encontrada ou expirada → erro esperado (200)
+  const isExpired =
+    !!record?.expires_at && Date.now() > new Date(record.expires_at).getTime();
+
+  if (!record || isExpired) {
     return jsonResponse(200, {
       success: false,
       error: 'INVALID_PASSWORD',
       message: 'Senha incorreta. Tente novamente.',
     });
   }
+
+  // Registra o último acesso (best-effort, não bloqueia o login em caso de falha)
+  supabase
+    .from('site_access_codes')
+    .update({ last_access_at: new Date().toISOString() })
+    .eq('id', record.id)
+    .then(({ error }) => {
+      if (error) console.error('Falha ao registrar último acesso:', error.message);
+    });
 
   // Success: issue token
   const exp = Date.now() + SESSION_DURATION_MS;
