@@ -28,6 +28,7 @@ import { AdminLayout } from "./components/admin/AdminLayout";
 import { AccessGate } from "./components/AccessGate";
 import { SettingsPage } from "./pages/admin/settings/SettingsPage";
 import AnalyticsPage from "./pages/admin/analytics/AnalyticsPage";
+import AccessRequestsPage from "./pages/admin/access-requests/AccessRequestsPage";
 import { usePageTracking } from "./hooks/usePageTracking";
 
 const PageTracker = () => {
@@ -68,6 +69,7 @@ const App = () => (
             <Route path="news" element={<NewsPage />} />
             <Route path="settings" element={<SettingsPage />} />
             <Route path="analytics" element={<AnalyticsPage />} />
+            <Route path="access-requests" element={<AccessRequestsPage />} />
           </Route>
 
           {/* All public site routes are gated */}
