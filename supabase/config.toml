@@ -37,3 +37,9 @@ verify_jwt = false
 
 [functions.track-visit]
 verify_jwt = false
+
+[functions.request-access]
+verify_jwt = false
+
+[functions.approve-access-request]
+verify_jwt = false

@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Lock } from 'lucide-react';
 import { useSiteAccess } from '@/hooks/useSiteAccess';
+import { RequestAccessDialog } from '@/components/RequestAccessDialog';
 
 const passwordSchema = z
   .string()
@@ -118,6 +119,12 @@ const SiteAccess = () => {
               Entrar
             </Button>
           </form>
+
+          <div className="mt-6 text-center">
+            <p className="text-sm text-muted-foreground">
+              Ainda não tem acesso? <RequestAccessDialog />
+            </p>
+          </div>
         </CardContent>
       </Card>
     </div>
