@@ -21,7 +21,8 @@ import {
   Activity,
   Newspaper,
   Settings,
-  BarChart3
+  BarChart3,
+  UserPlus
 } from 'lucide-react';
 
 const navigationItems = [
@@ -69,6 +70,11 @@ const navigationItems = [
     title: 'Relatório de Acessos',
     url: '/admin/analytics',
     icon: BarChart3,
+  },
+  {
+    title: 'Solicitações de Acesso',
+    url: '/admin/access-requests',
+    icon: UserPlus,
   },
   {
     title: 'Configurações',
