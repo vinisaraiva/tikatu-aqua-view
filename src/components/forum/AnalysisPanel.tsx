@@ -165,16 +165,16 @@ const AnalysisPanel = ({ filteredReadings, activeParameterCodes, dateFrom, dateT
               A análise usa exclusivamente as coletas, o parâmetro e o período selecionados
               acima. Ajuste os filtros para mudar o cenário.
             </p>
-            <Button onClick={run} disabled={!canRun} size="sm" className="max-w-full whitespace-normal text-xs sm:text-sm h-auto py-2 text-left">
+            <Button onClick={run} disabled={!canRun} size="lg">
               {loading ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin shrink-0" aria-hidden />
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden />
                   Gerando análise...
                 </>
               ) : (
                 <>
-                  <Sparkles className="mr-2 h-4 w-4 shrink-0" aria-hidden />
-                  Gerar análise com IA dos dados filtrados
+                  <Sparkles className="mr-2 h-4 w-4" aria-hidden />
+                  Gerar Análise com IA
                 </>
               )}
             </Button>
