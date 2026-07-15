@@ -20,7 +20,7 @@ const ForumHero = () => {
         aria-hidden="true"
       />
       <div className="relative z-10 mx-auto max-w-6xl px-4 py-14 sm:py-20">
-        <div className="mx-auto max-w-3xl rounded-2xl bg-black/45 backdrop-blur-sm px-5 py-8 text-center sm:px-8 sm:py-10">
+        <div className="mx-auto max-w-3xl text-center">
           <span className="inline-flex items-center rounded-full border border-white/30 bg-black/40 px-3 py-1 text-xs font-medium text-white">
             Demonstração baseada na plataforma Tikatu
           </span>
