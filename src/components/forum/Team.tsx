@@ -1,5 +1,4 @@
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 
 const Team = () => {
   return (
@@ -28,11 +27,6 @@ const Team = () => {
             <li>Universidade Federal do Sul da Bahia</li>
           </ul>
         </Card>
-      </div>
-      <div className="mt-8 flex justify-center">
-        <Button asChild size="lg" className="w-full sm:w-auto">
-          <a href="#publicacao">Produção científica</a>
-        </Button>
       </div>
     </section>
   );

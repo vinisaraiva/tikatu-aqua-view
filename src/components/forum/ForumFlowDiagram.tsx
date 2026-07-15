@@ -11,8 +11,8 @@ const STEPS = [
 
 const ForumFlowDiagram = () => {
   return (
-    <div className="w-full overflow-x-auto">
-      <ol className="flex min-w-max items-center gap-2 px-1 sm:justify-center">
+    <div className="w-full">
+      <ol className="flex flex-wrap items-center justify-center gap-x-2 gap-y-3 px-1 sm:flex-nowrap sm:min-w-max">
         {STEPS.map(({ label, Icon }, i) => (
           <li key={label} className="flex items-center gap-2">
             <div className="flex flex-col items-center gap-1">
@@ -24,7 +24,7 @@ const ForumFlowDiagram = () => {
               </span>
             </div>
             {i < STEPS.length - 1 && (
-              <span aria-hidden className="h-px w-6 bg-border sm:w-10" />
+              <span aria-hidden className="hidden h-px w-6 bg-border sm:inline-block sm:w-10" />
             )}
           </li>
         ))}

@@ -1,28 +1,29 @@
-## Objetivo
+## Ajustes na página `/forum-economia-do-mar`
 
-Melhorar a visualização mobile da página `/forum-economia-do-mar` com base nas imagens anexas: logo maior/mais legível no header, remover o link "Produção científica" do topo, eliminar a rolagem horizontal (causada pelo diagrama de fluxo no hero) e adicionar um botão "Produção científica" abaixo da seção Responsáveis.
+### 1. Remover botão "Produção científica" após Responsáveis
+**`src/components/forum/Team.tsx`**
+- Remover o bloco `<div className="mt-8 flex justify-center">...</div>` com o `<Button>` que aponta para `#publicacao`.
+- Remover o import não utilizado do `Button`.
+- Justificativa: a seção `Publication` já existe na página e é âncora natural do conteúdo.
 
-## Alterações
+### 2. Eliminar a barra de rolagem horizontal
+Investigação: o `<div>` raiz da página já tem `overflow-x-hidden`, mas a barra ainda aparece. Causa provável: o `ForumFlowDiagram` usa `overflow-x-auto` com `min-w-max`, que renderiza uma barra dentro do próprio bloco no mobile (o hero e a seção "Da bacia ao mar" repetem o diagrama).
 
-### 1. `src/components/forum/ForumHeader.tsx`
-- Aumentar a logo no mobile (`h-11` no mobile, `h-9` em telas maiores) e deixar o texto "Fórum de Economia do Mar" apenas em `md:` (já é `sm:`; mover para `md:` para dar mais respiro em telas pequenas).
-- **Remover** o botão "Produção científica" do header.
-- Manter apenas o botão "Conheça o Tikatu" à direita, com tamanho compacto no mobile.
-- Garantir que o header não estoure a largura (adicionar `min-w-0` / `truncate` onde necessário).
+**`src/components/forum/ForumFlowDiagram.tsx`**
+- No mobile, permitir que o diagrama quebre em duas linhas em vez de rolar: trocar `flex min-w-max items-center gap-2` por `flex flex-wrap items-center justify-center gap-x-2 gap-y-3 sm:flex-nowrap sm:min-w-max`.
+- Ocultar o conector (`<span aria-hidden ...>`) quando o item quebra de linha, mantendo-o só em `sm:` (`hidden sm:inline-block`).
+- Remover o `overflow-x-auto` do wrapper externo, já que não haverá mais overflow no mobile.
 
-### 2. `src/components/forum/ForumHero.tsx`
-- Envolver o `ForumFlowDiagram` num container com `overflow-x-auto` **restrito** (`-mx-4 px-4` para sangrar até a borda sem forçar a página a rolar) **ou** aplicar `overflow-hidden` no `<section>` já existente para conter a rolagem horizontal dentro do próprio hero, sem propagar para o `<body>`.
-- Confirmar `overflow-hidden` no `<section>` (já tem `overflow-hidden` — verificar se o diagrama é o culpado; caso sim, adicionar `overflow-x-auto` no wrapper interno do diagrama para que a barra apareça só nele, não na página).
-
-### 3. `src/pages/ForumEconomiaDoMar.tsx` (ou `src/components/forum/Team.tsx`)
-- Após o componente `<Team />`, adicionar um botão/CTA "Produção científica" que faz scroll até `#publicacao` (âncora já existente do componente `Publication`).
-- Botão centralizado, largura total no mobile (`w-full sm:w-auto`), usando `<Button asChild>` com `<a href="#publicacao">`.
-
-### 4. Prevenção geral de scroll horizontal
-- Adicionar `overflow-x-hidden` no container raiz da página (`<div className="min-h-screen ...">` em `ForumEconomiaDoMar.tsx`) como salvaguarda contra qualquer outro elemento que ultrapasse a viewport no mobile.
+### 3. Melhorar contraste do texto do hero sobre a imagem
+**`src/components/forum/ForumHero.tsx`**
+- Substituir o overlay chapado `bg-white/50 backdrop-blur-[2px]` por um gradiente vertical que escurece/clareia estrategicamente:
+  `bg-gradient-to-b from-background/85 via-background/70 to-background/85 backdrop-blur-[1px]`.
+  Isso deixa a imagem visível ao centro e reforça a leitura do título/parágrafo.
+- No `<h1>`, adicionar `drop-shadow-sm` para reforçar bordas do texto.
+- No `<p>` de descrição, trocar `text-muted-foreground` por `text-foreground/80` para ganho de contraste sem virar preto puro.
+- Manter o bloco de data/local com o mesmo tratamento (`text-foreground/80`).
 
 ## Detalhes técnicos
-
-- Nenhuma mudança de lógica ou dados — apenas apresentação/layout.
-- Nenhuma outra página é afetada; ajustes ficam contidos em componentes `forum/*` e na página do fórum.
-- A âncora `#publicacao` já é usada pelo componente `Publication` e pelo botão antigo do header, então o novo botão reaproveita esse alvo.
+- Nenhuma mudança de lógica ou dados.
+- Alterações restritas a `Team.tsx`, `ForumFlowDiagram.tsx` e `ForumHero.tsx`.
+- Uso de tokens semânticos (`background`, `foreground`) — sem cores hardcoded.
