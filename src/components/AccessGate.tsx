@@ -2,6 +2,8 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { useSiteAccess } from '@/hooks/useSiteAccess';
 
+const PUBLIC_ROUTES = ['/forum-economia-do-mar'];
+
 interface AccessGateProps {
   children: React.ReactNode;
 }
@@ -9,6 +11,11 @@ interface AccessGateProps {
 export const AccessGate = ({ children }: AccessGateProps) => {
   const { isAuthorized, loading } = useSiteAccess();
   const location = useLocation();
+
+  if (PUBLIC_ROUTES.includes(location.pathname)) {
+    return <>{children}</>;
+  }
+
 
   if (loading) {
     return (
