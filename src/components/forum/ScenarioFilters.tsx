@@ -27,7 +27,12 @@ interface Props {
   onReset: () => void;
 }
 
-const fmt = (d: Date) => format(d, "dd/MM/yy", { locale: ptBR });
+const fmt = (d: Date) => format(d, "dd/MM/yyyy", { locale: ptBR });
+
+const MIN_DATE = new Date(FORUM_DATE_MIN + "T00:00:00");
+const MAX_DATE = new Date(FORUM_DATE_MAX + "T00:00:00");
+const FROM_YEAR = MIN_DATE.getFullYear();
+const TO_YEAR = MAX_DATE.getFullYear();
 
 const ScenarioFilters = ({ value, onChange, onReset }: Props) => {
   const togglePoint = (id: string) => {
