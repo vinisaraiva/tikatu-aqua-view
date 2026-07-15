@@ -109,7 +109,6 @@ const ForumEconomiaDoMar = () => {
           <AIRoleSection />
           <AppliedResearch />
           <Publication />
-          <Publication />
 
           <section id="quiz" className="mx-auto max-w-6xl px-4 py-14">
             <div className="mb-6 flex items-center gap-2">
