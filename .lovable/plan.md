@@ -1,22 +1,29 @@
-## Diagnóstico
+## Objetivo
+Garantir que `/forum-economia-do-mar` (e outras rotas públicas futuras) fique sempre acessível sem login, mesmo que sejam envolvidas pelo `AccessGate`.
 
-- A rota publicada do Lovable funciona: `https://tikatu-aqua-view.lovable.app/forum-economia-do-mar` carrega a página correta.
-- O domínio `http://tikatu.com.br/forum-economia-do-mar` retorna `Not Found` vazio, o que indica que o domínio customizado não está servindo o deploy atual do Lovable ou está apontando para outro provedor/configuração antiga.
-- Não há indício de erro no React Router: a rota `/forum-economia-do-mar` existe e funciona no domínio `.lovable.app`.
+## Mudanças
 
-## Plano
+### 1. `src/components/AccessGate.tsx`
+Adicionar constante `PUBLIC_ROUTES` no topo do arquivo:
+```ts
+const PUBLIC_ROUTES = ['/forum-economia-do-mar'];
+```
 
-1. Verificar a configuração atual do domínio publicado/custom domain no Lovable.
-2. Se `tikatu.com.br` não estiver conectado como domínio customizado deste projeto, orientar a conexão em **Project Settings → Domains**.
-3. Se estiver conectado mas offline/incorreto, corrigir os DNS no registrador:
-   - `A` para `@` apontando para `185.158.133.1`
-   - adicionar também `www.tikatu.com.br` como domínio separado se quiser usar `www`
-   - remover registros conflitantes antigos
-4. Após DNS/SSL ficarem ativos, publicar/atualizar novamente se necessário.
-5. Validar acessando:
-   - `https://tikatu-aqua-view.lovable.app/forum-economia-do-mar`
-   - `https://tikatu.com.br/forum-economia-do-mar`
+No corpo do componente, antes de qualquer checagem de `loading`/`isAuthorized`, verificar se `location.pathname` está no allowlist. Se estiver, renderizar `children` diretamente e ignorar o gate:
+```ts
+if (PUBLIC_ROUTES.includes(location.pathname)) {
+  return <>{children}</>;
+}
+```
 
-## Resultado esperado
+Isso garante que:
+- Se algum dia a rota for envolta em `<AccessGate>` por engano, ela continuará pública.
+- O `NotFound` (rota `*`) que está dentro do AccessGate não redirecionará para `/acesso` se o path bater com a allowlist (defesa extra em caso de rewrite/redirect estranho do Render).
 
-O domínio `tikatu.com.br` passará a servir o mesmo app já publicado no Lovable, e a rota `/forum-economia-do-mar` abrirá normalmente em vez de mostrar `Not Found`.
+### 2. Nada mais precisa mudar
+- `App.tsx` já expõe `/forum-economia-do-mar` fora do `AccessGate` — mantemos assim.
+- Não altera lógica de autenticação nem de sessão.
+
+## Notas técnicas
+- A allowlist é um simples array de pathnames exatos. Se no futuro precisarmos de padrões (prefixos), trocamos por `PUBLIC_ROUTES.some(p => location.pathname.startsWith(p))`.
+- Isso é uma proteção de UI/roteamento no cliente, independente do fix de rewrite SPA no Render.
