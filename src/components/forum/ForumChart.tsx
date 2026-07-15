@@ -35,7 +35,7 @@ const normalize = (
 ) => {
   return parameters.map((p, i) => {
     const alt_p = alt?.[i];
-    const ref = p.conamaMax ?? Math.max(p.value, alt_p?.value ?? 0) * 1.2 || 1;
+    const ref = p.conamaMax ?? (Math.max(p.value, alt_p?.value ?? 0) * 1.2 || 1);
     return {
       name: shortLabel(p.name),
       "Coleta atual": Number(((p.value / ref) * 100).toFixed(1)),
