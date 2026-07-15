@@ -31,8 +31,6 @@ const fmt = (d: Date) => format(d, "dd/MM/yyyy", { locale: ptBR });
 
 const MIN_DATE = new Date(FORUM_DATE_MIN + "T00:00:00");
 const MAX_DATE = new Date(FORUM_DATE_MAX + "T00:00:00");
-const FROM_YEAR = MIN_DATE.getFullYear();
-const TO_YEAR = MAX_DATE.getFullYear();
 
 const ScenarioFilters = ({ value, onChange, onReset }: Props) => {
   const togglePoint = (id: string) => {
@@ -43,14 +41,9 @@ const ScenarioFilters = ({ value, onChange, onReset }: Props) => {
     });
   };
 
-  const toggleParam = (code: string) => {
-    const has = value.parameterCodes.includes(code);
-    onChange({
-      ...value,
-      parameterCodes: has
-        ? value.parameterCodes.filter((c) => c !== code)
-        : [...value.parameterCodes, code],
-    });
+  const selectParam = (code: string) => {
+    if (value.parameterCodes[0] === code) return;
+    onChange({ ...value, parameterCodes: [code] });
   };
 
   const pointsLabel =
@@ -149,9 +142,6 @@ const ScenarioFilters = ({ value, onChange, onReset }: Props) => {
                   defaultMonth={value.dateFrom}
                   onSelect={(d) => d && onChange({ ...value, dateFrom: d })}
                   disabled={(d) => d > value.dateTo || d < MIN_DATE || d > MAX_DATE}
-                  captionLayout="dropdown-buttons"
-                  fromYear={FROM_YEAR}
-                  toYear={TO_YEAR}
                   fromDate={MIN_DATE}
                   toDate={MAX_DATE}
                   className={cn("p-3 pointer-events-auto")}
@@ -174,9 +164,6 @@ const ScenarioFilters = ({ value, onChange, onReset }: Props) => {
                   defaultMonth={value.dateTo}
                   onSelect={(d) => d && onChange({ ...value, dateTo: d })}
                   disabled={(d) => d < value.dateFrom || d < MIN_DATE || d > MAX_DATE}
-                  captionLayout="dropdown-buttons"
-                  fromYear={FROM_YEAR}
-                  toYear={TO_YEAR}
                   fromDate={MIN_DATE}
                   toDate={MAX_DATE}
                   className={cn("p-3 pointer-events-auto")}
@@ -200,21 +187,22 @@ const ScenarioFilters = ({ value, onChange, onReset }: Props) => {
       {/* Parâmetros */}
       <div className="mt-4 space-y-2">
         <Label className="text-xs font-medium text-muted-foreground">
-          Parâmetros exibidos
+          Parâmetro exibido (selecione um)
         </Label>
-        <div className="flex flex-wrap gap-2">
+        <div role="radiogroup" className="flex flex-wrap gap-2">
           {FORUM_PARAMETERS.map((p) => {
-            const active = value.parameterCodes.includes(p.code);
+            const active = value.parameterCodes[0] === p.code;
             return (
               <button
                 key={p.code}
                 type="button"
-                onClick={() => toggleParam(p.code)}
-                aria-pressed={active}
+                role="radio"
+                onClick={() => selectParam(p.code)}
+                aria-checked={active}
                 className={cn(
                   "rounded-full border px-3 py-1 text-xs font-medium transition-colors",
                   active
-                    ? "border-primary bg-primary/10 text-primary"
+                    ? "border-primary bg-primary text-primary-foreground"
                     : "border-border bg-muted/40 text-muted-foreground hover:text-foreground",
                 )}
               >

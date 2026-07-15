@@ -148,10 +148,22 @@ const AnalysisPanel = ({ filteredReadings, activeParameterCodes, dateFrom, dateT
         )}
 
         {!result && (
-          <div className="flex flex-col items-start gap-2">
+          <div className="flex flex-col items-start gap-3">
+            <div className="flex flex-wrap gap-2 text-xs">
+              <span className="rounded-full border border-border bg-muted/50 px-2.5 py-1 text-muted-foreground">
+                {filteredReadings.length} coleta{filteredReadings.length === 1 ? "" : "s"}
+              </span>
+              <span className="rounded-full border border-border bg-muted/50 px-2.5 py-1 text-muted-foreground">
+                {activeParameterCodes.length} parâmetro
+                {activeParameterCodes.length === 1 ? "" : "s"}
+              </span>
+              <span className="rounded-full border border-border bg-muted/50 px-2.5 py-1 text-muted-foreground">
+                {dateFrom.toLocaleDateString("pt-BR")} – {dateTo.toLocaleDateString("pt-BR")}
+              </span>
+            </div>
             <p className="text-sm text-muted-foreground">
-              Gere uma interpretação organizada dos dados filtrados com síntese, pontos de
-              atenção, recomendações e limitações.
+              A análise usa exclusivamente as coletas, o parâmetro e o período selecionados
+              acima. Ajuste os filtros para mudar o cenário.
             </p>
             <Button onClick={run} disabled={!canRun} size="lg">
               {loading ? (
@@ -162,7 +174,7 @@ const AnalysisPanel = ({ filteredReadings, activeParameterCodes, dateFrom, dateT
               ) : (
                 <>
                   <Sparkles className="mr-2 h-4 w-4" aria-hidden />
-                  Gerar análise com IA
+                  Gerar análise com IA dos dados filtrados
                 </>
               )}
             </Button>
