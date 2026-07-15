@@ -3,8 +3,19 @@ import ForumFlowDiagram from "./ForumFlowDiagram";
 
 const ForumHero = () => {
   return (
-    <section className="relative overflow-hidden border-b border-border bg-gradient-to-b from-primary/5 via-background to-background">
-      <div className="mx-auto max-w-6xl px-4 py-14 sm:py-20">
+    <section className="relative overflow-hidden border-b border-border">
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: `url('/lovable-uploads/6c1c5451-5d11-445d-ac6a-b3c2450303b6.png')`,
+        }}
+        aria-hidden="true"
+      />
+      <div
+        className="absolute inset-0 bg-white/75 backdrop-blur-sm"
+        aria-hidden="true"
+      />
+      <div className="relative z-10 mx-auto max-w-6xl px-4 py-14 sm:py-20">
         <div className="mx-auto max-w-3xl text-center">
           <span className="inline-flex items-center rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground">
             Demonstração baseada na plataforma Tikatu
