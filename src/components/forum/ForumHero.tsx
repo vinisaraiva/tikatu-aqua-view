@@ -12,11 +12,11 @@ const ForumHero = () => {
         aria-hidden="true"
       />
       <div
-        className="absolute inset-0 bg-gradient-to-b from-background/95 via-background/85 to-background/95 backdrop-blur-[2px]"
+        className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/25 to-background/40"
         aria-hidden="true"
       />
       <div
-        className="absolute inset-0 bg-background/30"
+        className="absolute inset-0 bg-black/25"
         aria-hidden="true"
       />
       <div className="relative z-10 mx-auto max-w-6xl px-4 py-14 sm:py-20">
