@@ -128,14 +128,14 @@ const AnalysisPanel = ({ filteredReadings, activeParameterCodes, dateFrom, dateT
               </li>
               {summary.topParams.length > 0 ? (
                 <li>
-                  Parâmetros com maior frequência acima do limite:{" "}
+                  Parâmetros analisados que requerem atenção:{" "}
                   <strong className="text-foreground">
                     {summary.topParams.join(", ")}
                   </strong>
                   .
                 </li>
               ) : (
-                <li>Nenhum parâmetro ativo ultrapassou o limite de referência.</li>
+                <li>Nenhum parâmetro analisado ultrapassou o limite de referência.</li>
               )}
               {summary.worstPointName && (
                 <li>
