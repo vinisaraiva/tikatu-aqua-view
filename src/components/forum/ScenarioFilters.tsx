@@ -172,7 +172,6 @@ const ScenarioFilters = ({ value, onChange, onReset }: Props) => {
                   onSelect={(d) => d && onChange({ ...value, dateTo: d })}
                   disabled={(d) => d < value.dateFrom || d < MIN_DATE || d > MAX_DATE}
                   fromDate={MIN_DATE}
-                  fromDate={MIN_DATE}
                   toDate={MAX_DATE}
                   className={cn("p-3 pointer-events-auto")}
                   locale={ptBR}
