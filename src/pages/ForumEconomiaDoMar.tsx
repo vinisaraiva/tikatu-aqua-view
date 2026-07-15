@@ -26,7 +26,7 @@ import {
 } from "@/data/forumDataset";
 
 const defaultFilters = (): FilterState => ({
-  pointIds: FORUM_POINTS.map((p) => p.id),
+  pointIds: [],
   parameterCodes: [FORUM_PARAMETERS[0].code],
   dateFrom: new Date(FORUM_DATE_MIN + "T00:00:00"),
   dateTo: new Date(FORUM_DATE_MAX + "T00:00:00"),
