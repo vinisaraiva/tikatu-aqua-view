@@ -12,6 +12,8 @@ import AppliedResearch from "@/components/forum/AppliedResearch";
 import Publication from "@/components/forum/Publication";
 import Team from "@/components/forum/Team";
 import ContactFooter from "@/components/forum/ContactFooter";
+import EnvironmentalQuiz from "@/components/education/EnvironmentalQuiz";
+import { Sparkles } from "lucide-react";
 import {
   FORUM_POINTS,
   FORUM_PARAMETERS,
@@ -107,6 +109,21 @@ const ForumEconomiaDoMar = () => {
           <AIRoleSection />
           <AppliedResearch />
           <Publication />
+
+          <section id="quiz" className="mx-auto max-w-6xl px-4 py-14">
+            <div className="mb-6 flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-primary" aria-hidden />
+              <h2 className="text-2xl font-semibold sm:text-3xl">
+                Aprenda brincando: Quiz Ambiental Tikatu
+              </h2>
+            </div>
+            <p className="mb-6 max-w-3xl text-sm text-muted-foreground sm:text-base">
+              Teste seus conhecimentos sobre qualidade da água, ecossistemas costeiros e
+              economia do mar. Uma forma leve de fixar o que os dados acima revelam.
+            </p>
+            <EnvironmentalQuiz />
+          </section>
+
           <Team />
           <ContactFooter />
         </main>

@@ -173,7 +173,37 @@ const ScenarioFilters = ({ value, onChange, onReset }: Props) => {
               </PopoverContent>
             </Popover>
           </div>
+          <div className="flex flex-wrap gap-1.5 pt-1">
+            {[
+              { label: "7d", days: 7 },
+              { label: "30d", days: 30 },
+              { label: "90d", days: 90 },
+              { label: "1 ano", days: 365 },
+              { label: "Tudo", days: -1 },
+            ].map((preset) => (
+              <button
+                key={preset.label}
+                type="button"
+                onClick={() => {
+                  const to = MAX_DATE;
+                  const from =
+                    preset.days === -1
+                      ? MIN_DATE
+                      : (() => {
+                          const d = new Date(to);
+                          d.setDate(d.getDate() - preset.days);
+                          return d < MIN_DATE ? MIN_DATE : d;
+                        })();
+                  onChange({ ...value, dateFrom: from, dateTo: to });
+                }}
+                className="rounded-full border border-border bg-muted/40 px-2.5 py-0.5 text-xs text-muted-foreground transition-colors hover:border-primary hover:text-foreground"
+              >
+                {preset.label}
+              </button>
+            ))}
+          </div>
         </div>
+
 
         {/* Reset */}
         <div className="flex items-end justify-end">
