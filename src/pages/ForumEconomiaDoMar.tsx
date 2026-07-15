@@ -13,7 +13,10 @@ import Publication from "@/components/forum/Publication";
 import Team from "@/components/forum/Team";
 import ContactFooter from "@/components/forum/ContactFooter";
 import EnvironmentalQuiz from "@/components/education/EnvironmentalQuiz";
-import { Sparkles } from "lucide-react";
+import RiverChallenge from "@/components/education/RiverChallenge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Card, CardContent } from "@/components/ui/card";
+import { Sparkles, WavesIcon, BrainIcon } from "lucide-react";
 import {
   FORUM_POINTS,
   FORUM_PARAMETERS,
@@ -110,18 +113,75 @@ const ForumEconomiaDoMar = () => {
           <AppliedResearch />
           <Publication />
 
-          <section id="quiz" className="mx-auto max-w-6xl px-4 py-14">
+          <section id="jogos" className="mx-auto max-w-6xl px-4 py-14">
             <div className="mb-6 flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-primary" aria-hidden />
               <h2 className="text-2xl font-semibold sm:text-3xl">
-                Aprenda brincando: Quiz Ambiental Tikatu
+                Aprenda brincando com os jogos Tikatu
               </h2>
             </div>
-            <p className="mb-6 max-w-3xl text-sm text-muted-foreground sm:text-base">
-              Teste seus conhecimentos sobre qualidade da água, ecossistemas costeiros e
-              economia do mar. Uma forma leve de fixar o que os dados acima revelam.
+            <p className="mb-8 max-w-3xl text-sm text-muted-foreground sm:text-base">
+              Escolha um dos jogos abaixo para testar seus conhecimentos e explorar os
+              desafios da gestão da água de forma interativa.
             </p>
-            <EnvironmentalQuiz />
+
+            <div className="grid gap-6 sm:grid-cols-2">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Card className="group cursor-pointer transition hover:border-primary hover:shadow-lg">
+                    <CardContent className="flex flex-col items-start gap-4 p-6">
+                      <div className="rounded-lg bg-primary/10 p-3 text-primary">
+                        <BrainIcon className="h-6 w-6" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-semibold">Quiz Ambiental</h3>
+                        <p className="mt-1 text-sm text-muted-foreground">
+                          Responda perguntas sobre qualidade da água, pH, DBO e outros
+                          parâmetros ambientais.
+                        </p>
+                      </div>
+                      <span className="text-sm font-medium text-primary group-hover:underline">
+                        Jogar agora →
+                      </span>
+                    </CardContent>
+                  </Card>
+                </DialogTrigger>
+                <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Quiz Ambiental Tikatu</DialogTitle>
+                  </DialogHeader>
+                  <EnvironmentalQuiz />
+                </DialogContent>
+              </Dialog>
+
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Card className="group cursor-pointer transition hover:border-primary hover:shadow-lg">
+                    <CardContent className="flex flex-col items-start gap-4 p-6">
+                      <div className="rounded-lg bg-primary/10 p-3 text-primary">
+                        <WavesIcon className="h-6 w-6" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-semibold">Desafio do Rio</h3>
+                        <p className="mt-1 text-sm text-muted-foreground">
+                          Assuma o papel de gestor ambiental e tome decisões que impactam
+                          a saúde do rio e da comunidade.
+                        </p>
+                      </div>
+                      <span className="text-sm font-medium text-primary group-hover:underline">
+                        Jogar agora →
+                      </span>
+                    </CardContent>
+                  </Card>
+                </DialogTrigger>
+                <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Desafio do Rio</DialogTitle>
+                  </DialogHeader>
+                  <RiverChallenge />
+                </DialogContent>
+              </Dialog>
+            </div>
           </section>
 
           <Team />
