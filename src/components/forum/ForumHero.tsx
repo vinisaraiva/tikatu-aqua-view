@@ -32,11 +32,11 @@ const ForumHero = () => {
             como o Tikatu organiza e interpreta dados de qualidade da água.
           </p>
 
-          <div className="mt-6 space-y-1 text-sm text-foreground/80">
-            <p className="font-medium text-foreground">
+          <div className="mt-6 space-y-1 text-sm text-foreground">
+            <p className="font-semibold text-foreground">
               I Fórum de Economia do Mar de Porto Seguro
             </p>
-            <p>Expo Conectando Saberes · 17 de julho de 2026</p>
+            <p className="text-foreground/90">Expo Conectando Saberes · 17 de julho de 2026</p>
           </div>
 
           <div className="mt-8 flex justify-center">
