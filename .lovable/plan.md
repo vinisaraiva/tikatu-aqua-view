@@ -1,104 +1,70 @@
 
-# Página do evento: Fórum de Economia do Mar de Porto Seguro
+## Objetivo
 
-Página pública, sem login, integrada ao projeto Tikatu, servida em rota específica dentro do app atual (não é aplicação separada). Reaproveita a identidade visual, tokens e componentes já existentes (Leaflet, gráfico de barras, análise por IA), mas com layout curado, mobile-first e enxuto para uso presencial no evento.
+Transformar a seção de coletas da página `/forum-economia-do-mar` em um painel exploratório: o usuário ajusta filtros e mapa + gráfico + cards reagem em tempo real. A análise textual passa a ser gerada sob demanda por um botão "Gerar análise com IA".
 
-## Rota e acesso
+## Fonte de dados
 
-- Nova rota pública: `/forum-economia-do-mar` em `src/App.tsx`, **fora** do `<AccessGate>`, para acesso direto sem código.
-- Também pública em `robots.txt` (indexável) e com meta tags próprias via `react-helmet-async` (instalar), sem afetar demais páginas.
-- Subdomínio `economiadomar.tikatu.com.br` fica como orientação de DNS pós-publicação — não é criado por código.
+Substituir os 3 cenários fixos de `src/data/forumScenarios.ts` por um **dataset demonstrativo ampliado**, gerado uma vez e salvo em `src/data/forumDataset.ts` (JSON tipado, rotulado como "adaptado"):
 
-## Estrutura de arquivos
+- **6 pontos de coleta** ao longo do Buranhém e afluentes (cabeceira, médio, urbano Eunápolis, jusante Porto Seguro, estuário, e um afluente rural), cada um com nome, rio, ambiente, lat/lng plausíveis.
+- **~24 coletas** distribuídas em 12 meses de 2024 (2 por ponto em média), cobrindo períodos seco, chuvoso e transição.
+- **8 parâmetros por coleta**: pH, OD, turbidez, DBO, fósforo total, coliformes, temperatura, condutividade — com limites CONAMA já usados nos cenários atuais.
+- Valores gerados para dar variedade visível: pontos urbanos com DBO/fósforo/coliformes maiores; estuário com condutividade alta; período chuvoso aumenta turbidez e reduz OD; período seco melhora indicadores.
 
-```text
-src/pages/ForumEconomiaDoMar.tsx          # página única (single page, âncoras)
-src/components/forum/
-  ForumHeader.tsx                          # cabeçalho fixo compacto com logo
-  ForumHero.tsx                            # dobra inicial + selo + botão "Explorar uma coleta"
-  ForumFlowDiagram.tsx                     # Bacia → Rio → Estuário → Manguezal → Praia → Mar
-  ScenarioSelector.tsx                     # 3 cartões de cenário, controle de estado
-  CollectionPanel.tsx                      # dados do ponto + cartões de parâmetros
-  ParameterCard.tsx                        # cartão expansível (nome, valor, unidade, situação, ícone+rótulo)
-  ForumChart.tsx                           # gráfico de barras usando ReadingsBarChart existente
-  ForumMiniMap.tsx                         # wrapper leve sobre LeafletMap com props do cenário
-  AnalysisPanel.tsx                        # botão + steps de loading + resultado em 4 blocos
-  BlueEconomySection.tsx                   # "Da bacia ao mar" + 4 cartões
-  HowItWorks.tsx                           # fluxo Coleta→Validação→…→Comunicação
-  AIRoleSection.tsx                        # papel da IA + 4 pontos
-  AppliedResearch.tsx                      # Ciência → Tecnologia → Aplicação → Impacto
-  Publication.tsx                          # artigo + autores + campos DOI/periódico/link
-  Team.tsx                                 # responsáveis
-  ContactFooter.tsx                        # site, e-mail, botões, copiar link, compartilhar
-src/data/forumScenarios.ts                 # 3 cenários demonstrativos em JSON tipado
-```
+Cada coleta mantém a estrutura de `ScenarioParameter[]` (com `status` derivado por regra dos limites CONAMA na hora de gerar o dataset). Rótulo `originTag: "adaptado"` permanece visível para não confundir com dado real.
 
-Uma única página monta as seções em ordem; navegação por âncoras (`#coleta`, `#analise`, `#publicacao`, `#contato`).
+## Filtros (combinam-se, todos ao vivo)
 
-## Cenários demonstrativos
+Novo componente `src/components/forum/ScenarioFilters.tsx` acima do painel:
 
-Arquivo `src/data/forumScenarios.ts` com 3 objetos tipados. Cada cenário traz:
+1. **Ponto de coleta** — `Select` multi (checkbox popover) com os 6 pontos + opção "Todos". Default: todos.
+2. **Período** — dois `DatePicker` (data inicial / data final) usando o shadcn datepicker com `pointer-events-auto`. Default: ano inteiro.
+3. **Parâmetros exibidos** — chips toggle (badges clicáveis) para ligar/desligar cada um dos 8 parâmetros no gráfico e nos cards. Default: todos ligados.
 
-- id, título, data, período (seco/chuvoso), tipo de ambiente, origem (rotulada como *real*, *adaptado* ou *demonstrativo*), coordenadas;
-- lista de parâmetros (pH, OD, turbidez, DBO, fósforo total, coliformes termotolerantes, temperatura, condutividade) com valor, unidade, faixa CONAMA quando aplicável, situação (`Dentro da faixa adotada` / `Requer atenção` / `Requer acompanhamento` / `Não avaliado`) e descrição curta;
-- bloco de análise pré-escrita (síntese, atenção, recomendações, limitação) para garantir estabilidade offline no evento.
+Estado dos filtros vive em `ForumEconomiaDoMar.tsx` via `useState` + `useMemo` para derivar `filteredReadings`. Nada de URL params ou storage — reset ao recarregar é aceitável para evento.
 
-Cenários:
-1. Condições predominantemente adequadas (Rio Buranhém, período seco).
-2. Parâmetros que demandam atenção (estuário, período chuvoso).
-3. Comparação seco × chuvoso (mesmo ponto, dois conjuntos).
+## Reação em tempo real
 
-Cenário 1 selecionado por padrão. Trocar cenário atualiza cartões, gráfico, mapa e análise sem recarregar.
+- **Mapa** (`ForumMiniMap` renomeado para `ForumMap` e ampliado): passa a receber `points: {id, lat, lng, label, latestStatus}[]` e renderiza um marcador por ponto filtrado. Cor do marcador (droplet SVG) reflete o status agregado do ponto no intervalo (verde = tudo dentro da faixa; amarelo = requer acompanhamento; vermelho = requer atenção). Popup mostra nome + nº de coletas no intervalo. Se um único ponto ficar filtrado, dá zoom nele; caso contrário, ajusta `bounds` para caber todos.
+- **Gráfico** (`ForumChart`): passa a agregar as coletas filtradas — para cada parâmetro ativo, calcula média no intervalo e monta uma barra normalizada vs. referência CONAMA (mantém a lógica de cores atuais). Quando só uma coleta cai no filtro, mostra os valores brutos daquela coleta.
+- **Cards** (`ParameterCard`): grid de cards apenas para parâmetros ativos, mostrando média + range (mín–máx) no intervalo e nº de coletas que compõem.
+- **Cabeçalho do painel**: contadores "N coletas · M pontos · intervalo dd/mm–dd/mm" atualizando ao vivo.
+- **Empty state**: se filtros zerarem o conjunto, card com "Nenhuma coleta no intervalo selecionado" + botão "Limpar filtros".
 
-## Interatividade
+## Análise com IA (sob demanda)
 
-- Estado local via `useState`/`useMemo` na página.
-- `ParameterCard` expande explicação ao clicar (accordion controlado).
-- `ForumChart` reutiliza `ReadingsBarChart` com CONAMA min/max quando existirem.
-- `ForumMiniMap` usa `LeafletMap` existente com `hideBusinessNames`, altura reduzida.
-- `AnalysisPanel`: botão "Gerar análise" dispara sequência de 4 passos curtos (~1.6s total) e revela o texto pré-carregado do cenário atual em 4 blocos. Sem chamada de rede — garante estabilidade no evento.
-- Compartilhamento: Web Share API com fallback para "Copiar link" (toast do sonner já disponível).
+`AnalysisPanel` refatorado:
 
-## Identidade visual
+- Botão primário **"Gerar análise com IA"** dentro do card. Enquanto não clicado, mostra apenas um resumo estatístico local (gerado por regra, instantâneo: nº de coletas, parâmetros fora da faixa, ponto mais crítico).
+- Ao clicar, chama uma nova **Edge Function** `supabase/functions/forum-analyze/index.ts`:
+  - Recebe `{ readings, activeParameters, dateRange, points }` (payload já filtrado, sem PII).
+  - Chama Lovable AI Gateway via AI SDK (`@ai-sdk/openai-compatible` + `ai`) modelo `openai/gpt-5.5`, prompt em PT-BR pedindo síntese, pontos de atenção, recomendações e limitação (mesma estrutura do texto atual dos cenários).
+  - Retorna JSON `{ sintese, atencao[], recomendacoes[], limitacao }`.
+  - Rate limit simples por IP (in-memory) e limite de payload (≤ 40 coletas) para conter custo no evento.
+- Frontend chama a função via `supabase.functions.invoke("forum-analyze", ...)`, mostra skeleton enquanto carrega, renderiza o resultado. Erros (429/402/rede) exibem toast e o resumo local permanece.
+- A função é **pública** (`verify_jwt = false` no `supabase/config.toml`), pois a página é sem login.
 
-- Reutilizar tokens de `src/index.css` / `tailwind.config.ts`. Só semantic tokens; nada de `bg-white`/cores hardcoded.
-- Se necessário, adicionar variáveis específicas (`--forum-sand`, `--forum-deep`) derivadas da paleta existente, sem quebrar tema.
-- Logo oficial vinda do `Header` atual (mesmo asset).
-- Sem gradientes neon; bordas suaves, cartões claros, ícones `lucide-react` já usados no projeto.
+`LOVABLE_API_KEY` já existe nos secrets — nenhum secret novo.
 
-## SEO e compartilhamento
+## Alterações de arquivos
 
-- Instalar `react-helmet-async`, adicionar `HelmetProvider` em `src/main.tsx`.
-- `<Helmet>` na página com title, description, canonical (`/forum-economia-do-mar`), og:title/description/url/type, twitter:card. Não gerar og:image agora — hosting injeta preview.
-- Manter head sitewide de `index.html` intacto.
-
-## Textos e tom
-
-- Copy final embutida nos componentes, revisada para evitar jargão de marketing (lista de termos proibidos aplicada).
-- Nenhum lorem/placeholder. Campos DOI/periódico/link do artigo ficam como constantes no topo de `Publication.tsx`, com comentário indicando onde editar.
-
-## Responsividade e acessibilidade
-
-- Mobile-first: uma coluna até `md`, duas colunas em áreas interativas em `lg`.
-- Verificar 360/390/tablet/desktop; sem overflow horizontal.
-- Foco visível, `aria-label` em botões-ícone, `aria-expanded` nos cartões expansíveis, contraste AA.
+- **Criar** `src/data/forumDataset.ts` (pontos + coletas ampliados, tipado).
+- **Criar** `src/components/forum/ScenarioFilters.tsx`.
+- **Renomear/ampliar** `ForumMiniMap.tsx` → `ForumMap.tsx` (aceita array de pontos, bounds dinâmico, cor por status).
+- **Editar** `ForumChart.tsx` para consumir agregado por parâmetro.
+- **Editar** `CollectionPanel.tsx` — agora `ExplorerPanel.tsx`: recebe `filteredReadings` e monta header + mapa + gráfico + grid de cards.
+- **Editar** `AnalysisPanel.tsx` — botão "Gerar análise com IA", chamada à edge function, estados loading/erro.
+- **Editar** `ForumEconomiaDoMar.tsx` — remove `ScenarioSelector`, adiciona `ScenarioFilters`, gerencia estado e `useMemo`.
+- **Remover** `ScenarioSelector.tsx` (não mais usado) e o array `FORUM_SCENARIOS` de `forumScenarios.ts` (mantém apenas os tipos, reexportados).
+- **Criar** `supabase/functions/forum-analyze/index.ts` + entrada em `supabase/config.toml` com `verify_jwt = false`.
 
 ## Fora de escopo
 
-- Sem alterações em rotas existentes, admin, banco, edge functions.
-- Sem novas dependências além de `react-helmet-async`.
-- Sem geração de PDF, sem login, sem chatbot, sem gamificação.
+- Nada muda no admin, no AccessGate, em outras rotas, no banco, ou em edge functions existentes.
+- Sem persistência de filtros, sem export/PDF, sem login.
+- Sem consumo das tabelas `readings`/`reading_values` (mantido demonstrativo, conforme decisão).
 
-## Critérios de conclusão
+## Verificação
 
-Ao final: 3 cenários selecionáveis atualizando cartões/gráfico/mapa/análise; página funcional em 360 px sem rolagem horizontal; console limpo; textos definitivos; botões de compartilhar e "Acessar o Tikatu" funcionais; meta tags específicas ativas.
-
----
-
-## Detalhes técnicos
-
-- **Roteamento**: adicionar `<Route path="/forum-economia-do-mar" element={<ForumEconomiaDoMar />} />` acima do catch-all, sem `AccessGate`.
-- **Helmet**: `bun add react-helmet-async`; provider em `main.tsx`; `<Helmet>` na página do evento e nada mais (fallback continua o `index.html`).
-- **Reuso de componentes**: `LeafletMap` (`src/components/dashboard/LeafletMap.tsx`) e `ReadingsBarChart` (`src/components/dashboard/chart/ReadingsBarChart.tsx`) são reutilizados via wrappers finos, sem editá-los.
-- **Dados**: JSON estático em `src/data/forumScenarios.ts`, importado direto — zero rede em runtime, tolerante a falha de API.
-- **Análise IA**: usa texto pré-escrito do cenário para o evento; se desejado depois, plugar em `useWaterReport` sem mudar UI.
+Após implementar: rodar Playwright em `/forum-economia-do-mar`, alterar cada filtro e capturar screenshots confirmando que mapa (marcadores/bounds), gráfico e cards reagem; clicar em "Gerar análise com IA" e conferir resposta + logs da edge function.

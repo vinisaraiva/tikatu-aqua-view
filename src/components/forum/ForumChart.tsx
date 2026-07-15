@@ -6,60 +6,59 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Legend,
   Cell,
+  ReferenceLine,
 } from "recharts";
-import type { ScenarioParameter } from "@/data/forumScenarios";
+import type { ParameterStatus } from "@/data/forumScenarios";
 
-const statusColor: Record<ScenarioParameter["status"], string> = {
+export interface ChartRow {
+  code: string;
+  name: string;
+  avg: number;
+  min: number;
+  max: number;
+  unit: string;
+  conamaMax: number | null;
+  conamaMin: number | null;
+  status: ParameterStatus;
+  normalized: number; // % em relação à referência
+  count: number;
+}
+
+const statusColor: Record<ParameterStatus, string> = {
   "Dentro da faixa adotada": "#10b981",
   "Condição adequada": "#10b981",
-  "Requer atenção": "#f59e0b",
-  "Requer acompanhamento": "#0ea5e9",
+  "Requer atenção": "#ef4444",
+  "Requer acompanhamento": "#f59e0b",
   "Não avaliado": "#94a3b8",
 };
 
-interface Props {
-  parameters: ScenarioParameter[];
-  parametersAlt?: ScenarioParameter[];
-  altLabel?: string;
-}
-
 const shortLabel = (name: string) =>
-  name.replace(/\s*\(.+?\)\s*/g, "").replace("Oxigênio dissolvido", "OD");
+  name
+    .replace("Oxigênio dissolvido", "OD")
+    .replace("Coliformes termotolerantes", "Coliformes")
+    .replace("Fósforo total", "Fósforo")
+    .replace("Condutividade", "Cond.")
+    .replace("Temperatura", "Temp.");
 
-// Normaliza valores para escala 0-100 (percentual relativo ao limite adotado ou ao maior valor)
-const normalize = (
-  parameters: ScenarioParameter[],
-  alt?: ScenarioParameter[],
-) => {
-  return parameters.map((p, i) => {
-    const alt_p = alt?.[i];
-    const ref = p.conamaMax ?? (Math.max(p.value, alt_p?.value ?? 0) * 1.2 || 1);
-    return {
-      name: shortLabel(p.name),
-      "Coleta atual": Number(((p.value / ref) * 100).toFixed(1)),
-      ...(alt_p
-        ? { Alternativa: Number(((alt_p.value / ref) * 100).toFixed(1)) }
-        : {}),
-      raw: p.value,
-      rawAlt: alt_p?.value,
-      unit: p.unit,
-      status: p.status,
-    };
-  });
-};
+const ForumChart = ({ rows }: { rows: ChartRow[] }) => {
+  if (rows.length === 0) {
+    return (
+      <div className="flex h-80 w-full items-center justify-center rounded-lg border border-dashed border-border text-sm text-muted-foreground">
+        Nenhum parâmetro selecionado.
+      </div>
+    );
+  }
 
-const ForumChart = ({ parameters, parametersAlt, altLabel }: Props) => {
-  const data = normalize(parameters, parametersAlt);
+  const data = rows.map((r) => ({ ...r, label: shortLabel(r.name) }));
 
   return (
     <div className="h-80 w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data} margin={{ top: 20, right: 12, left: 0, bottom: 40 }}>
+        <BarChart data={data} margin={{ top: 20, right: 12, left: 0, bottom: 50 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
           <XAxis
-            dataKey="name"
+            dataKey="label"
             angle={-35}
             textAnchor="end"
             height={60}
@@ -71,7 +70,7 @@ const ForumChart = ({ parameters, parametersAlt, altLabel }: Props) => {
             fontSize={11}
             stroke="hsl(var(--muted-foreground))"
             label={{
-              value: "% em relação à referência",
+              value: "% da referência",
               angle: -90,
               position: "insideLeft",
               style: { fontSize: 11, fill: "hsl(var(--muted-foreground))" },
@@ -84,35 +83,20 @@ const ForumChart = ({ parameters, parametersAlt, altLabel }: Props) => {
               borderRadius: 8,
               fontSize: 12,
             }}
-            formatter={(_v, name, item: any) => {
-              if (name === "Coleta atual")
-                return [`${item.payload.raw} ${item.payload.unit ?? ""}`, name];
-              if (name === "Alternativa" && item.payload.rawAlt != null)
-                return [
-                  `${item.payload.rawAlt} ${item.payload.unit ?? ""}`,
-                  altLabel ?? "Alternativa",
-                ];
-              return [String(_v), String(name)];
+            formatter={(_v, _name, item: any) => {
+              const p = item.payload as ChartRow;
+              return [
+                `${p.avg} ${p.unit} (média · ${p.count} coleta${p.count === 1 ? "" : "s"})`,
+                p.name,
+              ];
             }}
           />
-          <Legend wrapperStyle={{ fontSize: 12 }} />
-          <Bar dataKey="Coleta atual" radius={[4, 4, 0, 0]}>
+          <ReferenceLine y={100} stroke="#ef4444" strokeDasharray="4 4" />
+          <Bar dataKey="normalized" radius={[4, 4, 0, 0]}>
             {data.map((d, i) => (
-              <Cell
-                key={i}
-                fill={statusColor[(d as any).status as ScenarioParameter["status"]]}
-              />
+              <Cell key={i} fill={statusColor[d.status]} />
             ))}
           </Bar>
-          {parametersAlt && (
-            <Bar
-              dataKey="Alternativa"
-              name={altLabel ?? "Alternativa"}
-              fill="hsl(var(--primary))"
-              radius={[4, 4, 0, 0]}
-              fillOpacity={0.55}
-            />
-          )}
         </BarChart>
       </ResponsiveContainer>
     </div>

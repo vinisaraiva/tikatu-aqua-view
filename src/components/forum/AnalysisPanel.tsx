@@ -1,122 +1,207 @@
-import { useEffect, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Loader2, CheckCircle2 } from "lucide-react";
-import type { ForumScenario } from "@/data/forumScenarios";
-import { cn } from "@/lib/utils";
+import { Sparkles, Loader2, AlertTriangle } from "lucide-react";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { FORUM_POINTS, FORUM_PARAMETERS, type Reading } from "@/data/forumDataset";
 
-const STEPS = [
-  "Validando os dados",
-  "Verificando indicadores",
-  "Organizando os resultados",
-  "Gerando a interpretação",
-];
+interface Props {
+  filteredReadings: Reading[];
+  activeParameterCodes: string[];
+  dateFrom: Date;
+  dateTo: Date;
+}
 
-const AnalysisPanel = ({ scenario }: { scenario: ForumScenario }) => {
-  const [state, setState] = useState<"idle" | "loading" | "done">("idle");
-  const [stepIndex, setStepIndex] = useState(0);
-  const timers = useRef<number[]>([]);
+interface AIResponse {
+  sintese: string;
+  atencao: string[];
+  recomendacoes: string[];
+  limitacao: string;
+}
 
-  useEffect(() => {
-    // Ao trocar cenário, reseta
-    setState("idle");
-    setStepIndex(0);
-    timers.current.forEach((t) => window.clearTimeout(t));
-    timers.current = [];
-  }, [scenario.id]);
+const localSummary = (readings: Reading[], activeCodes: string[]) => {
+  if (readings.length === 0) return null;
+  const outByParam: Record<string, number> = {};
+  const pointCounts: Record<string, number> = {};
+  const pointAttention: Record<string, number> = {};
 
-  useEffect(() => () => {
-    timers.current.forEach((t) => window.clearTimeout(t));
-  }, []);
+  for (const r of readings) {
+    pointCounts[r.pointId] = (pointCounts[r.pointId] ?? 0) + 1;
+    for (const p of r.parameters) {
+      if (!activeCodes.includes(p.code)) continue;
+      if (p.status === "Requer atenção") {
+        outByParam[p.name] = (outByParam[p.name] ?? 0) + 1;
+        pointAttention[r.pointId] = (pointAttention[r.pointId] ?? 0) + 1;
+      }
+    }
+  }
 
-  const start = () => {
-    setState("loading");
-    setStepIndex(0);
-    timers.current.forEach((t) => window.clearTimeout(t));
-    STEPS.forEach((_, i) => {
-      const t = window.setTimeout(() => setStepIndex(i + 1), (i + 1) * 400);
-      timers.current.push(t);
-    });
-    const done = window.setTimeout(() => setState("done"), STEPS.length * 400 + 200);
-    timers.current.push(done);
+  const worstPoint = Object.entries(pointAttention).sort((a, b) => b[1] - a[1])[0];
+  const worstPointName = worstPoint
+    ? FORUM_POINTS.find((p) => p.id === worstPoint[0])?.name
+    : null;
+  const topParams = Object.entries(outByParam)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3)
+    .map(([n]) => n);
+
+  return { outByParam, worstPointName, topParams };
+};
+
+const AnalysisPanel = ({ filteredReadings, activeParameterCodes, dateFrom, dateTo }: Props) => {
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<AIResponse | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const summary = useMemo(
+    () => localSummary(filteredReadings, activeParameterCodes),
+    [filteredReadings, activeParameterCodes],
+  );
+
+  const canRun = filteredReadings.length > 0 && activeParameterCodes.length > 0 && !loading;
+
+  const run = async () => {
+    setLoading(true);
+    setError(null);
+    setResult(null);
+    try {
+      const payload = {
+        dateFrom: dateFrom.toISOString().slice(0, 10),
+        dateTo: dateTo.toISOString().slice(0, 10),
+        activeParameterCodes,
+        points: FORUM_POINTS.filter((p) =>
+          filteredReadings.some((r) => r.pointId === p.id),
+        ).map((p) => ({ id: p.id, name: p.name, river: p.river, environment: p.environment })),
+        readings: filteredReadings.slice(0, 40).map((r) => ({
+          pointId: r.pointId,
+          date: r.date,
+          season: r.season,
+          parameters: r.parameters
+            .filter((p) => activeParameterCodes.includes(p.code))
+            .map((p) => ({
+              code: p.code,
+              name: p.name,
+              value: p.value,
+              unit: p.unit,
+              status: p.status,
+              conamaMin: p.conamaMin,
+              conamaMax: p.conamaMax,
+            })),
+        })),
+        parameters: FORUM_PARAMETERS.filter((p) => activeParameterCodes.includes(p.code)),
+      };
+
+      const { data, error: fnError } = await supabase.functions.invoke("forum-analyze", {
+        body: payload,
+      });
+
+      if (fnError) throw fnError;
+      if (!data || typeof data !== "object") throw new Error("Resposta inválida do servidor.");
+      setResult(data as AIResponse);
+    } catch (e: any) {
+      const msg = e?.message ?? "Falha ao gerar a análise.";
+      setError(msg);
+      toast.error("Não foi possível gerar a análise com IA", { description: msg });
+    } finally {
+      setLoading(false);
+    }
   };
-
-  const a = scenario.analysis;
 
   return (
     <Card id="analise">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Sparkles className="h-5 w-5 text-primary" aria-hidden />
-          Análise da coleta
+          Análise com IA
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-5">
-        {state === "idle" && (
-          <>
-            <p className="text-sm text-muted-foreground">
-              Gere uma interpretação organizada dos dados desta coleta, com
-              síntese, pontos de atenção, recomendações e limitações.
-            </p>
-            <Button onClick={start} size="lg">
-              <Sparkles className="mr-2 h-4 w-4" aria-hidden />
-              Gerar análise
-            </Button>
-          </>
-        )}
-
-        {state === "loading" && (
-          <ul className="space-y-2" aria-live="polite">
-            {STEPS.map((s, i) => {
-              const done = i < stepIndex;
-              const active = i === stepIndex;
-              return (
-                <li
-                  key={s}
-                  className={cn(
-                    "flex items-center gap-2 text-sm",
-                    done && "text-foreground",
-                    active && "text-primary",
-                    !done && !active && "text-muted-foreground",
-                  )}
-                >
-                  {done ? (
-                    <CheckCircle2 className="h-4 w-4 text-emerald-600" aria-hidden />
-                  ) : active ? (
-                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-                  ) : (
-                    <span className="h-4 w-4 rounded-full border border-border" />
-                  )}
-                  {s}
+        {/* Resumo local instantâneo */}
+        {summary && (
+          <section className="rounded-lg border border-border bg-muted/40 p-4">
+            <h3 className="text-sm font-semibold text-foreground">Resumo estatístico</h3>
+            <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
+              <li>
+                <strong className="text-foreground">{filteredReadings.length}</strong> coleta
+                {filteredReadings.length === 1 ? "" : "s"} nos filtros atuais.
+              </li>
+              {summary.topParams.length > 0 ? (
+                <li>
+                  Parâmetros com maior frequência acima do limite:{" "}
+                  <strong className="text-foreground">
+                    {summary.topParams.join(", ")}
+                  </strong>
+                  .
                 </li>
-              );
-            })}
-          </ul>
+              ) : (
+                <li>Nenhum parâmetro ativo ultrapassou o limite de referência.</li>
+              )}
+              {summary.worstPointName && (
+                <li>
+                  Ponto com mais registros de atenção:{" "}
+                  <strong className="text-foreground">{summary.worstPointName}</strong>.
+                </li>
+              )}
+            </ul>
+          </section>
         )}
 
-        {state === "done" && (
+        {!result && (
+          <div className="flex flex-col items-start gap-2">
+            <p className="text-sm text-muted-foreground">
+              Gere uma interpretação organizada dos dados filtrados com síntese, pontos de
+              atenção, recomendações e limitações.
+            </p>
+            <Button onClick={run} disabled={!canRun} size="lg">
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden />
+                  Gerando análise...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="mr-2 h-4 w-4" aria-hidden />
+                  Gerar análise com IA
+                </>
+              )}
+            </Button>
+            {!canRun && !loading && (
+              <p className="text-xs text-muted-foreground">
+                Selecione ao menos uma coleta e um parâmetro para habilitar.
+              </p>
+            )}
+          </div>
+        )}
+
+        {error && !loading && (
+          <div className="flex items-start gap-2 rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+            <span>{error}</span>
+          </div>
+        )}
+
+        {result && (
           <div className="grid gap-4 md:grid-cols-2">
             <section className="rounded-lg border border-border bg-muted/40 p-4">
-              <h3 className="text-sm font-semibold text-foreground">
-                Síntese geral
-              </h3>
+              <h3 className="text-sm font-semibold text-foreground">Síntese geral</h3>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                {a.sintese}
+                {result.sintese}
               </p>
             </section>
             <section className="rounded-lg border border-border bg-muted/40 p-4">
               <h3 className="text-sm font-semibold text-foreground">
                 Parâmetros que demandam atenção
               </h3>
-              {a.atencao.length > 0 ? (
+              {result.atencao.length > 0 ? (
                 <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-muted-foreground">
-                  {a.atencao.map((x) => (
-                    <li key={x}>{x}</li>
+                  {result.atencao.map((x, i) => (
+                    <li key={i}>{x}</li>
                   ))}
                 </ul>
               ) : (
                 <p className="mt-2 text-sm text-muted-foreground">
-                  Nenhum ponto de atenção nesta coleta.
+                  Nenhum ponto de atenção identificado.
                 </p>
               )}
             </section>
@@ -125,19 +210,23 @@ const AnalysisPanel = ({ scenario }: { scenario: ForumScenario }) => {
                 Recomendações de acompanhamento
               </h3>
               <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-muted-foreground">
-                {a.recomendacoes.map((x) => (
-                  <li key={x}>{x}</li>
+                {result.recomendacoes.map((x, i) => (
+                  <li key={i}>{x}</li>
                 ))}
               </ul>
             </section>
             <section className="rounded-lg border border-border bg-muted/40 p-4">
-              <h3 className="text-sm font-semibold text-foreground">
-                Limitações da análise
-              </h3>
+              <h3 className="text-sm font-semibold text-foreground">Limitações da análise</h3>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                {a.limitacao}
+                {result.limitacao}
               </p>
             </section>
+            <div className="md:col-span-2">
+              <Button variant="outline" onClick={run} disabled={loading}>
+                <Sparkles className="mr-2 h-4 w-4" aria-hidden />
+                Gerar novamente
+              </Button>
+            </div>
           </div>
         )}
       </CardContent>
