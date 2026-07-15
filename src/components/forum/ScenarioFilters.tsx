@@ -146,8 +146,14 @@ const ScenarioFilters = ({ value, onChange, onReset }: Props) => {
                 <Calendar
                   mode="single"
                   selected={value.dateFrom}
+                  defaultMonth={value.dateFrom}
                   onSelect={(d) => d && onChange({ ...value, dateFrom: d })}
-                  disabled={(d) => d > value.dateTo}
+                  disabled={(d) => d > value.dateTo || d < MIN_DATE || d > MAX_DATE}
+                  captionLayout="dropdown-buttons"
+                  fromYear={FROM_YEAR}
+                  toYear={TO_YEAR}
+                  fromDate={MIN_DATE}
+                  toDate={MAX_DATE}
                   className={cn("p-3 pointer-events-auto")}
                   locale={ptBR}
                   initialFocus
@@ -165,8 +171,14 @@ const ScenarioFilters = ({ value, onChange, onReset }: Props) => {
                 <Calendar
                   mode="single"
                   selected={value.dateTo}
+                  defaultMonth={value.dateTo}
                   onSelect={(d) => d && onChange({ ...value, dateTo: d })}
-                  disabled={(d) => d < value.dateFrom}
+                  disabled={(d) => d < value.dateFrom || d < MIN_DATE || d > MAX_DATE}
+                  captionLayout="dropdown-buttons"
+                  fromYear={FROM_YEAR}
+                  toYear={TO_YEAR}
+                  fromDate={MIN_DATE}
+                  toDate={MAX_DATE}
                   className={cn("p-3 pointer-events-auto")}
                   locale={ptBR}
                   initialFocus
