@@ -187,21 +187,22 @@ const ScenarioFilters = ({ value, onChange, onReset }: Props) => {
       {/* Parâmetros */}
       <div className="mt-4 space-y-2">
         <Label className="text-xs font-medium text-muted-foreground">
-          Parâmetros exibidos
+          Parâmetro exibido (selecione um)
         </Label>
-        <div className="flex flex-wrap gap-2">
+        <div role="radiogroup" className="flex flex-wrap gap-2">
           {FORUM_PARAMETERS.map((p) => {
-            const active = value.parameterCodes.includes(p.code);
+            const active = value.parameterCodes[0] === p.code;
             return (
               <button
                 key={p.code}
                 type="button"
-                onClick={() => toggleParam(p.code)}
-                aria-pressed={active}
+                role="radio"
+                onClick={() => selectParam(p.code)}
+                aria-checked={active}
                 className={cn(
                   "rounded-full border px-3 py-1 text-xs font-medium transition-colors",
                   active
-                    ? "border-primary bg-primary/10 text-primary"
+                    ? "border-primary bg-primary text-primary-foreground"
                     : "border-border bg-muted/40 text-muted-foreground hover:text-foreground",
                 )}
               >
