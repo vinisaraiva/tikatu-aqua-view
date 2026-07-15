@@ -32,6 +32,15 @@ const fmt = (d: Date) => format(d, "dd/MM/yyyy", { locale: ptBR });
 
 const MIN_DATE = new Date(FORUM_DATE_MIN + "T00:00:00");
 const MAX_DATE = new Date(FORUM_DATE_MAX + "T00:00:00");
+// Data da coleta mais recente disponível — usada como âncora dos presets
+// para que "7d/30d" sempre incluam pelo menos a última medição.
+const LATEST_READING_DATE = (() => {
+  const max = FORUM_READINGS.reduce(
+    (acc, r) => (r.date > acc ? r.date : acc),
+    FORUM_DATE_MIN,
+  );
+  return new Date(max + "T00:00:00");
+})();
 
 const ScenarioFilters = ({ value, onChange, onReset }: Props) => {
   const togglePoint = (id: string) => {
