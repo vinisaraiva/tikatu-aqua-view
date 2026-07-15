@@ -12,6 +12,8 @@ import AppliedResearch from "@/components/forum/AppliedResearch";
 import Publication from "@/components/forum/Publication";
 import Team from "@/components/forum/Team";
 import ContactFooter from "@/components/forum/ContactFooter";
+import EnvironmentalQuiz from "@/components/education/EnvironmentalQuiz";
+import { Sparkles } from "lucide-react";
 import {
   FORUM_POINTS,
   FORUM_PARAMETERS,
