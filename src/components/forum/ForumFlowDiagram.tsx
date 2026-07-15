@@ -16,7 +16,7 @@ const ForumFlowDiagram = () => {
         {STEPS.map(({ label, Icon }, i) => (
           <li key={label} className="flex items-center gap-2">
             <div className="flex flex-col items-center gap-1">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/40 bg-black/40 text-white shadow-[0_2px_8px_rgb(0_0_0_/_50%)]">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card text-primary">
                 <Icon className="h-5 w-5" aria-hidden />
               </div>
               <span className="text-xs font-medium text-white [text-shadow:_0_1px_4px_rgb(0_0_0_/_70%)]">
@@ -24,7 +24,7 @@ const ForumFlowDiagram = () => {
               </span>
             </div>
             {i < STEPS.length - 1 && (
-              <span aria-hidden className="hidden h-px w-6 bg-white/50 sm:inline-block sm:w-10" />
+              <span aria-hidden className="hidden h-px w-6 bg-border sm:inline-block sm:w-10" />
             )}
           </li>
         ))}
