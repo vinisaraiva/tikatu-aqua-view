@@ -7,7 +7,12 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { FORUM_POINTS, FORUM_PARAMETERS } from "@/data/forumDataset";
+import {
+  FORUM_POINTS,
+  FORUM_PARAMETERS,
+  FORUM_DATE_MIN,
+  FORUM_DATE_MAX,
+} from "@/data/forumDataset";
 
 export interface FilterState {
   pointIds: string[];
@@ -22,7 +27,12 @@ interface Props {
   onReset: () => void;
 }
 
-const fmt = (d: Date) => format(d, "dd/MM/yy", { locale: ptBR });
+const fmt = (d: Date) => format(d, "dd/MM/yyyy", { locale: ptBR });
+
+const MIN_DATE = new Date(FORUM_DATE_MIN + "T00:00:00");
+const MAX_DATE = new Date(FORUM_DATE_MAX + "T00:00:00");
+const FROM_YEAR = MIN_DATE.getFullYear();
+const TO_YEAR = MAX_DATE.getFullYear();
 
 const ScenarioFilters = ({ value, onChange, onReset }: Props) => {
   const togglePoint = (id: string) => {
@@ -136,8 +146,14 @@ const ScenarioFilters = ({ value, onChange, onReset }: Props) => {
                 <Calendar
                   mode="single"
                   selected={value.dateFrom}
+                  defaultMonth={value.dateFrom}
                   onSelect={(d) => d && onChange({ ...value, dateFrom: d })}
-                  disabled={(d) => d > value.dateTo}
+                  disabled={(d) => d > value.dateTo || d < MIN_DATE || d > MAX_DATE}
+                  captionLayout="dropdown-buttons"
+                  fromYear={FROM_YEAR}
+                  toYear={TO_YEAR}
+                  fromDate={MIN_DATE}
+                  toDate={MAX_DATE}
                   className={cn("p-3 pointer-events-auto")}
                   locale={ptBR}
                   initialFocus
@@ -155,8 +171,14 @@ const ScenarioFilters = ({ value, onChange, onReset }: Props) => {
                 <Calendar
                   mode="single"
                   selected={value.dateTo}
+                  defaultMonth={value.dateTo}
                   onSelect={(d) => d && onChange({ ...value, dateTo: d })}
-                  disabled={(d) => d < value.dateFrom}
+                  disabled={(d) => d < value.dateFrom || d < MIN_DATE || d > MAX_DATE}
+                  captionLayout="dropdown-buttons"
+                  fromYear={FROM_YEAR}
+                  toYear={TO_YEAR}
+                  fromDate={MIN_DATE}
+                  toDate={MAX_DATE}
                   className={cn("p-3 pointer-events-auto")}
                   locale={ptBR}
                   initialFocus
