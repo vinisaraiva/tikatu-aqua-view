@@ -29,6 +29,11 @@ const Team = () => {
           </ul>
         </Card>
       </div>
+      <div className="mt-8 flex justify-center">
+        <Button asChild size="lg" className="w-full sm:w-auto">
+          <a href="#publicacao">Produção científica</a>
+        </Button>
+      </div>
     </section>
   );
 };
