@@ -27,18 +27,16 @@ const ForumHero = () => {
           <h1 className="mt-5 text-3xl font-semibold leading-tight tracking-tight text-white [text-shadow:_0_2px_8px_rgb(0_0_0_/_60%)] sm:text-4xl md:text-5xl">
             A qualidade do mar também começa nos rios
           </h1>
-          <div className="mt-6 mx-auto max-w-2xl rounded-2xl bg-black/45 backdrop-blur-sm px-5 py-6 sm:px-8">
-            <p className="text-base text-white/95 [text-shadow:_0_1px_4px_rgb(0_0_0_/_60%)] sm:text-lg">
-              Explore uma coleta real, visualize os parâmetros monitorados e veja
-              como o Tikatu organiza e interpreta dados de qualidade da água.
-            </p>
+          <p className="mt-4 text-base text-white/95 [text-shadow:_0_1px_4px_rgb(0_0_0_/_60%)] sm:text-lg">
+            Explore uma coleta real, visualize os parâmetros monitorados e veja
+            como o Tikatu organiza e interpreta dados de qualidade da água.
+          </p>
 
-            <div className="mt-4 space-y-1 text-sm text-white [text-shadow:_0_1px_4px_rgb(0_0_0_/_60%)]">
-              <p className="font-semibold">
-                I Fórum de Economia do Mar de Porto Seguro
-              </p>
-              <p className="text-white/90">Expo Conectando Saberes · 17 de julho de 2026</p>
-            </div>
+          <div className="mt-6 space-y-1 text-sm text-white [text-shadow:_0_1px_4px_rgb(0_0_0_/_60%)]">
+            <p className="font-semibold">
+              I Fórum de Economia do Mar de Porto Seguro
+            </p>
+            <p className="text-white/90">Expo Conectando Saberes · 17 de julho de 2026</p>
           </div>
 
           <div className="mt-8 flex justify-center">
