@@ -30,6 +30,7 @@ import { SettingsPage } from "./pages/admin/settings/SettingsPage";
 import AnalyticsPage from "./pages/admin/analytics/AnalyticsPage";
 import AccessRequestsPage from "./pages/admin/access-requests/AccessRequestsPage";
 import { usePageTracking } from "./hooks/usePageTracking";
+import ForumEconomiaDoMar from "./pages/ForumEconomiaDoMar";
 
 const PageTracker = () => {
   usePageTracking();
@@ -55,6 +56,11 @@ const App = () => (
         <Routes>
           {/* Public access gate */}
           <Route path="/acesso" element={<SiteAccess />} />
+
+          {/* Public event page — no access gate */}
+          <Route path="/forum-economia-do-mar" element={<ForumEconomiaDoMar />} />
+
+
 
           {/* Admin routes (own auth, not behind site access gate) */}
           <Route path="/admin/login" element={<AdminLogin />} />
