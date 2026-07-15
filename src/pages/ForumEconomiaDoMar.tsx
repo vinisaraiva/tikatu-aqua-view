@@ -22,7 +22,7 @@ import {
 
 const defaultFilters = (): FilterState => ({
   pointIds: FORUM_POINTS.map((p) => p.id),
-  parameterCodes: FORUM_PARAMETERS.map((p) => p.code),
+  parameterCodes: [FORUM_PARAMETERS[0].code],
   dateFrom: new Date(FORUM_DATE_MIN + "T00:00:00"),
   dateTo: new Date(FORUM_DATE_MAX + "T00:00:00"),
 });
