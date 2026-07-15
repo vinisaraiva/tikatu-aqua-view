@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import {
   FORUM_POINTS,
   FORUM_PARAMETERS,
+  FORUM_READINGS,
   FORUM_DATE_MIN,
   FORUM_DATE_MAX,
 } from "@/data/forumDataset";
