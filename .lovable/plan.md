@@ -1,29 +1,17 @@
 ## Objetivo
-Garantir que `/forum-economia-do-mar` (e outras rotas públicas futuras) fique sempre acessível sem login, mesmo que sejam envolvidas pelo `AccessGate`.
 
-## Mudanças
+Trocar o fundo da primeira seção (hero) da página `/forum-economia-do-mar` pela mesma imagem usada na página de acesso, mas com um overlay claro para não atrapalhar a leitura do texto.
 
-### 1. `src/components/AccessGate.tsx`
-Adicionar constante `PUBLIC_ROUTES` no topo do arquivo:
-```ts
-const PUBLIC_ROUTES = ['/forum-economia-do-mar'];
-```
+## Alterações
 
-No corpo do componente, antes de qualquer checagem de `loading`/`isAuthorized`, verificar se `location.pathname` está no allowlist. Se estiver, renderizar `children` diretamente e ignorar o gate:
-```ts
-if (PUBLIC_ROUTES.includes(location.pathname)) {
-  return <>{children}</>;
-}
-```
+**Arquivo:** `src/components/forum/ForumHero.tsx`
 
-Isso garante que:
-- Se algum dia a rota for envolta em `<AccessGate>` por engano, ela continuará pública.
-- O `NotFound` (rota `*`) que está dentro do AccessGate não redirecionará para `/acesso` se o path bater com a allowlist (defesa extra em caso de rewrite/redirect estranho do Render).
+1. Adicionar dentro do `<section>` uma camada absoluta com a imagem de fundo:
+   - `url('/lovable-uploads/6c1c5451-5d11-445d-ac6a-b3c2450303b6.png')` (mesma da `SiteAccess`)
+   - `bg-cover bg-center bg-no-repeat`
+2. Adicionar por cima uma camada de overlay clara para suavizar a imagem:
+   - `bg-white/75` com um leve `backdrop-blur-sm` (mais claro que o overlay escuro da página de acesso, garantindo contraste do texto escuro atual).
+3. Manter o conteúdo (`max-w-6xl ...`) com `relative z-10` para ficar acima das camadas.
+4. Manter o gradiente atual `from-primary/5 via-background to-background` removido (ou mantido bem sutil) — a imagem passa a ser o fundo principal.
 
-### 2. Nada mais precisa mudar
-- `App.tsx` já expõe `/forum-economia-do-mar` fora do `AccessGate` — mantemos assim.
-- Não altera lógica de autenticação nem de sessão.
-
-## Notas técnicas
-- A allowlist é um simples array de pathnames exatos. Se no futuro precisarmos de padrões (prefixos), trocamos por `PUBLIC_ROUTES.some(p => location.pathname.startsWith(p))`.
-- Isso é uma proteção de UI/roteamento no cliente, independente do fix de rewrite SPA no Render.
+Nenhuma outra seção da página é afetada, e nenhuma lógica é alterada.
