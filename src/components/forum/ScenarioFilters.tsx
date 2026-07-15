@@ -149,9 +149,7 @@ const ScenarioFilters = ({ value, onChange, onReset }: Props) => {
                   defaultMonth={value.dateFrom}
                   onSelect={(d) => d && onChange({ ...value, dateFrom: d })}
                   disabled={(d) => d > value.dateTo || d < MIN_DATE || d > MAX_DATE}
-                  captionLayout="dropdown-buttons"
-                  fromYear={FROM_YEAR}
-                  toYear={TO_YEAR}
+                  fromDate={MIN_DATE}
                   fromDate={MIN_DATE}
                   toDate={MAX_DATE}
                   className={cn("p-3 pointer-events-auto")}
