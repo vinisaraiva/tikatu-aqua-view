@@ -41,14 +41,9 @@ const ScenarioFilters = ({ value, onChange, onReset }: Props) => {
     });
   };
 
-  const toggleParam = (code: string) => {
-    const has = value.parameterCodes.includes(code);
-    onChange({
-      ...value,
-      parameterCodes: has
-        ? value.parameterCodes.filter((c) => c !== code)
-        : [...value.parameterCodes, code],
-    });
+  const selectParam = (code: string) => {
+    if (value.parameterCodes[0] === code) return;
+    onChange({ ...value, parameterCodes: [code] });
   };
 
   const pointsLabel =
