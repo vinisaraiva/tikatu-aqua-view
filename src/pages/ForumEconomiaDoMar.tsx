@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import ForumHeader from "@/components/forum/ForumHeader";
 import ForumHero from "@/components/forum/ForumHero";
@@ -34,6 +34,10 @@ const defaultFilters = (): FilterState => ({
 
 const ForumEconomiaDoMar = () => {
   const [filters, setFilters] = useState<FilterState>(defaultFilters);
+
+  useEffect(() => {
+    setFilters(defaultFilters());
+  }, []);
 
   const filteredReadings = useMemo(() => {
     const fromMs = filters.dateFrom.getTime();
