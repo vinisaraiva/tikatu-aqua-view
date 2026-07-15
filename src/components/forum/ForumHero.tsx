@@ -12,7 +12,7 @@ const ForumHero = () => {
         aria-hidden="true"
       />
       <div
-        className="absolute inset-0 bg-white/75 backdrop-blur-sm"
+        className="absolute inset-0 bg-white/50 backdrop-blur-[2px]"
         aria-hidden="true"
       />
       <div className="relative z-10 mx-auto max-w-6xl px-4 py-14 sm:py-20">
