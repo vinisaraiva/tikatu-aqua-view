@@ -195,7 +195,7 @@ const ScenarioFilters = ({ value, onChange, onReset }: Props) => {
                 key={preset.label}
                 type="button"
                 onClick={() => {
-                  const to = MAX_DATE;
+                  const to = preset.days === -1 ? MAX_DATE : LATEST_READING_DATE;
                   const from =
                     preset.days === -1
                       ? MIN_DATE
