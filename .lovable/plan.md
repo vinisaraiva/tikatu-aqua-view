@@ -1,29 +1,26 @@
-## Ajustes na página `/forum-economia-do-mar`
+## Objetivo
+Tornar a seção de filtros (`ScenarioFilters`) mais compacta no painel do Fórum, especialmente no mobile, substituindo os controles atuais (chips grandes de parâmetros e grade de 3 colunas) por um layout tipo lista/accordion que ocupe menos espaço vertical.
 
-### 1. Remover botão "Produção científica" após Responsáveis
-**`src/components/forum/Team.tsx`**
-- Remover o bloco `<div className="mt-8 flex justify-center">...</div>` com o `<Button>` que aponta para `#publicacao`.
-- Remover o import não utilizado do `Button`.
-- Justificativa: a seção `Publication` já existe na página e é âncora natural do conteúdo.
+## Mudanças propostas
 
-### 2. Eliminar a barra de rolagem horizontal
-Investigação: o `<div>` raiz da página já tem `overflow-x-hidden`, mas a barra ainda aparece. Causa provável: o `ForumFlowDiagram` usa `overflow-x-auto` com `min-w-max`, que renderiza uma barra dentro do próprio bloco no mobile (o hero e a seção "Da bacia ao mar" repetem o diagrama).
+**Arquivo:** `src/components/forum/ScenarioFilters.tsx`
 
-**`src/components/forum/ForumFlowDiagram.tsx`**
-- No mobile, permitir que o diagrama quebre em duas linhas em vez de rolar: trocar `flex min-w-max items-center gap-2` por `flex flex-wrap items-center justify-center gap-x-2 gap-y-3 sm:flex-nowrap sm:min-w-max`.
-- Ocultar o conector (`<span aria-hidden ...>`) quando o item quebra de linha, mantendo-o só em `sm:` (`hidden sm:inline-block`).
-- Remover o `overflow-x-auto` do wrapper externo, já que não haverá mais overflow no mobile.
+1. **Container colapsável**: envolver todos os filtros em um `Accordion` (shadcn) fechado por padrão no mobile. Cabeçalho enxuto exibindo resumo dos filtros ativos (ex: `"3 pontos · pH · Últimos 30d"`) + ícone de filtro. Abre para revelar controles.
 
-### 3. Melhorar contraste do texto do hero sobre a imagem
-**`src/components/forum/ForumHero.tsx`**
-- Substituir o overlay chapado `bg-white/50 backdrop-blur-[2px]` por um gradiente vertical que escurece/clareia estrategicamente:
-  `bg-gradient-to-b from-background/85 via-background/70 to-background/85 backdrop-blur-[1px]`.
-  Isso deixa a imagem visível ao centro e reforça a leitura do título/parágrafo.
-- No `<h1>`, adicionar `drop-shadow-sm` para reforçar bordas do texto.
-- No `<p>` de descrição, trocar `text-muted-foreground` por `text-foreground/80` para ganho de contraste sem virar preto puro.
-- Manter o bloco de data/local com o mesmo tratamento (`text-foreground/80`).
+2. **Layout em lista vertical** (dentro do accordion):
+   - Trocar o `grid md:grid-cols-3` por lista vertical de linhas compactas, cada uma com label à esquerda e controle à direita (padrão "settings list").
+   - Linha "Pontos": mantém o `Popover` com checkboxes, mas o trigger vira uma linha slim.
+   - Linha "Período": presets (7d/30d/90d/1 ano/Tudo) como `Select` compacto em vez dos 5 chips; datas customizadas ficam num sub-popover "Personalizar".
+   - Linha "Parâmetro": trocar os chips grandes por um `Select` (dropdown) já que só um parâmetro pode ser selecionado por vez — economiza muito espaço vertical.
+
+3. **Botão "Restaurar filtros"**: mover para um ícone `RotateCcw` discreto no cabeçalho do accordion (ao lado do resumo), removendo a coluna dedicada.
 
 ## Detalhes técnicos
-- Nenhuma mudança de lógica ou dados.
-- Alterações restritas a `Team.tsx`, `ForumFlowDiagram.tsx` e `ForumHero.tsx`.
-- Uso de tokens semânticos (`background`, `foreground`) — sem cores hardcoded.
+
+- Reutilizar `Accordion`, `Select`, `Popover` já disponíveis em `src/components/ui`.
+- No desktop (`md:`), o accordion pode iniciar aberto (`defaultValue="filters"`); no mobile, fechado.
+- Preservar a `FilterState` e a API `onChange`/`onReset` — apenas UI muda, nenhuma lógica de filtragem é alterada.
+- Datas customizadas continuam via `Calendar` em popover, acessíveis por link "Personalizar período".
+
+## Resultado esperado
+Bloco de filtros passa de ~4 linhas visíveis para 1 linha (colapsado) ou 3 linhas slim (aberto) no mobile, sem perder funcionalidade.
