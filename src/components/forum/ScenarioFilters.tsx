@@ -7,7 +7,12 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { FORUM_POINTS, FORUM_PARAMETERS } from "@/data/forumDataset";
+import {
+  FORUM_POINTS,
+  FORUM_PARAMETERS,
+  FORUM_DATE_MIN,
+  FORUM_DATE_MAX,
+} from "@/data/forumDataset";
 
 export interface FilterState {
   pointIds: string[];
