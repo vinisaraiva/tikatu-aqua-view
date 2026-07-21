@@ -592,6 +592,42 @@ export type Database = {
           },
         ]
       }
+      volunteer_sessions: {
+        Row: {
+          created_at: string
+          expires_at: string
+          token: string
+          volunteer_id: number
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string
+          token?: string
+          volunteer_id: number
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          token?: string
+          volunteer_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "volunteer_sessions_volunteer_id_fkey"
+            columns: ["volunteer_id"]
+            isOneToOne: false
+            referencedRelation: "volunteers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "volunteer_sessions_volunteer_id_fkey"
+            columns: ["volunteer_id"]
+            isOneToOne: false
+            referencedRelation: "volunteers_view"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       volunteers: {
         Row: {
           api_key: string | null
@@ -704,6 +740,12 @@ export type Database = {
       validate_volunteer_file_path: {
         Args: { bucket_name: string; file_path: string }
         Returns: boolean
+      }
+      volunteer_verify_login: {
+        Args: { p_code: string; p_password: string }
+        Returns: {
+          volunteer_id: number
+        }[]
       }
     }
     Enums: {
