@@ -116,6 +116,27 @@ export type Database = {
           },
         ]
       }
+      app_config: {
+        Row: {
+          id: number
+          min_version: string
+          reload_token: string
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          min_version?: string
+          reload_token?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          min_version?: string
+          reload_token?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       app_settings: {
         Row: {
           created_at: string
