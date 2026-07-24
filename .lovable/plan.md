@@ -1,26 +1,47 @@
-## Objetivo
-Tornar a seção de filtros (`ScenarioFilters`) mais compacta no painel do Fórum, especialmente no mobile, substituindo os controles atuais (chips grandes de parâmetros e grade de 3 colunas) por um layout tipo lista/accordion que ocupe menos espaço vertical.
+# Botão "Forçar atualização do app"
 
-## Mudanças propostas
+Objetivo: permitir que um admin dispare, com um clique, a atualização do PWA **Tikatu Coleta** em todos os aparelhos dos voluntários, incrementando o campo `reload_token` da tabela `public.app_config` (já existente e compartilhada via Supabase `okduzgpkahddkdpzibua`).
 
-**Arquivo:** `src/components/forum/ScenarioFilters.tsx`
+## Abordagem escolhida: Opção B (escrita direta com RLS)
 
-1. **Container colapsável**: envolver todos os filtros em um `Accordion` (shadcn) fechado por padrão no mobile. Cabeçalho enxuto exibindo resumo dos filtros ativos (ex: `"3 pontos · pH · Últimos 30d"`) + ícone de filtro. Abre para revelar controles.
+A plataforma já autentica admins via Supabase Auth + tabela `user_roles` com função `has_role(uuid, app_role)`. Isso permite dispensar Edge Function e segredo no bundle — a RLS garante que só admins escrevem em `app_config`.
 
-2. **Layout em lista vertical** (dentro do accordion):
-   - Trocar o `grid md:grid-cols-3` por lista vertical de linhas compactas, cada uma com label à esquerda e controle à direita (padrão "settings list").
-   - Linha "Pontos": mantém o `Popover` com checkboxes, mas o trigger vira uma linha slim.
-   - Linha "Período": presets (7d/30d/90d/1 ano/Tudo) como `Select` compacto em vez dos 5 chips; datas customizadas ficam num sub-popover "Personalizar".
-   - Linha "Parâmetro": trocar os chips grandes por um `Select` (dropdown) já que só um parâmetro pode ser selecionado por vez — economiza muito espaço vertical.
+## Passos
 
-3. **Botão "Restaurar filtros"**: mover para um ícone `RotateCcw` discreto no cabeçalho do accordion (ao lado do resumo), removendo a coluna dedicada.
+### 1. Migração de RLS em `public.app_config`
+Adicionar política de UPDATE restrita a admins usando a função `has_role` já existente:
 
-## Detalhes técnicos
+```sql
+CREATE POLICY "Admins can update app_config"
+ON public.app_config
+FOR UPDATE
+TO authenticated
+USING (public.has_role(auth.uid(), 'admin'::public.app_role))
+WITH CHECK (public.has_role(auth.uid(), 'admin'::public.app_role));
 
-- Reutilizar `Accordion`, `Select`, `Popover` já disponíveis em `src/components/ui`.
-- No desktop (`md:`), o accordion pode iniciar aberto (`defaultValue="filters"`); no mobile, fechado.
-- Preservar a `FilterState` e a API `onChange`/`onReset` — apenas UI muda, nenhuma lógica de filtragem é alterada.
-- Datas customizadas continuam via `Calendar` em popover, acessíveis por link "Personalizar período".
+GRANT SELECT, UPDATE ON public.app_config TO authenticated;
+```
 
-## Resultado esperado
-Bloco de filtros passa de ~4 linhas visíveis para 1 linha (colapsado) ou 3 linhas slim (aberto) no mobile, sem perder funcionalidade.
+(Antes de rodar vou verificar via `supabase--read_query` as políticas atuais da tabela para não duplicar e confirmar que a leitura pública permanece.)
+
+### 2. Novo componente `ForceAppUpdateCard.tsx`
+Em `src/components/admin/volunteers/ForceAppUpdateCard.tsx`:
+- Card shadcn com título "Atualização do aplicativo" e descrição curta.
+- Botão "Forçar atualização do app (todos)" que:
+  1. Abre `ConfirmDialog` (já existe em `src/components/admin/ConfirmDialog.tsx`).
+  2. Lê `reload_token` atual de `app_config` id=1.
+  3. Faz update com `reload_token = String(atual + 1)` e `updated_at = now()`.
+  4. Toast de sucesso/erro via `useToast`.
+- Estado de loading no botão.
+
+### 3. Integração na página Voluntários
+Em `src/pages/admin/volunteers/VolunteersPage.tsx`, renderizar `<ForceAppUpdateCard />` no topo (acima da `DataTable`), separado por espaçamento existente.
+
+## Segurança
+- Escrita bloqueada por RLS para qualquer não-admin — mesmo que o componente vaze para outra tela.
+- Leitura pública de `app_config` preservada (o app dos voluntários lê como anon).
+- Nenhum segredo no bundle.
+
+## Fora de escopo
+- Campo para alterar `min_version` (spec marca como opcional; posso adicionar depois se pedir).
+- Edge Function (Opção A) — desnecessária dado o modelo de auth atual.
