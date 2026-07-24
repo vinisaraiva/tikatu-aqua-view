@@ -119,6 +119,8 @@ export default function VolunteersPage() {
         </Button>
       </div>
 
+      <ForceAppUpdateCard />
+
       <DataTable
         data={volunteers || []}
         columns={columns}
