@@ -1,47 +1,34 @@
-# Botão "Forçar atualização do app"
+## Objetivo
 
-Objetivo: permitir que um admin dispare, com um clique, a atualização do PWA **Tikatu Coleta** em todos os aparelhos dos voluntários, incrementando o campo `reload_token` da tabela `public.app_config` (já existente e compartilhada via Supabase `okduzgpkahddkdpzibua`).
+Manter o mesmo botão "Forçar atualização do app (todos)", mas trocar o que ele grava: em vez de incrementar `reload_token` (que hoje está causando logoff no app), ele passa a **incrementar `min_version`** em `public.app_config`. O app Tikatu Coleta compara a própria versão com `min_version` e recarrega preservando a sessão apenas quando estiver abaixo.
 
-## Abordagem escolhida: Opção B (escrita direta com RLS)
+Estado atual em `app_config` (id=1): `min_version = "1.0.0"`, `reload_token = "1"`.
 
-A plataforma já autentica admins via Supabase Auth + tabela `user_roles` com função `has_role(uuid, app_role)`. Isso permite dispensar Edge Function e segredo no bundle — a RLS garante que só admins escrevem em `app_config`.
+## Mudança na plataforma web
 
-## Passos
+Arquivo único: `src/components/admin/volunteers/ForceAppUpdateCard.tsx`
 
-### 1. Migração de RLS em `public.app_config`
-Adicionar política de UPDATE restrita a admins usando a função `has_role` já existente:
+- UX igual: mesmo card, mesmo título, mesmo botão "Forçar atualização do app (todos)", mesmo `ConfirmDialog`.
+- Handler passa a:
+  1. Ler `min_version` de `app_config` id=1.
+  2. Calcular próxima versão fazendo bump do patch (`x.y.z` → `x.y.(z+1)`; se o valor não bater com o regex `^\d+\.\d+\.\d+$`, cai para `1.0.1`).
+  3. `UPDATE app_config SET min_version = <novo>, updated_at = now() WHERE id = 1`.
+  4. Toast informando a nova versão mínima publicada.
+- Remove a leitura/escrita de `reload_token`.
+- Descrição do card atualizada: "Publica uma nova versão mínima. Aparelhos com versão inferior recarregam na próxima abertura, sem perder o login."
 
-```sql
-CREATE POLICY "Admins can update app_config"
-ON public.app_config
-FOR UPDATE
-TO authenticated
-USING (public.has_role(auth.uid(), 'admin'::public.app_role))
-WITH CHECK (public.has_role(auth.uid(), 'admin'::public.app_role));
+Nenhuma migração; RLS de admin sobre `app_config` já foi criada anteriormente e continua válida (o `UPDATE` roda no cliente sob a sessão do admin autenticado).
 
-GRANT SELECT, UPDATE ON public.app_config TO authenticated;
-```
+## Instrução a repassar ao time do app Tikatu Coleta (fora deste repo)
 
-(Antes de rodar vou verificar via `supabase--read_query` as políticas atuais da tabela para não duplicar e confirmar que a leitura pública permanece.)
+Para o mecanismo funcionar sem logoff, o app precisa:
 
-### 2. Novo componente `ForceAppUpdateCard.tsx`
-Em `src/components/admin/volunteers/ForceAppUpdateCard.tsx`:
-- Card shadcn com título "Atualização do aplicativo" e descrição curta.
-- Botão "Forçar atualização do app (todos)" que:
-  1. Abre `ConfirmDialog` (já existe em `src/components/admin/ConfirmDialog.tsx`).
-  2. Lê `reload_token` atual de `app_config` id=1.
-  3. Faz update com `reload_token = String(atual + 1)` e `updated_at = now()`.
-  4. Toast de sucesso/erro via `useToast`.
-- Estado de loading no botão.
-
-### 3. Integração na página Voluntários
-Em `src/pages/admin/volunteers/VolunteersPage.tsx`, renderizar `<ForceAppUpdateCard />` no topo (acima da `DataTable`), separado por espaçamento existente.
-
-## Segurança
-- Escrita bloqueada por RLS para qualquer não-admin — mesmo que o componente vaze para outra tela.
-- Leitura pública de `app_config` preservada (o app dos voluntários lê como anon).
-- Nenhum segredo no bundle.
+- Ler `min_version` de `app_config` na abertura.
+- Comparar com a versão embutida no bundle (ex.: constante `APP_VERSION`).
+- Se `APP_VERSION < min_version`: `window.location.reload()` **uma vez** (flag em `sessionStorage` para não loopar). **Não** chamar `supabase.auth.signOut()`, **não** limpar `localStorage`, **não** desregistrar o service worker de forma destrutiva.
+- Ignorar `reload_token` (era o gatilho que derrubava a sessão).
 
 ## Fora de escopo
-- Campo para alterar `min_version` (spec marca como opcional; posso adicionar depois se pedir).
-- Edge Function (Opção A) — desnecessária dado o modelo de auth atual.
+
+- Alterações no app mobile/PWA.
+- Remoção da coluna `reload_token` do banco.
