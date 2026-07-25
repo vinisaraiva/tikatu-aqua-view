@@ -17,21 +17,28 @@ export const ForceAppUpdateCard = () => {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const bumpVersion = (v: string): string => {
+    const match = /^(\d+)\.(\d+)\.(\d+)$/.exec((v ?? '').trim());
+    if (!match) return '1.0.1';
+    const [, major, minor, patch] = match;
+    return `${major}.${minor}.${parseInt(patch, 10) + 1}`;
+  };
+
   const handleConfirm = async () => {
     setLoading(true);
     try {
       const { data, error: readErr } = await supabase
         .from('app_config')
-        .select('reload_token')
+        .select('min_version')
         .eq('id', 1)
         .single();
       if (readErr) throw readErr;
 
-      const current = parseInt(String(data?.reload_token ?? '0'), 10) || 0;
+      const next = bumpVersion(String(data?.min_version ?? ''));
       const { error: updErr } = await supabase
         .from('app_config')
         .update({
-          reload_token: String(current + 1),
+          min_version: next,
           updated_at: new Date().toISOString(),
         })
         .eq('id', 1);
@@ -39,8 +46,7 @@ export const ForceAppUpdateCard = () => {
 
       toast({
         title: 'Atualização enviada',
-        description:
-          'Os aparelhos dos voluntários recarregarão o app na próxima abertura.',
+        description: `Nova versão mínima publicada: ${next}. Aparelhos com versão inferior recarregarão sem perder o login.`,
       });
       setConfirmOpen(false);
     } catch (err: any) {
@@ -63,9 +69,9 @@ export const ForceAppUpdateCard = () => {
             Atualização do aplicativo
           </CardTitle>
           <CardDescription>
-            Força os aparelhos dos voluntários a carregarem a versão mais recente
-            do app Tikatu Coleta, sem que precisem refazer login. O efeito ocorre
-            na próxima vez que cada aparelho abrir o app.
+            Publica uma nova versão mínima do app Tikatu Coleta. Aparelhos com
+            versão inferior recarregarão na próxima abertura, sem que os
+            voluntários precisem refazer login.
           </CardDescription>
         </CardHeader>
         <CardContent>
