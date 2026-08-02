@@ -8,7 +8,17 @@ export interface VolunteerPoint {
   river_name: string;
   city_name: string;
   is_primary: boolean;
+  weekdays?: number[] | null;
+  scheduled_time?: string | null;
+  tolerance_minutes?: number | null;
 }
+
+export interface VolunteerScheduleInput {
+  point_id: number;
+  weekdays: number[];
+  scheduled_time: string;
+}
+
 
 export interface Volunteer {
   id: number;
