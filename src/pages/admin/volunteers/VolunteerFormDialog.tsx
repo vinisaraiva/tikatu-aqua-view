@@ -279,11 +279,11 @@ export function VolunteerFormDialog({ open, onClose, volunteer }: VolunteerFormD
                   name="point_ids"
                   render={() => (
                     <FormItem>
-                      <FormLabel>Pontos de Coleta</FormLabel>
+                      <FormLabel>Pontos de Coleta e Agenda</FormLabel>
                       <FormDescription>
-                        Selecione os pontos que este voluntário irá monitorar. Clique na estrela para definir o ponto principal.
+                        Selecione os pontos que este voluntário irá monitorar, defina os dias e o horário de coleta de cada um. Clique na estrela para definir o ponto principal.
                       </FormDescription>
-                      <ScrollArea className="h-48 rounded-md border p-4">
+                      <ScrollArea className="h-64 rounded-md border p-4">
                         <div className="space-y-2">
                           {points?.map((point) => {
                             const isSelected = watchedPointIds.includes(point.id);
@@ -292,41 +292,51 @@ export function VolunteerFormDialog({ open, onClose, volunteer }: VolunteerFormD
                             return (
                               <div 
                                 key={point.id} 
-                                className={`flex items-center justify-between p-2 rounded-md transition-colors ${
+                                className={`p-2 rounded-md transition-colors ${
                                   isSelected ? 'bg-primary/10 border border-primary/20' : 'hover:bg-muted'
                                 }`}
                               >
-                                <div className="flex items-center space-x-3">
-                                  <Checkbox
-                                    checked={isSelected}
-                                    onCheckedChange={(checked) => handlePointToggle(point.id, checked as boolean)}
-                                  />
-                                  <div className="flex items-center gap-2">
-                                    <MapPin className="h-4 w-4 text-muted-foreground" />
-                                    <div>
-                                      <span className="font-medium">{point.name}</span>
-                                      <span className="text-muted-foreground text-sm ml-2">
-                                        {point.rivers?.name}
-                                      </span>
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center space-x-3">
+                                    <Checkbox
+                                      checked={isSelected}
+                                      onCheckedChange={(checked) => handlePointToggle(point.id, checked as boolean)}
+                                    />
+                                    <div className="flex items-center gap-2">
+                                      <MapPin className="h-4 w-4 text-muted-foreground" />
+                                      <div>
+                                        <span className="font-medium">{point.name}</span>
+                                        <span className="text-muted-foreground text-sm ml-2">
+                                          {point.rivers?.name}
+                                        </span>
+                                      </div>
                                     </div>
                                   </div>
+                                  {isSelected && (
+                                    <Button
+                                      type="button"
+                                      variant={isPrimary ? "default" : "ghost"}
+                                      size="sm"
+                                      onClick={() => handleSetPrimary(point.id)}
+                                      className="gap-1"
+                                    >
+                                      <Star className={`h-4 w-4 ${isPrimary ? 'fill-current' : ''}`} />
+                                      {isPrimary ? 'Principal' : 'Definir principal'}
+                                    </Button>
+                                  )}
                                 </div>
                                 {isSelected && (
-                                  <Button
-                                    type="button"
-                                    variant={isPrimary ? "default" : "ghost"}
-                                    size="sm"
-                                    onClick={() => handleSetPrimary(point.id)}
-                                    className="gap-1"
-                                  >
-                                    <Star className={`h-4 w-4 ${isPrimary ? 'fill-current' : ''}`} />
-                                    {isPrimary ? 'Principal' : 'Definir principal'}
-                                  </Button>
+                                  <VolunteerScheduleEditor
+                                    value={schedules[point.id] || { weekdays: [], scheduled_time: '08:00' }}
+                                    onChange={(value) => setSchedules((prev) => ({ ...prev, [point.id]: value }))}
+                                    invalid={scheduleError.includes(point.id)}
+                                  />
                                 )}
                               </div>
                             );
                           })}
                         </div>
+
                       </ScrollArea>
                       {watchedPointIds.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-2">
