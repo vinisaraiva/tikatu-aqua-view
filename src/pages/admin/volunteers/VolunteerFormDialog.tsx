@@ -33,7 +33,9 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useCreateVolunteer, useUpdateVolunteer } from '@/hooks/admin/useVolunteers';
 import { usePoints } from '@/hooks/admin/usePoints';
 import { ApiKeyDisplayDialog } from '@/components/admin/ApiKeyDisplayDialog';
+import { VolunteerScheduleEditor, ScheduleValue } from '@/components/admin/volunteers/VolunteerScheduleEditor';
 import { MapPin, Star } from 'lucide-react';
+
 
 const volunteerSchema = z.object({
   nome: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
@@ -78,6 +80,10 @@ export function VolunteerFormDialog({ open, onClose, volunteer }: VolunteerFormD
   const updateVolunteer = useUpdateVolunteer();
   const [showApiKeyDialog, setShowApiKeyDialog] = useState(false);
   const [createdVolunteer, setCreatedVolunteer] = useState<any>(null);
+  const [schedules, setSchedules] = useState<Record<number, ScheduleValue>>({});
+  const [scheduleError, setScheduleError] = useState<number[]>([]);
+
+
 
   const form = useForm<VolunteerFormData>({
     resolver: zodResolver(volunteerSchema),
@@ -97,11 +103,21 @@ export function VolunteerFormDialog({ open, onClose, volunteer }: VolunteerFormD
   const watchedType = form.watch('type');
 
   useEffect(() => {
+    setScheduleError([]);
     if (volunteer) {
       // Extrair point_ids do array de pontos
       const pointIds = volunteer.points?.map((p: any) => p.point_id) || [volunteer.point_id];
       const primaryPointId = volunteer.points?.find((p: any) => p.is_primary)?.point_id || volunteer.point_id;
-      
+
+      const loadedSchedules: Record<number, ScheduleValue> = {};
+      (volunteer.points || []).forEach((p: any) => {
+        loadedSchedules[p.point_id] = {
+          weekdays: Array.isArray(p.weekdays) ? p.weekdays.map(Number) : [],
+          scheduled_time: p.scheduled_time ? String(p.scheduled_time).slice(0, 5) : '08:00',
+        };
+      });
+      setSchedules(loadedSchedules);
+
       form.reset({
         nome: volunteer.nome || '',
         point_ids: pointIds,
@@ -113,6 +129,7 @@ export function VolunteerFormDialog({ open, onClose, volunteer }: VolunteerFormD
         is_active: volunteer.is_active,
       });
     } else {
+      setSchedules({});
       form.reset({
         nome: '',
         point_ids: [],
@@ -126,7 +143,29 @@ export function VolunteerFormDialog({ open, onClose, volunteer }: VolunteerFormD
     }
   }, [volunteer, form, open]);
 
+
+  const buildSchedules = (pointIds: number[]) =>
+    pointIds.map((pointId) => {
+      const schedule = schedules[pointId] || { weekdays: [], scheduled_time: '08:00' };
+      return {
+        point_id: pointId,
+        weekdays: schedule.weekdays,
+        scheduled_time: schedule.scheduled_time,
+      };
+    });
+
   const onSubmit = (data: VolunteerFormData) => {
+    const scheduleList = buildSchedules(data.point_ids);
+    const invalid = scheduleList
+      .filter((s) => s.weekdays.length === 0 || !s.scheduled_time)
+      .map((s) => s.point_id);
+
+    if (invalid.length > 0) {
+      setScheduleError(invalid);
+      return;
+    }
+    setScheduleError([]);
+
     if (volunteer) {
       updateVolunteer.mutate(
         { 
@@ -137,7 +176,8 @@ export function VolunteerFormDialog({ open, onClose, volunteer }: VolunteerFormD
           is_active: data.is_active,
           password: data.password,
           probe_model: data.probe_model,
-          probe_serial: data.probe_serial
+          probe_serial: data.probe_serial,
+          schedules: scheduleList
         },
         {
           onSuccess: () => {
@@ -154,7 +194,8 @@ export function VolunteerFormDialog({ open, onClose, volunteer }: VolunteerFormD
         type: data.type,
         password: data.password,
         probe_model: data.probe_model,
-        probe_serial: data.probe_serial
+        probe_serial: data.probe_serial,
+        schedules: scheduleList
       }, {
         onSuccess: (createdData) => {
           form.reset();
@@ -180,10 +221,15 @@ export function VolunteerFormDialog({ open, onClose, volunteer }: VolunteerFormD
     if (checked) {
       const newPoints = [...currentPoints, pointId];
       form.setValue('point_ids', newPoints, { shouldValidate: true });
+      setSchedules((prev) => ({
+        ...prev,
+        [pointId]: prev[pointId] || { weekdays: [], scheduled_time: '08:00' },
+      }));
       // Se é o primeiro ponto, definir como primário
       if (newPoints.length === 1) {
         form.setValue('primary_point_id', pointId, { shouldValidate: true });
       }
+
     } else {
       const newPoints = currentPoints.filter(id => id !== pointId);
       form.setValue('point_ids', newPoints, { shouldValidate: true });
@@ -233,11 +279,11 @@ export function VolunteerFormDialog({ open, onClose, volunteer }: VolunteerFormD
                   name="point_ids"
                   render={() => (
                     <FormItem>
-                      <FormLabel>Pontos de Coleta</FormLabel>
+                      <FormLabel>Pontos de Coleta e Agenda</FormLabel>
                       <FormDescription>
-                        Selecione os pontos que este voluntário irá monitorar. Clique na estrela para definir o ponto principal.
+                        Selecione os pontos que este voluntário irá monitorar, defina os dias e o horário de coleta de cada um. Clique na estrela para definir o ponto principal.
                       </FormDescription>
-                      <ScrollArea className="h-48 rounded-md border p-4">
+                      <ScrollArea className="h-64 rounded-md border p-4">
                         <div className="space-y-2">
                           {points?.map((point) => {
                             const isSelected = watchedPointIds.includes(point.id);
@@ -246,41 +292,51 @@ export function VolunteerFormDialog({ open, onClose, volunteer }: VolunteerFormD
                             return (
                               <div 
                                 key={point.id} 
-                                className={`flex items-center justify-between p-2 rounded-md transition-colors ${
+                                className={`p-2 rounded-md transition-colors ${
                                   isSelected ? 'bg-primary/10 border border-primary/20' : 'hover:bg-muted'
                                 }`}
                               >
-                                <div className="flex items-center space-x-3">
-                                  <Checkbox
-                                    checked={isSelected}
-                                    onCheckedChange={(checked) => handlePointToggle(point.id, checked as boolean)}
-                                  />
-                                  <div className="flex items-center gap-2">
-                                    <MapPin className="h-4 w-4 text-muted-foreground" />
-                                    <div>
-                                      <span className="font-medium">{point.name}</span>
-                                      <span className="text-muted-foreground text-sm ml-2">
-                                        {point.rivers?.name}
-                                      </span>
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center space-x-3">
+                                    <Checkbox
+                                      checked={isSelected}
+                                      onCheckedChange={(checked) => handlePointToggle(point.id, checked as boolean)}
+                                    />
+                                    <div className="flex items-center gap-2">
+                                      <MapPin className="h-4 w-4 text-muted-foreground" />
+                                      <div>
+                                        <span className="font-medium">{point.name}</span>
+                                        <span className="text-muted-foreground text-sm ml-2">
+                                          {point.rivers?.name}
+                                        </span>
+                                      </div>
                                     </div>
                                   </div>
+                                  {isSelected && (
+                                    <Button
+                                      type="button"
+                                      variant={isPrimary ? "default" : "ghost"}
+                                      size="sm"
+                                      onClick={() => handleSetPrimary(point.id)}
+                                      className="gap-1"
+                                    >
+                                      <Star className={`h-4 w-4 ${isPrimary ? 'fill-current' : ''}`} />
+                                      {isPrimary ? 'Principal' : 'Definir principal'}
+                                    </Button>
+                                  )}
                                 </div>
                                 {isSelected && (
-                                  <Button
-                                    type="button"
-                                    variant={isPrimary ? "default" : "ghost"}
-                                    size="sm"
-                                    onClick={() => handleSetPrimary(point.id)}
-                                    className="gap-1"
-                                  >
-                                    <Star className={`h-4 w-4 ${isPrimary ? 'fill-current' : ''}`} />
-                                    {isPrimary ? 'Principal' : 'Definir principal'}
-                                  </Button>
+                                  <VolunteerScheduleEditor
+                                    value={schedules[point.id] || { weekdays: [], scheduled_time: '08:00' }}
+                                    onChange={(value) => setSchedules((prev) => ({ ...prev, [point.id]: value }))}
+                                    invalid={scheduleError.includes(point.id)}
+                                  />
                                 )}
                               </div>
                             );
                           })}
                         </div>
+
                       </ScrollArea>
                       {watchedPointIds.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-2">

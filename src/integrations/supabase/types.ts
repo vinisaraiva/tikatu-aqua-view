@@ -613,6 +613,177 @@ export type Database = {
           },
         ]
       }
+      volunteer_push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          endpoint: string
+          id: string
+          last_success_at: string | null
+          p256dh: string
+          updated_at: string
+          user_agent: string | null
+          volunteer_id: number
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          last_success_at?: string | null
+          p256dh: string
+          updated_at?: string
+          user_agent?: string | null
+          volunteer_id: number
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          last_success_at?: string | null
+          p256dh?: string
+          updated_at?: string
+          user_agent?: string | null
+          volunteer_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "volunteer_push_subscriptions_volunteer_id_fkey"
+            columns: ["volunteer_id"]
+            isOneToOne: false
+            referencedRelation: "volunteers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "volunteer_push_subscriptions_volunteer_id_fkey"
+            columns: ["volunteer_id"]
+            isOneToOne: false
+            referencedRelation: "volunteers_view"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      volunteer_reminder_log: {
+        Row: {
+          created_at: string
+          id: string
+          kind: string
+          point_id: number
+          reminder_date: string
+          schedule_id: string
+          sent_count: number
+          volunteer_id: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind?: string
+          point_id: number
+          reminder_date: string
+          schedule_id: string
+          sent_count?: number
+          volunteer_id: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: string
+          point_id?: number
+          reminder_date?: string
+          schedule_id?: string
+          sent_count?: number
+          volunteer_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "volunteer_reminder_log_point_id_fkey"
+            columns: ["point_id"]
+            isOneToOne: false
+            referencedRelation: "points"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "volunteer_reminder_log_schedule_id_fkey"
+            columns: ["schedule_id"]
+            isOneToOne: false
+            referencedRelation: "volunteer_schedules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "volunteer_reminder_log_volunteer_id_fkey"
+            columns: ["volunteer_id"]
+            isOneToOne: false
+            referencedRelation: "volunteers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "volunteer_reminder_log_volunteer_id_fkey"
+            columns: ["volunteer_id"]
+            isOneToOne: false
+            referencedRelation: "volunteers_view"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      volunteer_schedules: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          point_id: number
+          scheduled_time: string
+          tolerance_minutes: number
+          updated_at: string
+          volunteer_id: number
+          weekdays: number[]
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          point_id: number
+          scheduled_time?: string
+          tolerance_minutes?: number
+          updated_at?: string
+          volunteer_id: number
+          weekdays?: number[]
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          point_id?: number
+          scheduled_time?: string
+          tolerance_minutes?: number
+          updated_at?: string
+          volunteer_id?: number
+          weekdays?: number[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "volunteer_schedules_point_id_fkey"
+            columns: ["point_id"]
+            isOneToOne: false
+            referencedRelation: "points"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "volunteer_schedules_volunteer_id_fkey"
+            columns: ["volunteer_id"]
+            isOneToOne: false
+            referencedRelation: "volunteers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "volunteer_schedules_volunteer_id_fkey"
+            columns: ["volunteer_id"]
+            isOneToOne: false
+            referencedRelation: "volunteers_view"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       volunteer_sessions: {
         Row: {
           created_at: string

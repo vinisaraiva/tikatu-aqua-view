@@ -8,7 +8,17 @@ export interface VolunteerPoint {
   river_name: string;
   city_name: string;
   is_primary: boolean;
+  weekdays?: number[] | null;
+  scheduled_time?: string | null;
+  tolerance_minutes?: number | null;
 }
+
+export interface VolunteerScheduleInput {
+  point_id: number;
+  weekdays: number[];
+  scheduled_time: string;
+}
+
 
 export interface Volunteer {
   id: number;
@@ -61,6 +71,8 @@ export const useCreateVolunteer = () => {
       type: 'manual' | 'probe';
       probe_model?: string;
       probe_serial?: string;
+      schedules?: VolunteerScheduleInput[];
+
     }) => {
       // Generate unique code
       const prefix = volunteerData.type === 'probe' ? 'SND' : 'VOL';
@@ -112,7 +124,23 @@ export const useCreateVolunteer = () => {
 
       if (pointsError) throw pointsError;
 
+      // Criar agendas de coleta
+      const schedules = (volunteerData.schedules || []).filter(s => volunteerData.point_ids.includes(s.point_id));
+      if (schedules.length > 0) {
+        const { error: schedulesError } = await supabase
+          .from('volunteer_schedules')
+          .insert(schedules.map(s => ({
+            volunteer_id: volunteer.id,
+            point_id: s.point_id,
+            weekdays: s.weekdays,
+            scheduled_time: s.scheduled_time,
+          })));
+
+        if (schedulesError) throw schedulesError;
+      }
+
       return volunteer;
+
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-volunteers'] });
@@ -146,6 +174,8 @@ export const useUpdateVolunteer = () => {
       password?: string;
       probe_model?: string;
       probe_serial?: string;
+      schedules?: VolunteerScheduleInput[];
+
     }) => {
       const updateData: any = {
         nome: volunteerData.nome,
@@ -194,7 +224,30 @@ export const useUpdateVolunteer = () => {
 
       if (insertError) throw insertError;
 
+      // Substituir agendas de coleta
+      const { error: deleteSchedulesError } = await supabase
+        .from('volunteer_schedules')
+        .delete()
+        .eq('volunteer_id', id);
+
+      if (deleteSchedulesError) throw deleteSchedulesError;
+
+      const schedules = (volunteerData.schedules || []).filter(s => volunteerData.point_ids.includes(s.point_id));
+      if (schedules.length > 0) {
+        const { error: schedulesError } = await supabase
+          .from('volunteer_schedules')
+          .insert(schedules.map(s => ({
+            volunteer_id: id,
+            point_id: s.point_id,
+            weekdays: s.weekdays,
+            scheduled_time: s.scheduled_time,
+          })));
+
+        if (schedulesError) throw schedulesError;
+      }
+
       return data;
+
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-volunteers'] });
