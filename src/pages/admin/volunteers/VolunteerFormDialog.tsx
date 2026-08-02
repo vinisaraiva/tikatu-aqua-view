@@ -103,11 +103,21 @@ export function VolunteerFormDialog({ open, onClose, volunteer }: VolunteerFormD
   const watchedType = form.watch('type');
 
   useEffect(() => {
+    setScheduleError([]);
     if (volunteer) {
       // Extrair point_ids do array de pontos
       const pointIds = volunteer.points?.map((p: any) => p.point_id) || [volunteer.point_id];
       const primaryPointId = volunteer.points?.find((p: any) => p.is_primary)?.point_id || volunteer.point_id;
-      
+
+      const loadedSchedules: Record<number, ScheduleValue> = {};
+      (volunteer.points || []).forEach((p: any) => {
+        loadedSchedules[p.point_id] = {
+          weekdays: Array.isArray(p.weekdays) ? p.weekdays.map(Number) : [],
+          scheduled_time: p.scheduled_time ? String(p.scheduled_time).slice(0, 5) : '08:00',
+        };
+      });
+      setSchedules(loadedSchedules);
+
       form.reset({
         nome: volunteer.nome || '',
         point_ids: pointIds,
@@ -119,6 +129,7 @@ export function VolunteerFormDialog({ open, onClose, volunteer }: VolunteerFormD
         is_active: volunteer.is_active,
       });
     } else {
+      setSchedules({});
       form.reset({
         nome: '',
         point_ids: [],
@@ -131,6 +142,7 @@ export function VolunteerFormDialog({ open, onClose, volunteer }: VolunteerFormD
       });
     }
   }, [volunteer, form, open]);
+
 
   const onSubmit = (data: VolunteerFormData) => {
     if (volunteer) {
