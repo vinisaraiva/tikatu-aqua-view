@@ -144,7 +144,28 @@ export function VolunteerFormDialog({ open, onClose, volunteer }: VolunteerFormD
   }, [volunteer, form, open]);
 
 
+  const buildSchedules = (pointIds: number[]) =>
+    pointIds.map((pointId) => {
+      const schedule = schedules[pointId] || { weekdays: [], scheduled_time: '08:00' };
+      return {
+        point_id: pointId,
+        weekdays: schedule.weekdays,
+        scheduled_time: schedule.scheduled_time,
+      };
+    });
+
   const onSubmit = (data: VolunteerFormData) => {
+    const scheduleList = buildSchedules(data.point_ids);
+    const invalid = scheduleList
+      .filter((s) => s.weekdays.length === 0 || !s.scheduled_time)
+      .map((s) => s.point_id);
+
+    if (invalid.length > 0) {
+      setScheduleError(invalid);
+      return;
+    }
+    setScheduleError([]);
+
     if (volunteer) {
       updateVolunteer.mutate(
         { 
@@ -155,7 +176,8 @@ export function VolunteerFormDialog({ open, onClose, volunteer }: VolunteerFormD
           is_active: data.is_active,
           password: data.password,
           probe_model: data.probe_model,
-          probe_serial: data.probe_serial
+          probe_serial: data.probe_serial,
+          schedules: scheduleList
         },
         {
           onSuccess: () => {
@@ -172,7 +194,8 @@ export function VolunteerFormDialog({ open, onClose, volunteer }: VolunteerFormD
         type: data.type,
         password: data.password,
         probe_model: data.probe_model,
-        probe_serial: data.probe_serial
+        probe_serial: data.probe_serial,
+        schedules: scheduleList
       }, {
         onSuccess: (createdData) => {
           form.reset();
@@ -198,10 +221,15 @@ export function VolunteerFormDialog({ open, onClose, volunteer }: VolunteerFormD
     if (checked) {
       const newPoints = [...currentPoints, pointId];
       form.setValue('point_ids', newPoints, { shouldValidate: true });
+      setSchedules((prev) => ({
+        ...prev,
+        [pointId]: prev[pointId] || { weekdays: [], scheduled_time: '08:00' },
+      }));
       // Se é o primeiro ponto, definir como primário
       if (newPoints.length === 1) {
         form.setValue('primary_point_id', pointId, { shouldValidate: true });
       }
+
     } else {
       const newPoints = currentPoints.filter(id => id !== pointId);
       form.setValue('point_ids', newPoints, { shouldValidate: true });
