@@ -33,6 +33,7 @@ const PointsBadges = ({ points }: { points: VolunteerPoint[] }) => {
             <TooltipContent>
               <p><strong>Ponto Principal</strong></p>
               <p>{primaryPoint.river_name} - {primaryPoint.city_name}</p>
+              <p>{formatSchedule(primaryPoint.weekdays, primaryPoint.scheduled_time) ?? 'Sem agenda definida'}</p>
             </TooltipContent>
           </Tooltip>
         )}
@@ -47,9 +48,12 @@ const PointsBadges = ({ points }: { points: VolunteerPoint[] }) => {
             <TooltipContent>
               <p><strong>Outros pontos:</strong></p>
               {otherPoints.map((p, i) => (
-                <p key={i}>{p.point_name} ({p.river_name})</p>
+                <p key={i}>
+                  {p.point_name} ({p.river_name}) — {formatSchedule(p.weekdays, p.scheduled_time) ?? 'sem agenda'}
+                </p>
               ))}
             </TooltipContent>
+
           </Tooltip>
         )}
       </div>
