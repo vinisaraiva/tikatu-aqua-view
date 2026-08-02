@@ -73,7 +73,22 @@ const columns = [
     return <code className="text-xs bg-muted px-2 py-1 rounded">{masked}</code>;
   }},
   { key: 'points', label: 'Pontos', render: (volunteer: any) => <PointsBadges points={volunteer.points} /> },
+  { key: 'schedule', label: 'Agenda', render: (volunteer: any) => {
+    const withSchedule = (volunteer.points || []).filter((p: any) => formatSchedule(p.weekdays, p.scheduled_time));
+    if (withSchedule.length === 0) return <span className="text-muted-foreground">-</span>;
+    return (
+      <div className="space-y-1 text-xs">
+        {withSchedule.map((p: any, i: number) => (
+          <div key={i}>
+            <span className="font-medium">{p.point_name}</span>{' '}
+            <span className="text-muted-foreground">{formatSchedule(p.weekdays, p.scheduled_time)}</span>
+          </div>
+        ))}
+      </div>
+    );
+  }},
   { key: 'is_active', label: 'Status', render: (volunteer: any) => volunteer.is_active ? 'Ativo' : 'Inativo' },
+
   { key: 'last_communication', label: 'Última Comunicação', render: (volunteer: any) => 
     volunteer.type === 'probe' && volunteer.last_communication 
       ? new Date(volunteer.last_communication).toLocaleString('pt-BR')
