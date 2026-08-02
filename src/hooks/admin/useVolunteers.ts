@@ -71,6 +71,8 @@ export const useCreateVolunteer = () => {
       type: 'manual' | 'probe';
       probe_model?: string;
       probe_serial?: string;
+      schedules?: VolunteerScheduleInput[];
+
     }) => {
       // Generate unique code
       const prefix = volunteerData.type === 'probe' ? 'SND' : 'VOL';
@@ -122,7 +124,23 @@ export const useCreateVolunteer = () => {
 
       if (pointsError) throw pointsError;
 
+      // Criar agendas de coleta
+      const schedules = (volunteerData.schedules || []).filter(s => volunteerData.point_ids.includes(s.point_id));
+      if (schedules.length > 0) {
+        const { error: schedulesError } = await supabase
+          .from('volunteer_schedules')
+          .insert(schedules.map(s => ({
+            volunteer_id: volunteer.id,
+            point_id: s.point_id,
+            weekdays: s.weekdays,
+            scheduled_time: s.scheduled_time,
+          })));
+
+        if (schedulesError) throw schedulesError;
+      }
+
       return volunteer;
+
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-volunteers'] });
