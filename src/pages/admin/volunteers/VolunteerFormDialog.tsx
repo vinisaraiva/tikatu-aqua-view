@@ -80,6 +80,10 @@ export function VolunteerFormDialog({ open, onClose, volunteer }: VolunteerFormD
   const updateVolunteer = useUpdateVolunteer();
   const [showApiKeyDialog, setShowApiKeyDialog] = useState(false);
   const [createdVolunteer, setCreatedVolunteer] = useState<any>(null);
+  const [schedules, setSchedules] = useState<Record<number, ScheduleValue>>({});
+  const [scheduleError, setScheduleError] = useState<number[]>([]);
+
+
 
   const form = useForm<VolunteerFormData>({
     resolver: zodResolver(volunteerSchema),
