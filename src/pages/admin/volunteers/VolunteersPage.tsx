@@ -143,6 +143,9 @@ export default function VolunteersPage() {
 
       <ForceAppUpdateCard />
 
+      <PendingCollectionsCard />
+
+
       <DataTable
         data={volunteers || []}
         columns={columns}
