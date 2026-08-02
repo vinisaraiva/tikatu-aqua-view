@@ -174,6 +174,8 @@ export const useUpdateVolunteer = () => {
       password?: string;
       probe_model?: string;
       probe_serial?: string;
+      schedules?: VolunteerScheduleInput[];
+
     }) => {
       const updateData: any = {
         nome: volunteerData.nome,
@@ -222,7 +224,30 @@ export const useUpdateVolunteer = () => {
 
       if (insertError) throw insertError;
 
+      // Substituir agendas de coleta
+      const { error: deleteSchedulesError } = await supabase
+        .from('volunteer_schedules')
+        .delete()
+        .eq('volunteer_id', id);
+
+      if (deleteSchedulesError) throw deleteSchedulesError;
+
+      const schedules = (volunteerData.schedules || []).filter(s => volunteerData.point_ids.includes(s.point_id));
+      if (schedules.length > 0) {
+        const { error: schedulesError } = await supabase
+          .from('volunteer_schedules')
+          .insert(schedules.map(s => ({
+            volunteer_id: id,
+            point_id: s.point_id,
+            weekdays: s.weekdays,
+            scheduled_time: s.scheduled_time,
+          })));
+
+        if (schedulesError) throw schedulesError;
+      }
+
       return data;
+
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-volunteers'] });
