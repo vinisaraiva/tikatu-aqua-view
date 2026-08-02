@@ -9,6 +9,9 @@ import { ApiKeyActions } from '@/components/admin/ApiKeyActions';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { ForceAppUpdateCard } from '@/components/admin/volunteers/ForceAppUpdateCard';
+import { PendingCollectionsCard } from '@/components/admin/volunteers/PendingCollectionsCard';
+import { formatSchedule } from '@/components/admin/volunteers/VolunteerScheduleEditor';
+
 
 const PointsBadges = ({ points }: { points: VolunteerPoint[] }) => {
   if (!points || points.length === 0) return <span className="text-muted-foreground">-</span>;
