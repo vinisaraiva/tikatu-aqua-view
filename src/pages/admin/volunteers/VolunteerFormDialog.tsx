@@ -33,7 +33,9 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useCreateVolunteer, useUpdateVolunteer } from '@/hooks/admin/useVolunteers';
 import { usePoints } from '@/hooks/admin/usePoints';
 import { ApiKeyDisplayDialog } from '@/components/admin/ApiKeyDisplayDialog';
+import { VolunteerScheduleEditor, ScheduleValue } from '@/components/admin/volunteers/VolunteerScheduleEditor';
 import { MapPin, Star } from 'lucide-react';
+
 
 const volunteerSchema = z.object({
   nome: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
