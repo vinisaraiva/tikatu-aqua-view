@@ -1,28 +1,27 @@
-# Lembretes de coleta: cron sob demanda por agenda
+# Corrigir "Coletas pendentes" mostrando coletas já feitas
 
-## Ideia
-Em vez de acordar a função a cada 15 minutos, o banco cria **um agendamento por horário realmente usado** nas agendas dos voluntários. Se só existe coleta às 08:00 em seg/qua/sex, a função roda exatamente 3 vezes por semana. Nada de execuções vazias.
+## Causa confirmada
 
-Lembrete continua sendo **1 push por coleta prevista** (o registro em `volunteer_reminder_log` já evita repetição).
+O card compara a agenda com a tabela `readings` filtrando `volunteer_id IS NOT NULL`.
+Consultei o banco: **não existe nenhuma linha em `readings` com `volunteer_id` preenchido** (todas as 15 leituras mais recentes têm `volunteer_id` nulo). Ou seja, o filtro nunca encontra nada e toda ocorrência da agenda cai como "Pendente".
 
-## Como funciona
+As coletas dos voluntários ficam registradas como planilhas no bucket `coleta-voluntarios`, no padrão `VOL368731/2026-08/20260803_144142_coleta.xlsx` (confirmado: upload em 03/08 às 14:41 UTC = 11:41 em Brasília). Ex.: 03/08 aparece como pendente no dashboard mesmo tendo upload feito naquele dia.
 
-1. Uma função no banco (`sync_volunteer_reminder_jobs`) lê `volunteer_schedules` ativas, agrupa por horário + dias da semana e:
-   - remove os agendamentos antigos criados por ela;
-   - cria um agendamento para cada combinação encontrada, chamando `volunteer-collection-reminders`.
-2. Um gatilho em `volunteer_schedules` (insert/update/delete) chama essa função — então salvar a agenda no admin já ajusta o cron automaticamente.
-3. O aviso é disparado ~10 minutos antes do horário previsto (ex.: agenda 08:00 → execução 07:50), para o voluntário receber o push antes da hora.
+## O que fazer
 
-Fuso: as agendas são em horário de Brasília e o cron do banco roda em UTC, então a conversão (+3h) é feita na hora de montar o agendamento.
+1. **Passar a considerar os uploads do bucket como comprovação de coleta** no hook `useCollectionCompliance`:
+   - listar os arquivos do bucket por prefixo do código do voluntário (meses dentro da janela de dias escolhida);
+   - extrair data e hora do nome do arquivo (`YYYYMMDD_HHMMSS`) e também aceitar o formato antigo (`...-2025-12-13T15-21-06...`), convertendo de UTC para o horário de Brasília;
+   - marcar a ocorrência da agenda como "Em dia" quando o horário do envio estiver dentro da tolerância, e "Fora do horário" quando houver envio no dia, mas fora da janela.
 
-## Ajuste na função de lembrete
-A janela de checagem passa a ser "10 min antes até o fim da tolerância (1h)", compatível com a execução única. Como a função é chamada exatamente no horário certo, ela encontra a agenda devida na primeira tentativa.
+2. **Manter a checagem em `readings` como fonte adicional**, aceitando tanto `volunteer_id` igual ao da agenda quanto leituras do mesmo ponto no mesmo dia (para coletas antigas gravadas sem `volunteer_id`), para que registros feitos pelo painel também contem como coleta realizada.
 
-Opcional (recomendo incluir): um segundo agendamento por horário, **no fim da tolerância**, que envia um "cobrança" apenas se ainda não houve coleta no dia. Assim o voluntário recebe no máximo 2 avisos: o lembrete e a cobrança.
+3. **Mostrar o horário efetivo da coleta** na coluna de status (ex.: "enviado 11:41"), facilitando conferir por que algo ficou "Fora do horário".
+
+Com isso, 03/08 (upload feito) deixa de aparecer como pendente; 31/07 e 05/08, que não têm envio, continuam corretamente como pendentes.
 
 ## Detalhes técnicos
-- Extensões `pg_cron` e `pg_net` habilitadas.
-- `sync_volunteer_reminder_jobs()` (security definer) monta expressões cron `MM HH * * D1,D2,...` com nomes prefixados `vol-reminder-` e usa `cron.unschedule`/`cron.schedule` com `net.http_post` para a URL da função.
-- O agendamento contém URL do projeto + anon key, portanto é aplicado via ferramenta de dados (não migração versionada), enquanto a função e o gatilho vão em migração.
-- Ajuste em `supabase/functions/volunteer-collection-reminders/index.ts`: janela `target - 10 … target + tolerance`, e suporte a `kind: 'overdue'` para a segunda passagem.
-- Card "Coletas pendentes" no admin continua com o botão de envio manual, sem alteração.
+
+- Arquivo principal: `src/hooks/admin/useCollectionCompliance.ts` (leitura via `supabase.storage.from('coleta-voluntarios').list(...)`, permitido para admin pelas policies atuais).
+- Ajuste de exibição em `src/components/admin/volunteers/PendingCollectionsCard.tsx`.
+- Sem mudança de banco de dados.
