@@ -150,7 +150,12 @@ export function PendingCollectionsCard() {
                         <Badge variant={STATUS_VARIANT[item.status]} className="w-fit">
                           {STATUS_LABEL[item.status]}
                         </Badge>
-                        {!item.has_push && (
+                        {item.collected_time && (
+                          <span className="text-xs text-muted-foreground">
+                            enviado {item.collected_time}
+                          </span>
+                        )}
+                        {item.status === 'missed' && !item.has_push && (
                           <span className="text-xs text-muted-foreground">sem push</span>
                         )}
                       </div>
