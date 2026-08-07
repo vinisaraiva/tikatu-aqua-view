@@ -39,6 +39,16 @@ import { supabase } from '@/integrations/supabase/client';
 
 const FORMATO_VERSAO = /^\d+\.\d+\.\d+$/;
 
+/**
+ * O build do app publica a versão em /version.json (ver scripts/prepare-web.js
+ * no repositório tikatu-coleta). Ler daqui evita o gestor ter que lembrar de
+ * cabeça qual versão está no ar.
+ *
+ * Se a busca falhar (CORS, site fora do ar), o card simplesmente não mostra a
+ * versão publicada — nada quebra.
+ */
+const URL_VERSAO_PUBLICADA = 'https://coleta.tikatu.com.br/version.json';
+
 /** Compara versões semânticas segmento a segmento. Mesma lógica do app. */
 function versaoMenor(a: string, b: string): boolean {
   const pa = a.split('.').map((n) => parseInt(n, 10) || 0);
@@ -61,6 +71,7 @@ export const ForceAppUpdateCard = () => {
   const [minVersion, setMinVersion] = useState<string>('');
   const [reloadToken, setReloadToken] = useState<string>('');
   const [novaVersao, setNovaVersao] = useState<string>('');
+  const [versaoPublicada, setVersaoPublicada] = useState<string | null>(null);
 
   const carregar = useCallback(async () => {
     const { data } = await supabase
@@ -78,6 +89,21 @@ export const ForceAppUpdateCard = () => {
   useEffect(() => {
     carregar();
   }, [carregar]);
+
+  useEffect(() => {
+    let vivo = true;
+    fetch(URL_VERSAO_PUBLICADA, { cache: 'no-store' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => {
+        if (vivo && j?.version) setVersaoPublicada(String(j.version));
+      })
+      .catch(() => {
+        /* silencioso: o card funciona sem essa informação */
+      });
+    return () => {
+      vivo = false;
+    };
+  }, []);
 
   /**
    * Forçar atualização = incrementar `reload_token`.
@@ -156,10 +182,10 @@ export const ForceAppUpdateCard = () => {
     }
   };
 
-  // A versão publicada do app está no package.json do repositório tikatu-coleta.
-  // Como a plataforma não tem como consultá-la, o aviso abaixo é informativo:
-  // ele lembra o gestor de conferir se o número bate com o que está no ar.
-  const versaoAlta = Boolean(minVersion) && versaoMenor('1.2.0', minVersion);
+  // Estado quebrado: exigir uma versão que ainda não foi publicada. Todos os
+  // aparelhos ficam recarregando atrás de algo que não existe.
+  const versaoAlta =
+    Boolean(minVersion) && Boolean(versaoPublicada) && versaoMenor(versaoPublicada!, minVersion);
 
   return (
     <>
@@ -176,6 +202,32 @@ export const ForceAppUpdateCard = () => {
         </CardHeader>
 
         <CardContent className="space-y-6">
+          {/* Os dois números lado a lado. Eles NÃO precisam ser iguais — e o
+              normal é a mínima ficar abaixo da publicada. */}
+          <div className="grid grid-cols-2 gap-4 rounded-lg border bg-muted/40 p-4">
+            <div>
+              <p className="text-xs text-muted-foreground">Versão publicada</p>
+              <p className="text-lg font-semibold">{versaoPublicada ?? '—'}</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                O que está no ar agora
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Versão mínima exigida</p>
+              <p className="text-lg font-semibold">{minVersion || '—'}</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                A mais antiga ainda tolerada
+              </p>
+            </div>
+          </div>
+
+          <p className="text-xs text-muted-foreground">
+            Os dois números não precisam ser iguais. O normal é a mínima ficar
+            <strong> abaixo</strong> da publicada — significa que ninguém está
+            sendo forçado a atualizar. Igualar as duas só faz sentido quando a
+            versão antiga não puder mais rodar.
+          </p>
+
           <div>
             <Button
               onClick={() => setConfirmOpen(true)}
@@ -217,10 +269,20 @@ export const ForceAppUpdateCard = () => {
               </Button>
             </div>
             <p className="text-xs text-muted-foreground">
-              Informe exatamente a versão que já está publicada. Um número acima
-              do que está no ar deixa todos os aparelhos recarregando atrás de uma
-              versão que não existe.
+              Só mexa aqui quando a versão antiga não puder mais rodar. Nunca
+              informe um número acima do que está publicado — isso deixa todos os
+              aparelhos recarregando atrás de uma versão que não existe.
             </p>
+            {versaoPublicada && novaVersao.trim() !== versaoPublicada && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 text-xs"
+                onClick={() => setNovaVersao(versaoPublicada)}
+              >
+                Usar a versão publicada ({versaoPublicada})
+              </Button>
+            )}
           </div>
 
           {versaoAlta && (
@@ -235,8 +297,9 @@ export const ForceAppUpdateCard = () => {
           )}
 
           <p className="text-xs text-muted-foreground">
-            Estado atual — versão mínima: <strong>{minVersion || '—'}</strong> ·
-            gatilho de recarga: <strong>{reloadToken || '—'}</strong>
+            Gatilho de recarga: <strong>{reloadToken || '—'}</strong> — cada clique
+            em "Forçar atualização" soma 1 aqui, e é isso que faz os aparelhos
+            recarregarem.
           </p>
         </CardContent>
       </Card>
