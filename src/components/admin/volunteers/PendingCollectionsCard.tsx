@@ -11,7 +11,11 @@ import {
 } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { BellRing, CalendarClock, Loader2 } from 'lucide-react';
-import { useCollectionCompliance, ComplianceStatus } from '@/hooks/admin/useCollectionCompliance';
+import {
+  useCollectionCompliance,
+  ComplianceStatus,
+  ABSENCE_LABEL,
+} from '@/hooks/admin/useCollectionCompliance';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -41,6 +45,25 @@ export function PendingCollectionsCard() {
   }, [items, statusFilter]);
 
   const missedCount = items?.filter((i) => i.status === 'missed').length ?? 0;
+
+  /** Quantas faltas por motivo — é o que vira estatística no relatório. */
+  const resumoMotivos = useMemo(() => {
+    const faltas = (items ?? []).filter((i) => i.status === 'missed');
+    const contagem = new Map<string, number>();
+    let semJustificativa = 0;
+    for (const f of faltas) {
+      if (f.absence_reason) {
+        contagem.set(f.absence_reason, (contagem.get(f.absence_reason) ?? 0) + 1);
+      } else {
+        semJustificativa++;
+      }
+    }
+    return {
+      porMotivo: [...contagem.entries()].sort((a, b) => b[1] - a[1]),
+      semJustificativa,
+      total: faltas.length,
+    };
+  }, [items]);
 
   const handleSendReminder = async (scheduleId: string) => {
     setSendingId(scheduleId);
@@ -125,6 +148,20 @@ export function PendingCollectionsCard() {
         ) : (
           <div className="overflow-x-auto">
             <Table>
+              {resumoMotivos.total > 0 && (
+                <caption className="caption-top pb-3 text-left text-xs text-muted-foreground">
+                  {resumoMotivos.porMotivo.map(([motivo, n]) => (
+                    <span key={motivo} className="mr-3 inline-block">
+                      {ABSENCE_LABEL[motivo as keyof typeof ABSENCE_LABEL]}: <strong>{n}</strong>
+                    </span>
+                  ))}
+                  {resumoMotivos.semJustificativa > 0 && (
+                    <span className="inline-block">
+                      Sem justificativa: <strong>{resumoMotivos.semJustificativa}</strong>
+                    </span>
+                  )}
+                </caption>
+              )}
               <TableHeader>
                 <TableRow>
                   <TableHead>Voluntário</TableHead>
@@ -132,6 +169,7 @@ export function PendingCollectionsCard() {
                   <TableHead>Data</TableHead>
                   <TableHead>Previsto</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Justificativa</TableHead>
                   <TableHead className="text-right">Ação</TableHead>
                 </TableRow>
               </TableHeader>
@@ -159,6 +197,29 @@ export function PendingCollectionsCard() {
                           <span className="text-xs text-muted-foreground">sem push</span>
                         )}
                       </div>
+                    </TableCell>
+
+                    {/* Um dia sem coleta E sem justificativa e' um buraco mudo na
+                        serie. Com justificativa, e' dado. A coluna separa os dois. */}
+                    <TableCell className="max-w-[260px]">
+                      {item.status !== 'missed' ? (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      ) : item.absence_reason ? (
+                        <div className="flex flex-col gap-1">
+                          <Badge variant="outline" className="w-fit font-normal">
+                            {ABSENCE_LABEL[item.absence_reason]}
+                          </Badge>
+                          {item.absence_notes && (
+                            <span className="text-xs text-muted-foreground">
+                              {item.absence_notes}
+                            </span>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-xs italic text-muted-foreground">
+                          não informada
+                        </span>
+                      )}
                     </TableCell>
                     <TableCell className="text-right">
                       {item.status === 'missed' && (

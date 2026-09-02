@@ -164,6 +164,64 @@ export type Database = {
         }
         Relationships: []
       }
+      collection_absences: {
+        Row: {
+          absence_date: string
+          created_at: string
+          id: number
+          notes: string | null
+          point_id: number
+          reason: Database["public"]["Enums"]["absence_reason"]
+          reported_at: string
+          schedule_id: string | null
+          volunteer_id: number
+        }
+        Insert: {
+          absence_date: string
+          created_at?: string
+          id?: never
+          notes?: string | null
+          point_id: number
+          reason: Database["public"]["Enums"]["absence_reason"]
+          reported_at?: string
+          schedule_id?: string | null
+          volunteer_id: number
+        }
+        Update: {
+          absence_date?: string
+          created_at?: string
+          id?: never
+          notes?: string | null
+          point_id?: number
+          reason?: Database["public"]["Enums"]["absence_reason"]
+          reported_at?: string
+          schedule_id?: string | null
+          volunteer_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collection_absences_point_id_fkey"
+            columns: ["point_id"]
+            isOneToOne: false
+            referencedRelation: "points"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collection_absences_schedule_id_fkey"
+            columns: ["schedule_id"]
+            isOneToOne: false
+            referencedRelation: "volunteer_schedules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collection_absences_volunteer_id_fkey"
+            columns: ["volunteer_id"]
+            isOneToOne: false
+            referencedRelation: "volunteers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cities: {
         Row: {
           created_at: string
@@ -941,6 +999,14 @@ export type Database = {
       }
     }
     Enums: {
+      absence_reason:
+        | "chuva"
+        | "acesso"
+        | "equipamento"
+        | "bomba"
+        | "pessoal"
+        | "esquecimento"
+        | "outro"
       app_role: "admin" | "moderator" | "user"
     }
     CompositeTypes: {

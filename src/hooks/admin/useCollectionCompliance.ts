@@ -3,6 +3,26 @@ import { supabase } from '@/integrations/supabase/client';
 
 export type ComplianceStatus = 'on_time' | 'off_window' | 'missed';
 
+/** Motivos fechados da tabela collection_absences (enum absence_reason). */
+export type AbsenceReason =
+  | 'chuva'
+  | 'acesso'
+  | 'equipamento'
+  | 'bomba'
+  | 'pessoal'
+  | 'esquecimento'
+  | 'outro';
+
+export const ABSENCE_LABEL: Record<AbsenceReason, string> = {
+  chuva: 'Chuva forte ou tempo ruim',
+  acesso: 'Acesso ao ponto impedido',
+  equipamento: 'Problema com a sonda',
+  bomba: 'Bomba do poço com defeito',
+  pessoal: 'Motivo pessoal ou de saúde',
+  esquecimento: 'Não conseguiu ir no horário',
+  outro: 'Outro',
+};
+
 export interface ComplianceItem {
   key: string;
   schedule_id: string;
@@ -17,6 +37,13 @@ export interface ComplianceItem {
   measured_at?: string;
   collected_time?: string;
   has_push: boolean;
+  /**
+   * Justificativa informada pelo voluntario para este dia, quando houver.
+   * Um dia sem coleta E sem justificativa e' um buraco mudo na serie; com
+   * justificativa, e' um dado. A tela precisa distinguir os dois.
+   */
+  absence_reason?: AbsenceReason;
+  absence_notes?: string | null;
 }
 
 const TZ = 'America/Bahia';
@@ -91,6 +118,21 @@ export const useCollectionCompliance = (days = 7) => {
         supabase.from('points').select('id, name'),
         supabase.from('volunteer_push_subscriptions').select('volunteer_id'),
       ]);
+
+      // Justificativas de falta. A RLS libera leitura apenas para admin — esta
+      // tela ja roda atras do login de admin.
+      const inicioJanela = new Date();
+      inicioJanela.setDate(inicioJanela.getDate() - (days - 1));
+      const { data: absences } = await supabase
+        .from('collection_absences')
+        .select('volunteer_id, point_id, absence_date, reason, notes')
+        .gte('absence_date', toLocalDateKey(inicioJanela));
+      const justificativas = new Map(
+        (absences || []).map((a: any) => [
+          `${a.volunteer_id}:${a.point_id}:${a.absence_date}`,
+          a,
+        ]),
+      );
 
       if (schedulesRes.error) throw schedulesRes.error;
       if (volunteersRes.error) throw volunteersRes.error;
@@ -203,6 +245,11 @@ export const useCollectionCompliance = (days = 7) => {
             status = inWindow ? 'on_time' : 'off_window';
           }
 
+          const justificativa =
+            status === 'missed'
+              ? justificativas.get(`${schedule.volunteer_id}:${schedule.point_id}:${dateKey}`)
+              : undefined;
+
           items.push({
             key: `${schedule.id}-${dateKey}`,
             schedule_id: schedule.id,
@@ -217,6 +264,8 @@ export const useCollectionCompliance = (days = 7) => {
             measured_at,
             collected_time,
             has_push: pushVolunteers.has(schedule.volunteer_id),
+            absence_reason: justificativa?.reason as AbsenceReason | undefined,
+            absence_notes: justificativa?.notes ?? null,
           });
         }
       }
