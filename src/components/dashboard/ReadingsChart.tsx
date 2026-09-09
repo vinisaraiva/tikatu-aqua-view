@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import ReadingsBarChart from './chart/ReadingsBarChart';
 import ChartLegend from './chart/ChartLegend';
 import ConamaLegend from './chart/ConamaLegend';
+import { buildAxisLabels } from './chart/chartLabels';
 
 interface Reading {
   id: string;
@@ -24,13 +25,6 @@ interface ReadingsChartProps {
 }
 
 const ReadingsChart = ({ readings, selectedParameter }: ReadingsChartProps) => {
-  console.log('ReadingsChart - Props recebidas:', {
-    readingsCount: readings.length,
-    selectedParameter,
-    firstReading: readings[0],
-    conamaValues: readings.map(r => ({ conamaMin: r.conamaMin, conamaMax: r.conamaMax }))
-  });
-
   if (!selectedParameter || readings.length === 0) {
     return (
       <Card>
@@ -78,50 +72,32 @@ const ReadingsChart = ({ readings, selectedParameter }: ReadingsChartProps) => {
   const conamaMax = sampleReading?.conamaMax;
   const unit = sampleReading?.unit || '';
 
-  // Enhanced debug log for CONAMA values
-  console.log('ReadingsChart - CONAMA values extracted:', { 
-    conamaMin, 
-    conamaMax, 
-    sampleReading: {
-      parameter: sampleReading?.parameter,
-      conamaMin: sampleReading?.conamaMin,
-      conamaMax: sampleReading?.conamaMax
-    },
-    allReadingsConama: parameterReadings.map(r => ({
-      point: r.point,
-      conamaMin: r.conamaMin,
-      conamaMax: r.conamaMax
-    }))
-  });
+  // Uma barra por coleta, em ordem cronológica, rotulada pela data
+  const sortedReadings = [...parameterReadings].sort(
+    (a, b) => new Date(a.datetime).getTime() - new Date(b.datetime).getTime()
+  );
+  const labels = buildAxisLabels(sortedReadings);
 
-  // Transform readings data for the chart - one bar per point
-  const chartData = parameterReadings.reduce((acc, reading) => {
-    const existingPoint = acc.find(item => item.point === reading.point);
-    
-    if (!existingPoint) {
-      // Determine color based on CONAMA status
-      let barColor = '#10b981'; // Default green for normal
-      if (reading.conamaStatus === 'attention') {
-        barColor = '#f59e0b'; // Yellow/amber for attention
-      } else if (reading.conamaStatus === 'critical') {
-        barColor = '#ef4444'; // Red for critical
-      }
-
-      acc.push({
-        point: reading.point,
-        value: reading.value,
-        unit: reading.unit,
-        conamaMin: reading.conamaMin,
-        conamaMax: reading.conamaMax,
-        status: reading.conamaStatus,
-        fill: barColor
-      });
+  const chartData = sortedReadings.map((reading, index) => {
+    let barColor = '#10b981';
+    if (reading.conamaStatus === 'attention') {
+      barColor = '#f59e0b';
+    } else if (reading.conamaStatus === 'critical') {
+      barColor = '#ef4444';
     }
-    
-    return acc;
-  }, [] as any[]);
 
-  console.log('ReadingsChart - Chart data prepared:', chartData);
+    return {
+      label: labels[index],
+      point: reading.point,
+      datetime: reading.datetime,
+      value: reading.value,
+      unit: reading.unit,
+      conamaMin: reading.conamaMin,
+      conamaMax: reading.conamaMax,
+      status: reading.conamaStatus,
+      fill: barColor
+    };
+  });
 
   return (
     <Card>

@@ -91,18 +91,6 @@ const FilterSection = ({
     }
   }, [selectedRiver, selectedPoints.length, onPointsChange]);
 
-  // Debug: Log current state
-  console.log('FilterSection Debug:', {
-    selectedState,
-    selectedCity,
-    selectedRiver,
-    selectedCityId: selectedCityData?.id,
-    selectedRiverId: selectedRiverData?.id,
-    pointsCount: points.length,
-    selectedPoints,
-    selectedParameter,
-    selectedParameterData,
-  });
 
   const handlePointChange = (pointName: string, checked: boolean) => {
     console.log('FilterSection - Point change START:', { 

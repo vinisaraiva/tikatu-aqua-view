@@ -17,8 +17,9 @@ const ReadingsBarChart = ({
   conamaMin, 
   conamaMax 
 }: ReadingsBarChartProps) => {
-  console.log('ReadingsBarChart - CONAMA values received:', { conamaMin, conamaMax });
-  
+  // Usa o rótulo (data / ponto · data) quando disponível
+  const dataKeyX = chartData.some(item => item.label) ? 'label' : 'point';
+
   return (
     <div className="h-80">
       <ResponsiveContainer width="100%" height="100%">
@@ -28,11 +29,13 @@ const ReadingsBarChart = ({
         >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis 
-            dataKey="point" 
+            dataKey={dataKeyX}
             angle={-45}
             textAnchor="end"
             height={80}
-            fontSize={12}
+            fontSize={11}
+            interval="preserveStartEnd"
+            minTickGap={4}
           />
           <YAxis 
             label={{ value: unit, angle: -90, position: 'insideLeft' }}

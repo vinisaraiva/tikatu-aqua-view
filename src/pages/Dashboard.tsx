@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -103,11 +103,10 @@ const Dashboard = () => {
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('by-parameter');
 
-  const handleDateChange = (start: Date | undefined, end: Date | undefined) => {
-    console.log('Dashboard - Date change received:', { start, end });
+  const handleDateChange = useCallback((start: Date | undefined, end: Date | undefined) => {
     setStartDate(start);
     setEndDate(end);
-  };
+  }, []);
 
   // Fetch readings data for report generation
   const { data: cities } = useCities(selectedState);
@@ -152,17 +151,6 @@ const Dashboard = () => {
     parameterDescription: reading.parameter
   }));
 
-  // Debug: Log current state
-  console.log('Dashboard - Current state:', {
-    selectedState,
-    selectedCity,
-    selectedRiver,
-    selectedPoints,
-    selectedParameter,
-    startDate: startDate?.toISOString(),
-    endDate: endDate?.toISOString()
-  });
-
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
@@ -177,7 +165,7 @@ const Dashboard = () => {
           </p>
         </div>
 
-        {/* Debug info */}
+        {/* Filtros ativos */}
         {(startDate || endDate || selectedParameter || selectedPoints.length > 0 || selectedState || selectedCity) && (
           <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
             <p className="text-sm text-blue-800">
