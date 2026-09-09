@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -103,11 +103,10 @@ const Dashboard = () => {
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('by-parameter');
 
-  const handleDateChange = (start: Date | undefined, end: Date | undefined) => {
-    console.log('Dashboard - Date change received:', { start, end });
+  const handleDateChange = useCallback((start: Date | undefined, end: Date | undefined) => {
     setStartDate(start);
     setEndDate(end);
-  };
+  }, []);
 
   // Fetch readings data for report generation
   const { data: cities } = useCities(selectedState);
