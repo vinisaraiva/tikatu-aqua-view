@@ -90,92 +90,43 @@ export const transformReadingsData = ({
   selectedPointsData, 
   parameter 
 }: TransformReadingsParams): Reading[] => {
-  console.log('TransformReadingsData - Iniciando transformação:', {
-    readingValuesCount: readingValues.length,
-    readingsCount: readings.length,
-    selectedPointsCount: selectedPointsData.length,
-    selectedParameterCode: parameter // Now using parameter CODE
-  });
-
-  // Debug: log all reading values with their parameters
-  readingValues.forEach((value, index) => {
-    console.log(`ReadingValue ${index}:`, {
-      reading_id: value.reading_id,
-      parameter_id: value.parameter_id,
-      value: value.value,
-      parameter_code: value.parameter?.code,
-      parameter_description: value.parameter?.description,
-      conama_min: value.parameter?.conama_min,
-      conama_max: value.parameter?.conama_max
-    });
-  });
-
   // Filter reading values by selected parameter CODE (not description)
   const filteredReadingValues = readingValues.filter(value => {
     const parameterCode = value.parameter?.code || '';
-    const shouldInclude = !parameter || parameter === parameterCode;
-    
-    console.log('Filtro de parâmetro (usando código):', {
-      valueParameterCode: parameterCode,
-      selectedParameterCode: parameter,
-      shouldInclude
-    });
-    
-    return shouldInclude;
+    return !parameter || parameter === parameterCode;
   });
 
-  console.log('ReadingValues após filtro de parâmetro:', filteredReadingValues.length);
+  const readingsById = new Map(readings.map(r => [r.id, r]));
+  const pointsById = new Map(selectedPointsData.map(p => [p.id, p]));
 
-  // Transform data for display
   const transformedReadings: Reading[] = filteredReadingValues.map((value) => {
-    const reading = readings.find(r => r.id === value.reading_id);
-    const point = selectedPointsData.find(p => p.id === reading?.point_id);
-    
-    console.log('Transformando value:', {
-      reading_id: value.reading_id,
-      reading_found: !!reading,
-      point_found: !!point,
-      point_id: reading?.point_id,
-      conama_values: {
-        min: value.parameter?.conama_min,
-        max: value.parameter?.conama_max
-      }
-    });
+    const reading = readingsById.get(value.reading_id);
+    const point = reading ? pointsById.get(reading.point_id) : undefined;
 
     if (!reading || !point) {
-      console.log('Dados faltando - pulando:', { reading: !!reading, point: !!point });
       return null;
     }
 
-    // Extract CONAMA values from parameter
-    const conamaMin = value.parameter?.conama_min || null;
-    const conamaMax = value.parameter?.conama_max || null;
+    const conamaMin = value.parameter?.conama_min ?? null;
+    const conamaMax = value.parameter?.conama_max ?? null;
 
-    // Determine CONAMA status with intelligent attention zones
     let conamaStatus: 'normal' | 'attention' | 'critical' = 'normal';
     let hasAnomaly = false;
 
     if (value.parameter) {
-      const { conama_min, conama_max } = value.parameter;
-      
-      console.log('CONAMA Classification Debug:', {
-        parameter: value.parameter.code,
-        value: value.value,
-        conama_min,
-        conama_max
-      });
-      
-      // Calculate intelligent attention zones
-      const classificationResult = calculateConamaStatus(value.value, conama_min, conama_max, value.parameter.code);
+      const classificationResult = calculateConamaStatus(
+        value.value,
+        value.parameter.conama_min,
+        value.parameter.conama_max,
+        value.parameter.code
+      );
       conamaStatus = classificationResult.status;
       hasAnomaly = classificationResult.hasAnomaly;
-      
-      console.log('Classificado como:', conamaStatus.toUpperCase(), 'Anomalia:', hasAnomaly);
     }
 
-    const transformedReading = {
+    return {
       id: `${reading.id}-${value.parameter_id}`,
-      parameter: value.parameter?.description || 'Parâmetro Desconhecido', // Still display description in UI
+      parameter: value.parameter?.description || 'Parâmetro Desconhecido',
       parameterCode: value.parameter?.code || '',
       value: value.value,
       unit: value.parameter?.unit || '',
@@ -183,24 +134,13 @@ export const transformReadingsData = ({
       conamaStatus,
       hasAnomaly,
       point: point.name,
-      conamaMin, // Include CONAMA minimum value
-      conamaMax  // Include CONAMA maximum value
-    };
-
-    console.log('Reading transformado com CONAMA:', {
-      ...transformedReading,
       conamaMin,
       conamaMax
-    });
-    return transformedReading;
+    };
   }).filter(Boolean) as Reading[];
 
-  console.log('Total de readings transformados:', transformedReadings.length);
-  console.log('CONAMA values nos dados transformados:', transformedReadings.map(r => ({
-    parameter: r.parameter,
-    conamaMin: r.conamaMin,
-    conamaMax: r.conamaMax
-  })));
-  
-  return transformedReadings;
+  // Ordem cronológica crescente para os gráficos temporais
+  return transformedReadings.sort(
+    (a, b) => new Date(a.datetime).getTime() - new Date(b.datetime).getTime()
+  );
 };
