@@ -12,6 +12,7 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useMapCache } from '@/hooks/useMapCache';
 import { SiteAccessCodesCard } from '@/components/admin/settings/SiteAccessCodesCard';
+import { SiteAccessToggleCard } from '@/components/admin/settings/SiteAccessToggleCard';
 
 export const SettingsPage = () => {
   const { data: educationSetting, isLoading: isLoadingEducation } = useAppSetting('show_education_menu');
@@ -125,6 +126,8 @@ export const SettingsPage = () => {
         <Settings className="h-6 w-6" />
         <h1 className="text-2xl font-bold">Configurações do Sistema</h1>
       </div>
+
+      <SiteAccessToggleCard />
 
       <SiteAccessCodesCard />
 
