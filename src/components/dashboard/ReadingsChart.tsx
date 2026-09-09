@@ -24,13 +24,6 @@ interface ReadingsChartProps {
 }
 
 const ReadingsChart = ({ readings, selectedParameter }: ReadingsChartProps) => {
-  console.log('ReadingsChart - Props recebidas:', {
-    readingsCount: readings.length,
-    selectedParameter,
-    firstReading: readings[0],
-    conamaValues: readings.map(r => ({ conamaMin: r.conamaMin, conamaMax: r.conamaMax }))
-  });
-
   if (!selectedParameter || readings.length === 0) {
     return (
       <Card>
