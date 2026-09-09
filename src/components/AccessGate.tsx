@@ -16,7 +16,7 @@ export const AccessGate = ({ children }: AccessGateProps) => {
   const { isAuthorized, loading } = useSiteAccess();
   const location = useLocation();
 
-  if (PUBLIC_ROUTES.includes(location.pathname)) {
+  if (!SITE_ACCESS_ENABLED || PUBLIC_ROUTES.includes(location.pathname)) {
     return <>{children}</>;
   }
 
