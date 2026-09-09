@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import ReadingsBarChart from './chart/ReadingsBarChart';
 import ChartLegend from './chart/ChartLegend';
 import ConamaLegend from './chart/ConamaLegend';
+import { buildAxisLabels } from './chart/chartLabels';
 
 interface Reading {
   id: string;
