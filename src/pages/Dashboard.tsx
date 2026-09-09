@@ -165,7 +165,7 @@ const Dashboard = () => {
           </p>
         </div>
 
-        {/* Debug info */}
+        {/* Filtros ativos */}
         {(startDate || endDate || selectedParameter || selectedPoints.length > 0 || selectedState || selectedCity) && (
           <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
             <p className="text-sm text-blue-800">
