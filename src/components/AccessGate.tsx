@@ -4,6 +4,10 @@ import { useSiteAccess } from '@/hooks/useSiteAccess';
 
 const PUBLIC_ROUTES = ['/forum-economia-do-mar'];
 
+// Interruptor da senha de acesso ao site.
+// false = site liberado sem senha. Volte para true para reativar a tela /acesso.
+const SITE_ACCESS_ENABLED = false;
+
 interface AccessGateProps {
   children: React.ReactNode;
 }
