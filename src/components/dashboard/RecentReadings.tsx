@@ -6,7 +6,7 @@ import CollectionPointsMap from './CollectionPointsMap';
 import ReadingsTable from './ReadingsTable';
 import ReadingsFilters from './ReadingsFilters';
 import { transformReadingsData } from './ReadingsDataTransformer';
-import { useReadings, useReadingValues } from '@/hooks/useReadingsData';
+import { useReadings, useReadingValues, DEFAULT_WINDOW_DAYS, READINGS_LIMIT } from '@/hooks/useReadingsData';
 import { useCities, useRivers, usePoints } from '@/hooks/useGeographicData';
 
 interface RecentReadingsProps {
@@ -19,52 +19,31 @@ interface RecentReadingsProps {
 }
 
 const RecentReadings = ({ city, river, points, parameter, startDate, endDate }: RecentReadingsProps) => {
-  console.log('RecentReadings - Props recebidas:', { city, river, points, parameter, startDate, endDate });
-
-  // CORREÇÃO: Buscar dados da cidade e rio para obter os IDs corretos
   const { data: cities = [] } = useCities();
   const selectedCityData = cities.find(c => c.name === city);
-  console.log('RecentReadings - Cidade selecionada:', selectedCityData);
-  
+
   const { data: rivers = [] } = useRivers(selectedCityData?.id);
   const selectedRiverData = rivers.find(r => r.name === river);
-  console.log('RecentReadings - Rio selecionado:', selectedRiverData);
-  
-  // CORREÇÃO: Usar o ID do rio para buscar pontos específicos desse rio
+
   const { data: allPoints = [] } = usePoints(selectedRiverData?.id);
-  console.log('RecentReadings - Todos os pontos do rio:', allPoints);
-  
   const selectedPointsData = allPoints.filter(point => points.includes(point.name));
-  console.log('RecentReadings - Pontos selecionados:', selectedPointsData);
-  
   const pointIds = selectedPointsData.map(point => point.id);
-  console.log('RecentReadings - IDs dos pontos:', pointIds);
 
-  // Fetch real readings data
   const { data: readings = [], isLoading: readingsLoading, error: readingsError } = useReadings(pointIds, startDate, endDate);
-  console.log('RecentReadings - Leituras brutas:', readings);
-  console.log('RecentReadings - Loading readings:', readingsLoading);
-  console.log('RecentReadings - Error readings:', readingsError);
-  
-  // Get reading IDs to fetch parameter values
   const readingIds = readings.map(reading => reading.id);
-  console.log('RecentReadings - IDs das leituras:', readingIds);
-  
   const { data: readingValues = [], isLoading: valuesLoading } = useReadingValues(readingIds);
-  console.log('RecentReadings - Valores das leituras:', readingValues);
-  console.log('RecentReadings - Loading values:', valuesLoading);
 
-  // Transform data for display
   const transformedReadings = transformReadingsData({
     readingValues,
     readings,
     selectedPointsData,
     parameter
   });
-  console.log('RecentReadings - Dados transformados:', transformedReadings);
 
   const isLoading = readingsLoading || valuesLoading;
   const error = readingsError;
+  const usingDefaultWindow = !startDate && !endDate;
+  const truncated = readings.length >= READINGS_LIMIT;
 
   if (!city || !river || points.length === 0) {
     return (
@@ -90,7 +69,6 @@ const RecentReadings = ({ city, river, points, parameter, startDate, endDate }: 
   }
 
   if (error) {
-    console.error('RecentReadings - Erro ao carregar dados:', error);
     return (
       <Card>
         <CardHeader>
@@ -109,6 +87,17 @@ const RecentReadings = ({ city, river, points, parameter, startDate, endDate }: 
 
   return (
     <div className="space-y-6">
+      {usingDefaultWindow && (
+        <p className="text-xs text-gray-500">
+          Mostrando os últimos {DEFAULT_WINDOW_DAYS} dias — escolha um período para ver mais.
+        </p>
+      )}
+      {truncated && (
+        <p className="text-xs text-amber-600">
+          Muitos registros no período selecionado. Reduza o intervalo de datas para ver todos os dados.
+        </p>
+      )}
+
       {/* Gráfico e Mapa lado a lado */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         <ReadingsChart readings={transformedReadings} selectedParameter={parameter} />
@@ -138,16 +127,6 @@ const RecentReadings = ({ city, river, points, parameter, startDate, endDate }: 
             <div className="text-center py-8 text-gray-500">
               <AlertCircleIcon className="h-12 w-12 mx-auto mb-4 text-gray-400" />
               <p>Nenhuma leitura encontrada para os filtros selecionados</p>
-              <div className="text-xs mt-4 text-left bg-gray-100 p-3 rounded">
-                <p><strong>Debug Info:</strong></p>
-                <p>Cidade: {city} (ID: {selectedCityData?.id})</p>
-                <p>Rio: {river} (ID: {selectedRiverData?.id})</p>
-                <p>Pontos: {points.join(', ')} (IDs: {pointIds.join(', ')})</p>
-                <p>Parâmetro: {parameter}</p>
-                <p>Leituras encontradas: {readings.length}</p>
-                <p>Valores encontrados: {readingValues.length}</p>
-                <p>Dados transformados: {transformedReadings.length}</p>
-              </div>
             </div>
           ) : (
             <ReadingsTable readings={transformedReadings} />
