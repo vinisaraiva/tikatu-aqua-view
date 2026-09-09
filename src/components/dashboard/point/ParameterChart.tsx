@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import ReadingsBarChart from '../chart/ReadingsBarChart';
 import ConamaLegend from '../chart/ConamaLegend';
 import ChartLegend from '../chart/ChartLegend';
+import { buildAxisLabels } from '../chart/chartLabels';
 
 interface Reading {
   id: string;
@@ -32,9 +33,14 @@ const ParameterChart = ({
   conamaMin, 
   conamaMax 
 }: ParameterChartProps) => {
-  // Transform readings data for chart
+  // Transform readings data for chart (ordem cronológica, rótulo com data)
   const chartData = useMemo(() => {
-    return readings.map(reading => {
+    const sorted = [...readings].sort(
+      (a, b) => new Date(a.datetime).getTime() - new Date(b.datetime).getTime()
+    );
+    const labels = buildAxisLabels(sorted);
+
+    return sorted.map((reading, index) => {
       let barColor = '#3b82f6'; // Default blue
       
       // Set color based on CONAMA status
@@ -47,7 +53,9 @@ const ParameterChart = ({
       }
 
       return {
+        label: labels[index],
         point: reading.point,
+        datetime: reading.datetime,
         value: reading.value,
         fill: barColor,
         status: reading.conamaStatus,
