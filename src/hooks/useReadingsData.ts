@@ -32,78 +32,95 @@ export interface Parameter {
   conama_max: number | null;
 }
 
+/** Janela padrão (em dias) usada quando nenhuma data é selecionada. */
+export const DEFAULT_WINDOW_DAYS = 30;
+
+/** Teto de registros por consulta, para não pesar o carregamento. */
+export const READINGS_LIMIT = 2000;
+
+const CHUNK_SIZE = 200;
+const STALE_TIME = 5 * 60 * 1000;
+
+const chunk = <T,>(items: T[], size: number): T[][] => {
+  const result: T[][] = [];
+  for (let i = 0; i < items.length; i += size) {
+    result.push(items.slice(i, i + size));
+  }
+  return result;
+};
+
+export const getDefaultStartDate = (): Date => {
+  const date = new Date();
+  date.setDate(date.getDate() - DEFAULT_WINDOW_DAYS);
+  return date;
+};
+
 export const useReadings = (pointIds: number[], startDate?: Date, endDate?: Date) => {
+  const usingDefaultWindow = !startDate && !endDate;
+  const effectiveStart = startDate ?? (usingDefaultWindow ? getDefaultStartDate() : undefined);
+
   return useQuery({
-    queryKey: ['readings', pointIds, startDate, endDate],
+    queryKey: [
+      'readings',
+      pointIds,
+      effectiveStart?.toISOString().slice(0, 10),
+      endDate?.toISOString(),
+    ],
     queryFn: async (): Promise<Reading[]> => {
-      console.log('useReadings - Buscando leituras para pontos:', pointIds);
-      
-      if (pointIds.length === 0) {
-        console.log('useReadings - Nenhum ponto selecionado, retornando array vazio');
-        return [];
-      }
-      
+      if (pointIds.length === 0) return [];
+
       let query = supabase
         .from('readings')
         .select('*')
         .in('point_id', pointIds)
-        .order('measured_at', { ascending: false });
-      
-      if (startDate) {
-        console.log('useReadings - Aplicando filtro de data inicial:', startDate);
-        query = query.gte('measured_at', startDate.toISOString());
+        .order('measured_at', { ascending: false })
+        .limit(READINGS_LIMIT);
+
+      if (effectiveStart) {
+        query = query.gte('measured_at', effectiveStart.toISOString());
       }
-      
+
       if (endDate) {
-        console.log('useReadings - Aplicando filtro de data final:', endDate);
         query = query.lte('measured_at', endDate.toISOString());
       }
-      
-      console.log('useReadings - Executando query...');
+
       const { data, error } = await query;
-      
-      if (error) {
-        console.error('useReadings - Erro na query:', error);
-        throw error;
-      }
-      
-      console.log('useReadings - Dados retornados:', data?.length || 0, 'leituras');
+
+      if (error) throw error;
       return data || [];
     },
-    enabled: pointIds.length > 0
+    enabled: pointIds.length > 0,
+    staleTime: STALE_TIME,
   });
 };
 
 export const useReadingValues = (readingIds: number[]) => {
+  const sortedIds = [...readingIds].sort((a, b) => a - b);
+
   return useQuery({
-    queryKey: ['reading_values', readingIds],
+    queryKey: ['reading_values', sortedIds],
     queryFn: async (): Promise<ReadingValue[]> => {
-      console.log('useReadingValues - Buscando valores para leituras:', readingIds);
-      
-      if (readingIds.length === 0) {
-        console.log('useReadingValues - Nenhuma leitura fornecida, retornando array vazio');
-        return [];
-      }
-      
-      console.log('useReadingValues - Executando query...');
-      const { data, error } = await supabase
-        .from('reading_values')
-        .select(`
-          *,
-          parameter:parameters(code, description, unit, conama_min, conama_max)
-        `)
-        .in('reading_id', readingIds);
-      
-      if (error) {
-        console.error('useReadingValues - Erro na query:', error);
-        throw error;
-      }
-      
-      console.log('useReadingValues - Dados retornados:', data?.length || 0, 'valores de leitura');
-      console.log('useReadingValues - Detalhes dos valores:', data);
-      return data || [];
+      if (sortedIds.length === 0) return [];
+
+      const batches = await Promise.all(
+        chunk(sortedIds, CHUNK_SIZE).map(async (ids) => {
+          const { data, error } = await supabase
+            .from('reading_values')
+            .select(`
+              *,
+              parameter:parameters(code, description, unit, conama_min, conama_max)
+            `)
+            .in('reading_id', ids);
+
+          if (error) throw error;
+          return (data || []) as ReadingValue[];
+        })
+      );
+
+      return batches.flat();
     },
-    enabled: readingIds.length > 0
+    enabled: sortedIds.length > 0,
+    staleTime: STALE_TIME,
   });
 };
 
@@ -115,9 +132,10 @@ export const useParameters = () => {
         .from('parameters')
         .select('*')
         .order('code');
-      
+
       if (error) throw error;
       return data || [];
-    }
+    },
+    staleTime: STALE_TIME,
   });
 };

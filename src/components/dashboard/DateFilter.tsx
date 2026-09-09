@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useCallback, useState } from 'react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { CalendarIcon } from 'lucide-react';
@@ -12,51 +12,103 @@ interface DateFilterProps {
   onDateChange: (startDate: Date | undefined, endDate: Date | undefined) => void;
 }
 
+// Horário de Brasília/Bahia (UTC-3)
+const BAHIA_OFFSET = '-03:00';
+
+const pad = (value: number) => String(value).padStart(2, '0');
+
+const dayKey = (date: Date) =>
+  `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+
+const startOfDayBahia = (date: Date) => new Date(`${dayKey(date)}T00:00:00${BAHIA_OFFSET}`);
+const endOfDayBahia = (date: Date) => new Date(`${dayKey(date)}T23:59:59.999${BAHIA_OFFSET}`);
+
+const PRESETS = [
+  { label: '7 dias', days: 7 },
+  { label: '30 dias', days: 30 },
+  { label: '90 dias', days: 90 },
+  { label: '12 meses', days: 365 },
+];
+
 const DateFilter = ({ onDateChange }: DateFilterProps) => {
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [endDate, setEndDate] = useState<Date | undefined>();
   const [isRange, setIsRange] = useState(false);
 
-  // Debug: Log when dates change
-  useEffect(() => {
-    console.log('DateFilter - Dates changed:', { startDate, endDate, isRange });
-    if (!isRange) {
-      onDateChange(startDate, startDate);
-    } else {
-      onDateChange(startDate, endDate);
-    }
-  }, [startDate, endDate, isRange, onDateChange]);
+  const emit = useCallback(
+    (start: Date | undefined, end: Date | undefined, range: boolean) => {
+      if (!start && !end) {
+        onDateChange(undefined, undefined);
+        return;
+      }
+
+      if (!range) {
+        // Data única cobre o dia inteiro
+        onDateChange(
+          start ? startOfDayBahia(start) : undefined,
+          start ? endOfDayBahia(start) : undefined
+        );
+        return;
+      }
+
+      onDateChange(
+        start ? startOfDayBahia(start) : undefined,
+        end ? endOfDayBahia(end) : undefined
+      );
+    },
+    [onDateChange]
+  );
 
   const handleStartDateChange = (date: Date | undefined) => {
-    console.log('DateFilter - Start date selected:', date);
     setStartDate(date);
+    emit(date, endDate, isRange);
   };
 
   const handleEndDateChange = (date: Date | undefined) => {
-    console.log('DateFilter - End date selected:', date);
     setEndDate(date);
+    emit(startDate, date, isRange);
   };
 
   const handleRangeToggle = (rangeMode: boolean) => {
-    console.log('DateFilter - Range mode changed:', rangeMode);
     setIsRange(rangeMode);
-    if (!rangeMode) {
-      setEndDate(undefined);
-    }
+    const nextEnd = rangeMode ? endDate : undefined;
+    if (!rangeMode) setEndDate(undefined);
+    emit(startDate, nextEnd, rangeMode);
+  };
+
+  const applyPreset = (days: number) => {
+    const end = new Date();
+    const start = new Date();
+    start.setDate(start.getDate() - (days - 1));
+    setIsRange(true);
+    setStartDate(start);
+    setEndDate(end);
+    emit(start, end, true);
   };
 
   const clearDates = () => {
-    console.log('DateFilter - Clearing dates');
     setStartDate(undefined);
     setEndDate(undefined);
+    onDateChange(undefined, undefined);
   };
 
   return (
     <div className="space-y-4">
+      <div className="flex flex-wrap items-center gap-2">
+        {PRESETS.map((preset) => (
+          <Button
+            key={preset.days}
+            variant="secondary"
+            size="sm"
+            onClick={() => applyPreset(preset.days)}
+          >
+            {preset.label}
+          </Button>
+        ))}
+      </div>
+
       <div className="flex items-center gap-4">
-        <label className="text-sm font-medium text-gray-700">
-          Filtro de Data
-        </label>
+        <label className="text-sm font-medium text-gray-700">Filtro de Data</label>
         <div className="flex items-center gap-2">
           <label className="flex items-center gap-1 text-sm">
             <input
@@ -89,12 +141,12 @@ const DateFilter = ({ onDateChange }: DateFilterProps) => {
               <Button
                 variant="outline"
                 className={cn(
-                  "w-[240px] justify-start text-left font-normal",
+                  "w-full sm:w-[240px] justify-start text-left font-normal",
                   !startDate && "text-muted-foreground"
                 )}
               >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {startDate ? format(startDate, "PPP", { locale: ptBR }) : "Selecionar data"}
+                <CalendarIcon className="mr-2 h-4 w-4 shrink-0" />
+                {startDate ? format(startDate, "dd/MM/yyyy", { locale: ptBR }) : "Selecionar data"}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -117,12 +169,12 @@ const DateFilter = ({ onDateChange }: DateFilterProps) => {
                 <Button
                   variant="outline"
                   className={cn(
-                    "w-[240px] justify-start text-left font-normal",
+                    "w-full sm:w-[240px] justify-start text-left font-normal",
                     !endDate && "text-muted-foreground"
                   )}
                 >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {endDate ? format(endDate, "PPP", { locale: ptBR }) : "Selecionar data"}
+                  <CalendarIcon className="mr-2 h-4 w-4 shrink-0" />
+                  {endDate ? format(endDate, "dd/MM/yyyy", { locale: ptBR }) : "Selecionar data"}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -147,15 +199,6 @@ const DateFilter = ({ onDateChange }: DateFilterProps) => {
           </div>
         )}
       </div>
-
-      {/* Debug info */}
-      {(startDate || endDate) && (
-        <div className="text-xs text-gray-500 p-2 bg-gray-50 rounded">
-          Debug: Start: {startDate?.toLocaleDateString('pt-BR') || 'N/A'}, 
-          End: {endDate?.toLocaleDateString('pt-BR') || 'N/A'}, 
-          Range: {isRange ? 'Yes' : 'No'}
-        </div>
-      )}
     </div>
   );
 };
