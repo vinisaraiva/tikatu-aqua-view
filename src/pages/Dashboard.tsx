@@ -151,17 +151,6 @@ const Dashboard = () => {
     parameterDescription: reading.parameter
   }));
 
-  // Debug: Log current state
-  console.log('Dashboard - Current state:', {
-    selectedState,
-    selectedCity,
-    selectedRiver,
-    selectedPoints,
-    selectedParameter,
-    startDate: startDate?.toISOString(),
-    endDate: endDate?.toISOString()
-  });
-
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
