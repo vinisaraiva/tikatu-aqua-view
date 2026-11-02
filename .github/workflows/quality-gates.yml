@@ -1,0 +1,20 @@
+# Gates de qualidade. O GitHub Actions está desligado nesta conta: quem roda estes passos
+# é o Fiscal do Hermes (fiscal-apps.py), que lê os `run:` deste arquivo no commit do PR.
+name: quality-gates
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  gates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - name: Dependências (bun install)
+        run: bun install
+      - name: TypeScript (tsc --noEmit)
+        run: bunx tsc --noEmit -p tsconfig.app.json
+      - name: Build (vite build)
+        run: bun run build
