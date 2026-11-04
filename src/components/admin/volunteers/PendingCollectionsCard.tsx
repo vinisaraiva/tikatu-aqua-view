@@ -10,12 +10,14 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { BellRing, CalendarClock, Loader2 } from 'lucide-react';
+import { BellRing, CalendarClock, Loader2, Undo2, XCircle } from 'lucide-react';
 import {
   useCollectionCompliance,
   ComplianceStatus,
+  ComplianceItem,
   ABSENCE_LABEL,
 } from '@/hooks/admin/useCollectionCompliance';
+import { DismissAbsenceDialog } from './DismissAbsenceDialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -35,16 +37,30 @@ export function PendingCollectionsCard() {
   const [days, setDays] = useState('7');
   const [statusFilter, setStatusFilter] = useState<'all' | ComplianceStatus>('missed');
   const [sendingId, setSendingId] = useState<string | null>(null);
+  const [dismissItem, setDismissItem] = useState<ComplianceItem | null>(null);
   const { toast } = useToast();
 
   const { data: items, isLoading, refetch } = useCollectionCompliance(Number(days));
 
+  // "Pendentes" mostra só faltas ainda sem justificativa; as dispensadas aparecem em "Todas".
   const filtered = useMemo(() => {
     if (!items) return [];
-    return statusFilter === 'all' ? items : items.filter((i) => i.status === statusFilter);
+    if (statusFilter === 'all') return items;
+    if (statusFilter === 'missed') return items.filter((i) => i.status === 'missed' && !i.absence_reason);
+    return items.filter((i) => i.status === statusFilter);
   }, [items, statusFilter]);
 
-  const missedCount = items?.filter((i) => i.status === 'missed').length ?? 0;
+  const missedCount = items?.filter((i) => i.status === 'missed' && !i.absence_reason).length ?? 0;
+
+  const handleUndo = async (absenceId: number) => {
+    const { error } = await supabase.from('collection_absences').delete().eq('id', absenceId);
+    if (error) {
+      toast({ title: 'Erro', description: 'Não foi possível desfazer.', variant: 'destructive' });
+      return;
+    }
+    toast({ title: 'Dispensa desfeita', description: 'A coleta voltou para pendentes.' });
+    refetch();
+  };
 
   /** Quantas faltas por motivo — é o que vira estatística no relatório. */
   const resumoMotivos = useMemo(() => {
@@ -222,7 +238,13 @@ export function PendingCollectionsCard() {
                       )}
                     </TableCell>
                     <TableCell className="text-right">
-                      {item.status === 'missed' && (
+                      {item.status === 'missed' && item.absence_id ? (
+                        <Button variant="ghost" size="sm" onClick={() => handleUndo(item.absence_id!)}>
+                          <Undo2 className="h-4 w-4" />
+                          <span className="ml-1 hidden sm:inline">Desfazer</span>
+                        </Button>
+                      ) : item.status === 'missed' && (
+                        <div className="flex justify-end gap-1">
                         <Button
                           variant="outline"
                           size="sm"
@@ -236,6 +258,11 @@ export function PendingCollectionsCard() {
                           )}
                           <span className="ml-1 hidden sm:inline">Lembrar</span>
                         </Button>
+                        <Button variant="outline" size="sm" onClick={() => setDismissItem(item)}>
+                          <XCircle className="h-4 w-4" />
+                          <span className="ml-1 hidden sm:inline">Dispensar</span>
+                        </Button>
+                        </div>
                       )}
                     </TableCell>
                   </TableRow>
@@ -245,6 +272,14 @@ export function PendingCollectionsCard() {
           </div>
         )}
       </CardContent>
+      <DismissAbsenceDialog
+        item={dismissItem}
+        onClose={() => setDismissItem(null)}
+        onSaved={() => {
+          setDismissItem(null);
+          refetch();
+        }}
+      />
     </Card>
   );
 }
