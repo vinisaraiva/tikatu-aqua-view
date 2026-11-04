@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "12.2.12 (cd3cf9e)"
+    PostgrestVersion: "12.2.12"
   }
   public: {
     Tables: {
@@ -243,6 +243,55 @@ export type Database = {
           },
           {
             foreignKeyName: "collection_absences_volunteer_id_fkey"
+            columns: ["volunteer_id"]
+            isOneToOne: false
+            referencedRelation: "volunteers_view"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      collection_skips: {
+        Row: {
+          created_at: string
+          descartadas: string[]
+          id: number
+          measured_at: string
+          point_id: number
+          volunteer_id: number
+        }
+        Insert: {
+          created_at?: string
+          descartadas?: string[]
+          id?: never
+          measured_at: string
+          point_id: number
+          volunteer_id: number
+        }
+        Update: {
+          created_at?: string
+          descartadas?: string[]
+          id?: never
+          measured_at?: string
+          point_id?: number
+          volunteer_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collection_skips_point_id_fkey"
+            columns: ["point_id"]
+            isOneToOne: false
+            referencedRelation: "points"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collection_skips_volunteer_id_fkey"
+            columns: ["volunteer_id"]
+            isOneToOne: false
+            referencedRelation: "volunteers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collection_skips_volunteer_id_fkey"
             columns: ["volunteer_id"]
             isOneToOne: false
             referencedRelation: "volunteers_view"
