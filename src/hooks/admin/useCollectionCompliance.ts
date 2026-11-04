@@ -44,6 +44,7 @@ export interface ComplianceItem {
    */
   absence_reason?: AbsenceReason;
   absence_notes?: string | null;
+  absence_id?: number;
 }
 
 const TZ = 'America/Bahia';
@@ -125,7 +126,7 @@ export const useCollectionCompliance = (days = 7) => {
       inicioJanela.setDate(inicioJanela.getDate() - (days - 1));
       const { data: absences } = await supabase
         .from('collection_absences')
-        .select('volunteer_id, point_id, absence_date, reason, notes')
+        .select('id, volunteer_id, point_id, absence_date, reason, notes')
         .gte('absence_date', toLocalDateKey(inicioJanela));
       const justificativas = new Map(
         (absences || []).map((a: any) => [
@@ -266,6 +267,7 @@ export const useCollectionCompliance = (days = 7) => {
             has_push: pushVolunteers.has(schedule.volunteer_id),
             absence_reason: justificativa?.reason as AbsenceReason | undefined,
             absence_notes: justificativa?.notes ?? null,
+            absence_id: justificativa?.id,
           });
         }
       }
