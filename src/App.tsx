@@ -1,4 +1,5 @@
 
+import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -32,6 +33,9 @@ import AccessRequestsPage from "./pages/admin/access-requests/AccessRequestsPage
 import { usePageTracking } from "./hooks/usePageTracking";
 import ForumEconomiaDoMar from "./pages/ForumEconomiaDoMar";
 
+// Apresentação para investidores: carregada sob demanda para não pesar o resto do site.
+const Apresentacao = lazy(() => import("./pages/Apresentacao"));
+
 const PageTracker = () => {
   usePageTracking();
   return null;
@@ -59,6 +63,16 @@ const App = () => (
 
           {/* Public event page — no access gate */}
           <Route path="/forum-economia-do-mar" element={<ForumEconomiaDoMar />} />
+
+          {/* Apresentação para investidores — fora dos menus, noindex, sem portão de acesso */}
+          <Route
+            path="/apresentacao"
+            element={
+              <Suspense fallback={<div className="min-h-screen bg-[#021019]" />}>
+                <Apresentacao />
+              </Suspense>
+            }
+          />
 
 
 
