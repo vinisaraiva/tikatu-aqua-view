@@ -145,7 +145,7 @@ const Navegacao = () => {
   );
 };
 
-/** Cena 3: origem e o que já foi construído (fonte: roteiro do projeto de 10/11/2026). */
+/** Cena 3: origem e o que já foi construído (roteiro de 10/11/2026; situação dos artigos atualizada pelo Vinícius em 11/11/2026). */
 const ENTREGAS = [
   {
     estado: "Publicado",
@@ -160,14 +160,15 @@ const ENTREGAS = [
     link: "https://cran.r-project.org/package=tikatuwq",
   },
   {
-    estado: "Aceito",
+    estado: "Publicado",
     titulo: "Artigo da biblioteca tikatuwq",
-    onde: "International Journal of River Basin Management · aceite em 22/10/2026",
+    onde: "International Journal of River Basin Management · outubro de 2026",
+    link: "https://doi.org/10.1080/15715124.2026.2754836",
   },
   {
-    estado: "Aceito",
+    estado: "Publicado",
     titulo: "Frequência amostral no Buranhém",
-    onde: "Earth Science Informatics · aceite em 07/11/2026",
+    onde: "Earth Science Informatics · 11/11/2026",
   },
 ];
 
@@ -230,7 +231,7 @@ const Origem = () => (
             </Reveal>
           ))}
         </ul>
-        <p className="mt-3 text-xs text-slate-500">Aceite e publicação são situações distintas.</p>
+        <p className="mt-3 text-xs text-slate-500">Três artigos publicados e um software aberto (situação em 11/11/2026).</p>
       </div>
     </div>
   </section>
