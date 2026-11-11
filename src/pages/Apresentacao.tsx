@@ -9,32 +9,24 @@ import { AoVivo, AppColeta } from "@/components/apresentacao/AoVivo";
 import { Reveal, SceneLabel, Transicao } from "@/components/apresentacao/primitives";
 import { Amostragem } from "@/components/apresentacao/Amostragem";
 import { Sonda3D } from "@/components/apresentacao/Sonda3D";
-import { Investimento, PASSOS_INVESTIMENTO } from "@/components/apresentacao/Investimento";
+import { Perguntas } from "@/components/apresentacao/Perguntas";
+import { Confiavel, PASSOS_CONFIAVEL } from "@/components/apresentacao/Confiavel";
+import { Investimento, PASSOS_INVESTIMENTO, TOTAL } from "@/components/apresentacao/Investimento";
 import { useMenosMovimento } from "@/components/apresentacao/useMenosMovimento";
 import { AvisoMovimento, BotaoMovimento, Palco, useModoTelas, type Cena } from "@/components/apresentacao/Palco";
+import { formatar, useIdioma, useT, type Bi } from "@/components/apresentacao/idioma";
+import { BotaoIdioma } from "@/components/apresentacao/BotaoIdioma";
 
-const CENAS = [
-  "Abertura",
-  "O problema",
-  "A origem",
-  "Como funciona",
-  "Painel ao vivo",
-  "App de coleta",
-  "Para quem",
-  "Equipe",
-  "Próxima etapa",
-  "O investimento",
-  "Como apoiar",
-];
-
-/** Barra de progresso no topo + pontos de navegação entre cenas (desktop). */
-const Navegacao = () => {
+/** Barra de progresso no topo + pontos de navegação entre cenas (desktop, modo rolagem). */
+const Navegacao = ({ nomes }: { nomes: Bi[] }) => {
+  const t = useT();
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, { stiffness: 140, damping: 30, mass: 0.3 });
   const [atual, setAtual] = useState(1);
+  const total = nomes.length;
 
   useEffect(() => {
-    const secoes = CENAS.map((_, i) => document.getElementById(`cena-${i + 1}`)).filter(
+    const secoes = Array.from({ length: total }, (_, i) => document.getElementById(`cena-${i + 1}`)).filter(
       (el): el is HTMLElement => el !== null,
     );
     const obs = new IntersectionObserver(
@@ -47,7 +39,7 @@ const Navegacao = () => {
     );
     secoes.forEach((s) => obs.observe(s));
     return () => obs.disconnect();
-  }, []);
+  }, [total]);
 
   // Setas ← → (e PageUp/PageDown) pulam de cena em cena, como no deck. Cenas com
   // data-paradas="N" (rolagem "grudada") ganham N paradas, uma por passo.
@@ -56,9 +48,9 @@ const Navegacao = () => {
   useEffect(() => {
     const paradas = () => {
       const lista: number[] = [];
-      CENAS.forEach((_, i) => {
+      for (let i = 0; i < total; i++) {
         const el = document.getElementById(`cena-${i + 1}`);
-        if (!el) return;
+        if (!el) continue;
         // offsetTop ignora as transformações da transição entre cenas.
         let topo = 0;
         for (let p: HTMLElement | null = el; p; p = p.offsetParent as HTMLElement | null) topo += p.offsetTop;
@@ -76,7 +68,7 @@ const Navegacao = () => {
             lista.push(Math.round(topo + curso));
           }
         }
-      });
+      }
       // Ordena e junta paradas muito próximas (evita "pulinhos" de poucos pixels).
       const minimo = window.innerHeight * 0.2;
       // Mantém o início de cada cena; a última parada (fim da página) sempre fica.
@@ -110,7 +102,7 @@ const Navegacao = () => {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [reduce]);
+  }, [reduce, total]);
 
   return (
     <>
@@ -121,17 +113,17 @@ const Navegacao = () => {
       />
       <nav
         className="fixed right-5 top-1/2 z-40 hidden -translate-y-1/2 flex-col gap-3 lg:flex"
-        aria-label="Cenas da apresentação"
+        aria-label={t(["Cenas da apresentação", "Presentation scenes"])}
       >
-        {CENAS.map((nome, i) => (
+        {nomes.map((nome, i) => (
           <a
-            key={nome}
+            key={nome[0]}
             href={`#cena-${i + 1}`}
             className="group flex items-center justify-end gap-3"
             aria-current={atual === i + 1 ? "step" : undefined}
           >
             <span className="pointer-events-none text-xs text-slate-300 opacity-0 transition-opacity group-hover:opacity-100">
-              {nome}
+              {t(nome)}
             </span>
             <span
               className={`block rounded-full transition-all duration-300 ${
@@ -145,202 +137,142 @@ const Navegacao = () => {
   );
 };
 
-/** Cena 3: origem e o que já foi construído (fonte: roteiro do projeto de 10/11/2026). */
-const ENTREGAS = [
-  {
-    estado: "Publicado",
-    titulo: "Plataforma Tikatu",
-    onde: "International Journal of River Basin Management · 2025",
-    link: "https://doi.org/10.1080/15715124.2025.2528958",
-  },
-  {
-    estado: "Software disponível",
-    titulo: "tikatuwq no CRAN",
-    onde: "Rotinas abertas, documentação e exemplos reprodutíveis",
-    link: "https://cran.r-project.org/package=tikatuwq",
-  },
-  {
-    estado: "Aceito",
-    titulo: "Artigo da biblioteca tikatuwq",
-    onde: "International Journal of River Basin Management · aceite em 22/10/2026",
-  },
-  {
-    estado: "Aceito",
-    titulo: "Frequência amostral no Buranhém",
-    onde: "Earth Science Informatics · aceite em 07/11/2026",
-  },
-];
-
-const Origem = () => (
-  <section id="cena-3" className="relative flex min-h-[100svh] flex-col justify-center overflow-hidden py-16" aria-label="A origem">
-    <div
-      className="pointer-events-none absolute inset-0"
-      style={{ background: "radial-gradient(50% 60% at 15% 50%, rgba(45,212,191,0.10), transparent 70%)" }}
-      aria-hidden
-    />
-    <div className="relative mx-auto grid max-w-6xl gap-12 px-6 md:grid-cols-[1fr_1.25fr]">
-      <Reveal>
-        <SceneLabel index={3}>A origem</SceneLabel>
-        <h2 className="text-3xl font-semibold leading-tight text-white sm:text-5xl">Uma base que já existe.</h2>
-        <p className="mt-5 text-lg leading-relaxed text-slate-300">
-          O Tikatu nasceu no mestrado em Ciências e Tecnologias Ambientais, com a construção da plataforma e a validação
-          inicial no Rio Chamagunga, em Porto Seguro. Hoje é uma pesquisa de doutorado em Biossistemas na UFSB:
-        </p>
-        <p className="mt-4 border-l-2 border-cyan-300/50 pl-4 text-slate-200">
-          “Do dado à decisão: desenvolvimento e avaliação do ecossistema Tikatu para monitoramento, análise
-          computacional e interpretação auditável da qualidade da água.”
-        </p>
-      </Reveal>
-      <div>
-        <Reveal delay={0.1}>
-          <div className="mb-4 text-xs font-semibold uppercase tracking-[0.25em] text-cyan-300/80">
-            Entregas que sustentam o percurso
-          </div>
-        </Reveal>
-        <ul className="divide-y divide-white/10 border-y border-white/10">
-          {ENTREGAS.map((e, i) => (
-            <Reveal key={e.titulo} delay={0.1 + i * 0.08}>
-              <li className="flex items-start gap-4 py-5">
-                <span
-                  className={`mt-1 w-28 shrink-0 text-[11px] font-semibold uppercase tracking-wider ${
-                    e.estado === "Aceito" ? "text-[#efb08c]" : "text-emerald-300"
-                  }`}
-                >
-                  {e.estado}
-                </span>
-                <div className="flex-1">
-                  <div className="font-semibold text-white">
-                    {e.link ? (
-                      <a
-                        href={e.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 hover:text-cyan-200"
-                      >
-                        {e.titulo}
-                        <ArrowUpRight className="h-4 w-4" />
-                      </a>
-                    ) : (
-                      e.titulo
-                    )}
-                  </div>
-                  <div className="mt-1 text-sm text-slate-400">{e.onde}</div>
-                </div>
-              </li>
-            </Reveal>
-          ))}
-        </ul>
-        <p className="mt-3 text-xs text-slate-500">Aceite e publicação são situações distintas.</p>
-      </div>
-    </div>
-  </section>
-);
-
 const PUBLICOS = [
   {
     icon: Building2,
-    titulo: "Gestão pública",
-    texto: "Mais pontos e mais frequência de dados para apoiar decisões sobre saneamento, outorga e fiscalização.",
+    titulo: ["Gestão pública", "Public management"],
+    texto: [
+      "Mais pontos e mais frequência de dados para apoiar decisões sobre saneamento, outorga e fiscalização.",
+      "More sites and more frequent data to support decisions on sanitation, water-use permits and enforcement.",
+    ],
     link: "/dashboard",
-    linkTexto: "Ver o painel",
+    linkTexto: ["Ver o painel", "See the dashboard"],
   },
   {
     icon: FlaskConical,
-    titulo: "Pesquisa",
-    texto: "Séries históricas e índices como IQA e IET, organizados por ponto e período para análise científica.",
+    titulo: ["Pesquisa", "Research"],
+    texto: [
+      "Séries históricas e índices como IQA e IET, organizados por ponto e período para análise científica.",
+      "Time series and indices such as the WQI and TSI, organised by site and period for scientific analysis.",
+    ],
     link: "/indices",
-    linkTexto: "Ver os índices",
+    linkTexto: ["Ver os índices", "See the indices"],
   },
   {
     icon: Ship,
-    titulo: "Economia do mar",
-    texto: "Turismo, pesca e aquicultura dependem de água limpa: dado confiável vira valor econômico.",
+    titulo: ["Economia do mar", "Blue economy"],
+    texto: [
+      "Turismo, pesca e aquicultura dependem de água limpa: dado confiável vira valor econômico.",
+      "Tourism, fishing and aquaculture depend on clean water: reliable data becomes economic value.",
+    ],
     link: "/forum-economia-do-mar",
-    linkTexto: "Ver o caso do Fórum",
+    linkTexto: ["Ver o caso do Fórum", "See the Forum case"],
   },
   {
     icon: Globe2,
-    titulo: "Agenda 2030",
-    texto: "Contribui para os ODS 6 (água potável e saneamento), 14 (vida na água) e 17 (parcerias).",
+    titulo: ["Agenda 2030", "2030 Agenda"],
+    texto: [
+      "Contribui para os ODS 6 (água potável e saneamento), 14 (vida na água) e 17 (parcerias).",
+      "Contributes to SDGs 6 (clean water and sanitation), 14 (life below water) and 17 (partnerships).",
+    ],
     link: "/agenda-2030",
-    linkTexto: "Ver a Agenda 2030",
+    linkTexto: ["Ver a Agenda 2030", "See the 2030 Agenda"],
   },
-];
+] as const;
 
-const ParaQuem = () => (
-  <section id="cena-7" className="mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-center px-6 py-16" aria-label="Para quem e por que importa">
-    <Reveal>
-      <SceneLabel index={7}>Para quem e por que importa</SceneLabel>
-      <h2 className="max-w-3xl text-3xl font-semibold leading-tight text-white sm:text-5xl">
-        Um mesmo dado, quatro portas de valor.
-      </h2>
-    </Reveal>
-    <div className="mt-8 grid gap-4 sm:grid-cols-2">
-      {PUBLICOS.map(({ icon: Icon, titulo, texto, link, linkTexto }, i) => (
-        <Reveal key={titulo} delay={0.08 * i}>
-          <div className="group flex h-full flex-col rounded-2xl border border-white/10 bg-white/[0.03] p-5 transition-colors hover:border-cyan-300/40 hover:bg-white/[0.06]">
-            <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-400/15 text-cyan-200">
-              <Icon className="h-5 w-5" />
+const ParaQuem = () => {
+  const t = useT();
+  return (
+    <section
+      id="cena-8"
+      className="mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-center px-6 py-16"
+      aria-label={t(["Para quem e por que importa", "Who it is for and why it matters"])}
+    >
+      <Reveal>
+        <SceneLabel index={8}>{t(["Para quem e por que importa", "Who it is for and why it matters"])}</SceneLabel>
+        <h2 className="max-w-3xl text-3xl font-semibold leading-tight text-white sm:text-5xl">
+          {t(["Um mesmo dado, quatro portas de valor.", "One dataset, four doors to value."])}
+        </h2>
+      </Reveal>
+      <div className="mt-8 grid gap-4 sm:grid-cols-2">
+        {PUBLICOS.map(({ icon: Icon, titulo, texto, link, linkTexto }, i) => (
+          <Reveal key={link} delay={0.08 * i}>
+            <div className="group flex h-full flex-col rounded-2xl border border-white/10 bg-white/[0.03] p-5 transition-colors hover:border-cyan-300/40 hover:bg-white/[0.06]">
+              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-400/15 text-cyan-200">
+                <Icon className="h-5 w-5" />
+              </div>
+              <h3 className="text-xl font-semibold text-white">{t(titulo)}</h3>
+              <p className="mt-2 flex-1 text-slate-300">{t(texto)}</p>
+              <Link
+                to={link}
+                target="_blank"
+                rel="noopener"
+                className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-cyan-300 hover:text-cyan-200"
+              >
+                {t(linkTexto)}
+                <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+              </Link>
             </div>
-            <h3 className="text-xl font-semibold text-white">{titulo}</h3>
-            <p className="mt-2 flex-1 text-slate-300">{texto}</p>
-            <Link
-              to={link}
-              target="_blank"
-              rel="noopener"
-              className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-cyan-300 hover:text-cyan-200"
-            >
-              {linkTexto}
-              <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-            </Link>
-          </div>
-        </Reveal>
-      ))}
-    </div>
-  </section>
-);
+          </Reveal>
+        ))}
+      </div>
+    </section>
+  );
+};
 
-const EQUIPE = [
+// O título acadêmico vai junto do nome (Dr.); embaixo, o cargo e a instituição.
+const EQUIPE: { papel: Bi; nome: string; linhas: Bi[] }[] = [
   {
-    papel: "Idealização e desenvolvimento",
+    papel: ["Idealização e desenvolvimento", "Concept and development"],
     nome: "Vinícius Saraiva Santos",
     linhas: [
-      "Administração e Análise de Sistemas",
-      "Técnico em TI do IFBA, Campus Porto Seguro",
-      "Mestre em Ciências e Tecnologias Ambientais",
-      "Doutorando em Biossistemas pela UFSB",
+      ["Administração e Análise de Sistemas", "Systems Analysis and Administration"],
+      ["Técnico em TI do IFBA, Campus Porto Seguro", "IT technician at IFBA, Porto Seguro campus"],
+      ["Mestre em Ciências e Tecnologias Ambientais", "Master's in Environmental Sciences and Technologies"],
+      ["Doutorando em Biossistemas pela UFSB", "PhD candidate in Biosystems at UFSB"],
     ],
   },
   {
-    papel: "Orientação científica",
-    nome: "Fabrício Berton Zanchi",
-    linhas: ["Professor doutor da UFSB", "Programa de Pós-Graduação em Biossistemas", "Vínculo de pesquisa: NuPEcoTropic"],
+    papel: ["Orientação científica", "Scientific supervision"],
+    nome: "Dr. Fabrício Berton Zanchi",
+    linhas: [
+      ["Professor da UFSB", "Professor at UFSB (Federal University of Southern Bahia)"],
+      ["Programa de Pós-Graduação em Biossistemas", "Graduate Program in Biosystems"],
+      ["Vínculo de pesquisa: NuPEcoTropic", "Research group: NuPEcoTropic"],
+    ],
   },
 ];
 
-const TRAJETORIA = [
-  { fase: "TI", texto: "Experiência profissional" },
-  { fase: "Mestrado", texto: "Construção da plataforma" },
-  { fase: "Doutorado", texto: "Avaliação do ecossistema" },
+const TRAJETORIA: { fase: Bi; texto: Bi }[] = [
+  { fase: ["TI", "IT"], texto: ["Experiência profissional", "Professional experience"] },
+  { fase: ["Mestrado", "Master's"], texto: ["Construção da plataforma", "Building the platform"] },
+  { fase: ["Doutorado", "PhD"], texto: ["Avaliação do ecossistema", "Evaluating the ecosystem"] },
 ];
 
 const Equipe = () => {
   const reduce = useMenosMovimento();
+  const t = useT();
   return (
-    <section id="cena-8" className="mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-center px-6 py-16" aria-label="Equipe">
+    <section
+      id="cena-9"
+      className="mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-center px-6 py-16"
+      aria-label={t(["Equipe", "Team"])}
+    >
       <Reveal>
-        <SceneLabel index={8}>Equipe</SceneLabel>
-        <h2 className="text-3xl font-semibold leading-tight text-white sm:text-5xl">Tecnologia e pesquisa ambiental.</h2>
+        <SceneLabel index={9}>{t(["Equipe", "Team"])}</SceneLabel>
+        <h2 className="text-3xl font-semibold leading-tight text-white sm:text-5xl">
+          {t(["Tecnologia e pesquisa ambiental.", "Technology and environmental research."])}
+        </h2>
       </Reveal>
       <div className="mt-8 grid gap-6 md:grid-cols-2">
         {EQUIPE.map((p, i) => (
           <Reveal key={p.nome} delay={0.1 * i}>
             <div className="h-full rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
-              <div className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-300/80">{p.papel}</div>
+              <div className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-300/80">{t(p.papel)}</div>
               <div className="mt-3 text-2xl font-semibold text-white">{p.nome}</div>
               <ul className="mt-4 space-y-1.5 text-slate-300">
                 {p.linhas.map((l) => (
-                  <li key={l}>{l}</li>
+                  <li key={l[0]}>{t(l)}</li>
                 ))}
               </ul>
             </div>
@@ -357,12 +289,12 @@ const Equipe = () => {
           aria-hidden
         />
         <ol className="relative grid grid-cols-3 gap-4">
-          {TRAJETORIA.map((t, i) => (
-            <Reveal key={t.fase} delay={0.3 + i * 0.25}>
+          {TRAJETORIA.map((f, i) => (
+            <Reveal key={f.fase[0]} delay={0.3 + i * 0.25}>
               <li>
                 <span className="block h-3.5 w-3.5 rounded-full bg-[#efb08c] ring-4 ring-[#062a3d]" aria-hidden />
-                <div className="mt-4 font-semibold text-white sm:text-lg">{t.fase}</div>
-                <div className="text-sm text-slate-400">{t.texto}</div>
+                <div className="mt-4 font-semibold text-white sm:text-lg">{t(f.fase)}</div>
+                <div className="text-sm text-slate-400">{t(f.texto)}</div>
               </li>
             </Reveal>
           ))}
@@ -372,143 +304,207 @@ const Equipe = () => {
   );
 };
 
-const RECURSOS = [
-  { titulo: "Sonda automática", texto: "Mede no rio, somada às sondas portáteis dos voluntários" },
-  { titulo: "Campo e logística", texto: "Estrutura, calibração, visitas e deslocamentos" },
-  { titulo: "Tecnologia e IA", texto: "Integração da sonda, plataforma e processamento de dados" },
-  { titulo: "Validação e voluntários", texto: "Análises de laboratório e formação da rede" },
+// Cada investimento ligado a uma entrega concreta.
+const RECURSOS: { titulo: Bi; texto: Bi }[] = [
+  {
+    titulo: ["Sonda automática", "Automatic probe"],
+    texto: ["Medição contínua no rio, ao lado das coletas dos voluntários", "Continuous measurement in the river, alongside volunteer sampling"],
+  },
+  {
+    titulo: ["Campo e logística", "Field and logistics"],
+    texto: ["Novas campanhas e mais pontos acompanhados", "New campaigns and more sites monitored"],
+  },
+  {
+    titulo: ["Tecnologia e IA", "Technology and AI"],
+    texto: ["Registros mais completos e ferramentas avaliadas em uso real", "More complete records and tools evaluated in real use"],
+  },
+  {
+    titulo: ["Validação e voluntários", "Validation and volunteers"],
+    texto: ["Medições conferidas em laboratório e rede formada", "Lab-checked measurements and a trained network"],
+  },
 ];
 
-const ETAPAS_APOIO = [
-  { n: "01", titulo: "Pactuar", texto: "Escolher a frente e dimensionar a etapa.", evidencia: "Plano de aplicação" },
-  { n: "02", titulo: "Preparar", texto: "Definir locais e métodos; adquirir materiais.", evidencia: "Protocolos e aquisições" },
-  { n: "03", titulo: "Medir e verificar", texto: "Executar as campanhas; conferir dados.", evidencia: "Registros documentados" },
-  { n: "04", titulo: "Compartilhar", texto: "Produzir relatórios e devolutivas.", evidencia: "Relatórios de execução" },
+const ETAPAS_APOIO: { n: string; titulo: Bi; texto: Bi; evidencia: Bi }[] = [
+  {
+    n: "01",
+    titulo: ["Pactuar", "Agree"],
+    texto: ["Escolher a frente e dimensionar a etapa.", "Choose the area of support and size the stage."],
+    evidencia: ["Plano de aplicação", "Spending plan"],
+  },
+  {
+    n: "02",
+    titulo: ["Preparar", "Prepare"],
+    texto: ["Definir locais e métodos; adquirir materiais.", "Define sites and methods; purchase materials."],
+    evidencia: ["Protocolos e aquisições", "Protocols and purchases"],
+  },
+  {
+    n: "03",
+    titulo: ["Medir e verificar", "Measure and verify"],
+    texto: ["Executar as campanhas; conferir dados.", "Run the field campaigns; check the data."],
+    evidencia: ["Registros documentados", "Documented records"],
+  },
+  {
+    n: "04",
+    titulo: ["Compartilhar", "Share"],
+    texto: ["Produzir relatórios e devolutivas.", "Produce reports and share results back."],
+    evidencia: ["Relatórios de execução", "Implementation reports"],
+  },
 ];
 
-const ProximosPassos = () => (
-  <section
-    id="cena-9"
-    className="relative mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-center px-6 py-16"
-    aria-label="A próxima etapa"
-  >
-    <Reveal>
-      <SceneLabel index={9}>A próxima etapa</SceneLabel>
-      <h2 className="max-w-3xl text-3xl font-semibold leading-tight text-white sm:text-5xl">
-        A próxima etapa: mais rios medidos, com mais tecnologia.
-      </h2>
-      <p className="mt-4 max-w-2xl text-slate-300 sm:text-lg">
-        A plataforma e o app já funcionam. Agora é levar o monitoramento a mais pontos e rios, com uma sonda automática
-        ao lado das portáteis, e evoluir a tecnologia que transforma as medições em informação validada.
-      </p>
-    </Reveal>
-
-    <div className="mt-8 grid items-stretch gap-6 md:grid-cols-[1fr_1.1fr]">
-      <div className="grid content-center gap-3">
-        <div className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-300/80">O que o apoio viabiliza</div>
-        {RECURSOS.map((r, i) => (
-          <Reveal key={r.titulo} delay={0.08 * i}>
-            <div className="flex h-full items-baseline justify-between gap-4 rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4">
-              <span className="shrink-0 font-semibold text-white">{r.titulo}</span>
-              <span className="text-right text-sm text-slate-400">{r.texto}</span>
-            </div>
-          </Reveal>
-        ))}
-      </div>
-      <Sonda3D />
-    </div>
-  </section>
-);
-
-const ComoApoiar = () => (
-  <section
-    id="cena-11"
-    className="relative flex min-h-[100svh] flex-col justify-center overflow-hidden py-16"
-    aria-label="Como apoiar"
-  >
-    <div
-      className="pointer-events-none absolute inset-0"
-      style={{ background: "radial-gradient(70% 50% at 50% 100%, rgba(34,211,238,0.18), transparent 70%)" }}
-      aria-hidden
-    />
-    <div className="relative mx-auto w-full max-w-6xl px-6">
+const ProximosPassos = () => {
+  const t = useT();
+  return (
+    <section
+      id="cena-10"
+      className="relative mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-center px-6 py-16"
+      aria-label={t(["A próxima etapa", "The next stage"])}
+    >
       <Reveal>
-        <SceneLabel index={11}>Como apoiar</SceneLabel>
-        <h2 className="max-w-3xl text-3xl font-semibold leading-tight text-white sm:text-4xl">
-          Um plano. Quatro etapas que podem ser conferidas.
+        <SceneLabel index={10}>{t(["A próxima etapa", "The next stage"])}</SceneLabel>
+        <h2 className="max-w-3xl text-3xl font-semibold leading-tight text-white sm:text-5xl">
+          {t([
+            "A próxima etapa: mais rios medidos, com mais tecnologia.",
+            "The next stage: more rivers measured, with more technology.",
+          ])}
         </h2>
+        <p className="mt-4 max-w-2xl text-slate-300 sm:text-lg">
+          {t([
+            "A plataforma e o app já funcionam. O financiamento permite ampliar a coleta, com uma sonda automática ao lado das portáteis, e avaliar em condições reais de uso as soluções que a pesquisa está construindo.",
+            "The platform and the app already work. The funding makes it possible to expand sampling, with an automatic probe alongside the portable ones, and to evaluate the solutions the research is building under real conditions of use.",
+          ])}
+        </p>
       </Reveal>
-      <ol className="mt-6 grid gap-3 sm:grid-cols-2 md:grid-cols-4 md:gap-4">
-        {ETAPAS_APOIO.map((e, i) => (
-          <Reveal key={e.n} delay={0.1 * i}>
-            <li className="h-full rounded-2xl border border-white/10 bg-white/[0.03] p-4 sm:p-5">
-              <div className="font-mono text-sm text-cyan-300">{e.n}</div>
-              <div className="mt-1 text-lg font-semibold text-white">{e.titulo}</div>
-              <p className="mt-1 text-sm text-slate-300">{e.texto}</p>
-              <div className="mt-3 text-[11px] font-semibold uppercase tracking-wider text-[#efb08c]">Evidência</div>
-              <div className="text-sm text-white">{e.evidencia}</div>
-            </li>
-          </Reveal>
-        ))}
-      </ol>
-      <p className="mt-3 text-xs text-slate-500">
-        Cronograma, marcos e formalização pactuados conforme os procedimentos institucionais. Entregas condicionadas ao
-        escopo aprovado; resultados científicos e impacto não são garantidos.
-      </p>
 
-      <Reveal delay={0.1}>
-        <div className="mt-8 flex flex-col items-center gap-6 rounded-3xl border border-cyan-300/30 bg-gradient-to-br from-cyan-400/15 via-teal-400/10 to-transparent px-6 py-8 text-center md:flex-row md:justify-between md:px-10 md:text-left">
-          <div>
-            <h3 className="text-2xl font-semibold text-white sm:text-4xl">Vamos viabilizar a próxima etapa?</h3>
-            <p className="mt-3 max-w-xl text-slate-300">
-              Buscamos R$ 108.838,20 para ampliar o monitoramento no território. Próximo passo: definir a frente de
-              apoio e seu plano de aplicação.
-            </p>
+      <div className="mt-8 grid items-stretch gap-6 md:grid-cols-[1fr_1.1fr]">
+        <div className="grid content-center gap-3">
+          <div className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-300/80">
+            {t(["O que o apoio viabiliza", "What the support makes possible"])}
           </div>
-          <div className="flex shrink-0 flex-col items-center gap-3">
-            <div className="rounded-2xl bg-[#f4f2ea] px-4 py-2.5">
-              <img src="/apresentacao/logo-tikatu.webp" alt="Tikatu" className="h-8 w-auto" />
-            </div>
-            <a
-              href="https://www.tikatu.com.br"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-full bg-cyan-300 px-6 py-3 font-semibold text-slate-950 transition-colors hover:bg-cyan-200"
-            >
-              Conhecer o Tikatu
-              <ArrowUpRight className="h-4 w-4" />
-            </a>
-            <a href="mailto:contato@tikatu.com.br" className="text-sm text-cyan-100/90 underline-offset-4 hover:underline">
-              contato@tikatu.com.br
-            </a>
-          </div>
+          {RECURSOS.map((r, i) => (
+            <Reveal key={r.titulo[0]} delay={0.08 * i}>
+              <div className="flex h-full items-baseline justify-between gap-4 rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4">
+                <span className="shrink-0 font-semibold text-white">{t(r.titulo)}</span>
+                <span className="text-right text-sm text-slate-400">{t(r.texto)}</span>
+              </div>
+            </Reveal>
+          ))}
         </div>
-      </Reveal>
+        <Sonda3D />
+      </div>
+    </section>
+  );
+};
 
-      <p className="mt-6 text-center text-xs text-slate-500">
-        Proposta de financiamento de pesquisa aplicada. Não representa oferta de serviço contratado.
-      </p>
-    </div>
-  </section>
-);
+const ComoApoiar = () => {
+  const t = useT();
+  const l = useIdioma();
+  const total = formatar(TOTAL, l, 2);
+  return (
+    <section
+      id="cena-12"
+      className="relative flex min-h-[100svh] flex-col justify-center overflow-hidden py-16"
+      aria-label={t(["Como apoiar", "How to support"])}
+    >
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{ background: "radial-gradient(70% 50% at 50% 100%, rgba(34,211,238,0.18), transparent 70%)" }}
+        aria-hidden
+      />
+      <div className="relative mx-auto w-full max-w-6xl px-6">
+        <Reveal>
+          <SceneLabel index={12}>{t(["Como apoiar", "How to support"])}</SceneLabel>
+          <h2 className="max-w-3xl text-3xl font-semibold leading-tight text-white sm:text-4xl">
+            {t(["Um plano. Quatro etapas que podem ser conferidas.", "One plan. Four stages you can verify."])}
+          </h2>
+        </Reveal>
+        <ol className="mt-6 grid gap-3 sm:grid-cols-2 md:grid-cols-4 md:gap-4">
+          {ETAPAS_APOIO.map((e, i) => (
+            <Reveal key={e.n} delay={0.1 * i}>
+              <li className="h-full rounded-2xl border border-white/10 bg-white/[0.03] p-4 sm:p-5">
+                <div className="font-mono text-sm text-cyan-300">{e.n}</div>
+                <div className="mt-1 text-lg font-semibold text-white">{t(e.titulo)}</div>
+                <p className="mt-1 text-sm text-slate-300">{t(e.texto)}</p>
+                <div className="mt-3 text-[11px] font-semibold uppercase tracking-wider text-[#efb08c]">
+                  {t(["Evidência", "Evidence"])}
+                </div>
+                <div className="text-sm text-white">{t(e.evidencia)}</div>
+              </li>
+            </Reveal>
+          ))}
+        </ol>
+        <p className="mt-3 text-xs text-slate-500">
+          {t([
+            "Cronograma, marcos e formalização pactuados conforme os procedimentos institucionais. Entregas condicionadas ao escopo aprovado; resultados científicos e impacto não são garantidos.",
+            "Schedule, milestones and formal arrangements agreed according to institutional procedures. Deliverables depend on the approved scope; scientific results and impact are not guaranteed.",
+          ])}
+        </p>
 
+        <Reveal delay={0.1}>
+          <div className="mt-8 flex flex-col items-center gap-6 rounded-3xl border border-cyan-300/30 bg-gradient-to-br from-cyan-400/15 via-teal-400/10 to-transparent px-6 py-8 text-center md:flex-row md:justify-between md:px-10 md:text-left">
+            <div>
+              <h3 className="text-2xl font-semibold text-white sm:text-4xl">
+                {t(["Vamos viabilizar a próxima etapa?", "Shall we make the next stage happen?"])}
+              </h3>
+              <p className="mt-3 max-w-xl text-slate-300">
+                {t([
+                  `Buscamos R$ ${total} para ampliar o monitoramento no território. Próximo passo: definir a frente de apoio e seu plano de aplicação.`,
+                  `We are seeking R$ ${total} to expand monitoring in the region. Next step: choose the area of support and its spending plan.`,
+                ])}
+              </p>
+            </div>
+            <div className="flex shrink-0 flex-col items-center gap-3">
+              <div className="rounded-2xl bg-[#f4f2ea] px-4 py-2.5">
+                <img src="/apresentacao/logo-tikatu.webp" alt="Tikatu" className="h-8 w-auto" />
+              </div>
+              <a
+                href="https://www.tikatu.com.br"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-full bg-cyan-300 px-6 py-3 font-semibold text-slate-950 transition-colors hover:bg-cyan-200"
+              >
+                {t(["Conhecer o Tikatu", "Visit Tikatu"])}
+                <ArrowUpRight className="h-4 w-4" />
+              </a>
+              <a href="mailto:contato@tikatu.com.br" className="text-sm text-cyan-100/90 underline-offset-4 hover:underline">
+                contato@tikatu.com.br
+              </a>
+            </div>
+          </div>
+        </Reveal>
+
+        <p className="mt-6 text-center text-xs text-slate-500">
+          {t([
+            "Proposta de financiamento de pesquisa aplicada. Não representa oferta de serviço contratado.",
+            "Funding proposal for applied research. Not an offer of contracted services.",
+          ])}
+        </p>
+      </div>
+    </section>
+  );
+};
+
+// Roteiro: o que já existe → onde e com que frequência medir → como conferir e explicar →
+// como chega ao campo e às pessoas → equipe → o que o financiamento permite.
 const TELAS: Cena[] = [
-  { nome: "Abertura", el: <Hero />, cheia: true },
-  { nome: "O problema", el: <Amostragem />, transicao: "mare" },
-  { nome: "A origem", el: <Origem />, transicao: "cortina" },
-  { nome: "Como funciona", el: <Fluxo />, passos: PASSOS_FLUXO, transicao: "deslizar" },
-  { nome: "Painel ao vivo", el: <AoVivo />, transicao: "mergulho" },
-  { nome: "App de coleta", el: <AppColeta />, transicao: "deslizar" },
-  { nome: "Para quem", el: <ParaQuem />, transicao: "iris" },
-  { nome: "Equipe", el: <Equipe />, transicao: "cortina" },
-  { nome: "Próxima etapa", el: <ProximosPassos />, transicao: "mare" },
-  { nome: "O investimento", el: <Investimento />, passos: PASSOS_INVESTIMENTO, transicao: "mergulho" },
-  { nome: "Como apoiar", el: <ComoApoiar />, transicao: "iris" },
+  { nome: ["Abertura", "Opening"], el: <Hero />, cheia: true },
+  { nome: ["O que já existe", "What already exists"], el: <AoVivo />, transicao: "mare" },
+  { nome: ["As perguntas", "The questions"], el: <Perguntas />, transicao: "cortina" },
+  { nome: ["Com que frequência", "How often"], el: <Amostragem />, transicao: "deslizar" },
+  { nome: ["Informação confiável", "Reliable information"], el: <Confiavel />, passos: PASSOS_CONFIAVEL, transicao: "mergulho" },
+  { nome: ["Como funciona", "How it works"], el: <Fluxo />, passos: PASSOS_FLUXO, transicao: "deslizar" },
+  { nome: ["App de coleta", "Sampling app"], el: <AppColeta />, transicao: "mare" },
+  { nome: ["Para quem", "Who it is for"], el: <ParaQuem />, transicao: "iris" },
+  { nome: ["Equipe", "Team"], el: <Equipe />, transicao: "cortina" },
+  { nome: ["Próxima etapa", "Next stage"], el: <ProximosPassos />, transicao: "mare" },
+  { nome: ["O investimento", "The investment"], el: <Investimento />, passos: PASSOS_INVESTIMENTO, transicao: "mergulho" },
+  { nome: ["Como apoiar", "How to support"], el: <ComoApoiar />, transicao: "iris" },
 ];
 
 const Apresentacao = () => {
   const reduce = useMenosMovimento();
   const telas = useModoTelas();
+  const l = useIdioma();
+  const t = useT();
 
   // Rolagem suave só para os links internos (#cena-N) e só sem prefers-reduced-motion.
   useEffect(() => {
@@ -524,9 +520,16 @@ const Apresentacao = () => {
   return (
     <>
       <Helmet>
-        <title>Tikatu · Apresentação</title>
+        <html lang={l === "en" ? "en" : "pt-BR"} />
+        <title>{t(["Tikatu · Apresentação", "Tikatu · Presentation"])}</title>
         <meta name="robots" content="noindex, nofollow" />
-        <meta name="description" content="Tikatu: apoio à próxima etapa da pesquisa em qualidade da água." />
+        <meta
+          name="description"
+          content={t([
+            "Tikatu: apoio à próxima etapa da pesquisa em qualidade da água.",
+            "Tikatu: support for the next stage of water quality research.",
+          ])}
+        />
         <meta name="theme-color" content="#021019" />
       </Helmet>
       <div className="min-h-screen bg-[#062a3d] font-sans text-slate-100 antialiased selection:bg-cyan-300/30">
@@ -535,17 +538,18 @@ const Apresentacao = () => {
           <Palco cenas={TELAS} />
         ) : (
           <>
-            <Navegacao />
+            <Navegacao nomes={TELAS.map((c) => c.nome)} />
             <main className="overflow-x-clip">
               <div className="bg-gradient-to-b from-[#021019] via-[#04202f] to-[#062a3d]">
                 <Hero />
               </div>
               {TELAS.slice(1).map((c) =>
                 // Fluxo é "grudado" na rolagem: sem transição para não interferir no sticky.
-                c.passos ? <div key={c.nome}>{c.el}</div> : <Transicao key={c.nome}>{c.el}</Transicao>,
+                c.passos ? <div key={c.nome[0]}>{c.el}</div> : <Transicao key={c.nome[0]}>{c.el}</Transicao>,
               )}
             </main>
-            <div className="fixed bottom-3 left-3 z-40 rounded-full border border-white/10 bg-[#021019]/70 backdrop-blur">
+            <div className="fixed bottom-3 left-3 z-40 flex items-center gap-1 rounded-full border border-white/10 bg-[#021019]/70 py-0.5 pl-0.5 backdrop-blur">
+              <BotaoIdioma className="border-0" />
               <BotaoMovimento />
             </div>
           </>

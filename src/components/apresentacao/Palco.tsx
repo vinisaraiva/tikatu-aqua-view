@@ -3,9 +3,11 @@ import { AnimatePresence, motion, type Variants } from "framer-motion";
 import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 import { PalcoContext } from "./primitives";
 import { definirMovimento, useMenosMovimento, useSistemaReduzSemEscolha } from "./useMenosMovimento";
+import { useT, type Bi } from "./idioma";
+import { BotaoIdioma } from "./BotaoIdioma";
 
 export interface Cena {
-  nome: string;
+  nome: Bi;
   el: ReactNode;
   /** Etapas dentro da mesma tela (as setas avançam a etapa antes de trocar de tela). */
   passos?: number;
@@ -113,19 +115,20 @@ const VARIANTES_SUAVES: Variants = {
 /** Convite discreto quando o sistema está com animações reduzidas e ninguém escolheu ainda. */
 export const AvisoMovimento = () => {
   const mostrar = useSistemaReduzSemEscolha();
+  const t = useT();
   if (!mostrar) return null;
   return (
     <div className="fixed left-1/2 top-4 z-[60] flex w-[min(92vw,34rem)] -translate-x-1/2 flex-wrap items-center justify-center gap-3 rounded-2xl border border-cyan-300/30 bg-[#04202f]/95 px-5 py-3 text-sm text-slate-200 shadow-2xl backdrop-blur">
-      <span>Este computador está com as animações reduzidas.</span>
+      <span>{t(["Este computador está com as animações reduzidas.", "Animations are reduced on this computer."])}</span>
       <button
         type="button"
         onClick={() => definirMovimento("completo")}
         className="rounded-full bg-cyan-300 px-4 py-1.5 font-semibold text-slate-950 hover:bg-cyan-200"
       >
-        Ativar animações
+        {t(["Ativar animações", "Turn on animations"])}
       </button>
       <button type="button" onClick={() => definirMovimento("reduzido")} className="text-slate-400 hover:text-white">
-        Manter
+        {t(["Manter", "Keep"])}
       </button>
     </div>
   );
@@ -134,18 +137,19 @@ export const AvisoMovimento = () => {
 /** Botão para ligar/desligar as animações (salvo neste navegador). */
 export const BotaoMovimento = ({ className = "" }: { className?: string }) => {
   const reduce = useMenosMovimento();
+  const t = useT();
   return (
     <button
       type="button"
       onClick={() => definirMovimento(reduce ? "completo" : "reduzido")}
       aria-pressed={!reduce}
-      title={reduce ? "Ativar animações" : "Reduzir animações"}
+      title={reduce ? t(["Ativar animações", "Turn on animations"]) : t(["Reduzir animações", "Reduce animations"])}
       className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs transition-colors ${
         reduce ? "text-slate-400 hover:text-white" : "text-cyan-200 hover:text-white"
       } ${className}`}
     >
       <Sparkles className="h-3.5 w-3.5" />
-      {reduce ? "Animações: reduzidas" : "Animações: ligadas"}
+      {reduce ? t(["Animações: reduzidas", "Animations: reduced"]) : t(["Animações: ligadas", "Animations: on"])}
     </button>
   );
 };
@@ -160,6 +164,7 @@ export const Palco = ({ cenas }: { cenas: Cena[] }) => {
   const reduce = useMenosMovimento();
   const [estado, setEstado] = useState(() => ({ i: lerHash(cenas.length), passo: 0, dir: 1, tipo: "deslizar" as TipoTransicao }));
   const travado = useRef(0);
+  const t = useT();
 
   const ir = useCallback(
     (delta: 1 | -1) => {
@@ -271,7 +276,7 @@ export const Palco = ({ cenas }: { cenas: Cena[] }) => {
     // As cenas pedem 100svh de altura; aqui descontamos a barra de controles para elas caberem sem encolher.
     <div
       className="fixed inset-0 overflow-hidden bg-[#021019] [&_section]:min-h-[calc(100svh-3.5rem)]"
-      aria-roledescription="apresentação"
+      aria-roledescription={t(["apresentação", "presentation"])}
     >
       <AnimatePresence initial={false} custom={rumo}>
         <motion.div
@@ -282,8 +287,8 @@ export const Palco = ({ cenas }: { cenas: Cena[] }) => {
           animate="centro"
           exit="sai"
           className="absolute inset-0 overflow-hidden bg-gradient-to-b from-[#04202f] to-[#062a3d] shadow-[-40px_0_80px_rgba(0,0,0,0.55)]"
-          aria-roledescription="tela"
-          aria-label={`${i + 1} de ${total}: ${cenas[i].nome}`}
+          aria-roledescription={t(["tela", "screen"])}
+          aria-label={`${i + 1} / ${total}: ${t(cenas[i].nome)}`}
         >
           <PalcoContext.Provider value={{ ativo: true, passo }}>
             <Encaixe cheia={cenas[i].cheia}>{cenas[i].el}</Encaixe>
@@ -302,25 +307,25 @@ export const Palco = ({ cenas }: { cenas: Cena[] }) => {
       {/* Controles */}
       <nav
         className="fixed bottom-4 left-1/2 z-50 flex -translate-x-1/2 items-center gap-1 rounded-full border border-white/10 bg-[#021019]/70 px-2 py-1.5 shadow-xl backdrop-blur"
-        aria-label="Telas da apresentação"
+        aria-label={t(["Telas da apresentação", "Presentation screens"])}
       >
         <button
           type="button"
           onClick={() => ir(-1)}
           disabled={i === 0 && passo === 0}
           className="rounded-full p-1.5 text-slate-300 hover:bg-white/10 hover:text-white disabled:opacity-30"
-          aria-label="Anterior"
+          aria-label={t(["Anterior", "Previous"])}
         >
           <ChevronLeft className="h-4 w-4" />
         </button>
         <div className="flex items-center gap-1.5 px-1">
           {cenas.map((c, k) => (
             <button
-              key={c.nome}
+              key={c.nome[0]}
               type="button"
               onClick={() => irPara(k)}
-              title={c.nome}
-              aria-label={c.nome}
+              title={t(c.nome)}
+              aria-label={t(c.nome)}
               aria-current={k === i ? "step" : undefined}
               className="group flex h-5 items-center"
             >
@@ -340,12 +345,14 @@ export const Palco = ({ cenas }: { cenas: Cena[] }) => {
           onClick={() => ir(1)}
           disabled={i === total - 1 && passo === passos - 1}
           className="rounded-full p-1.5 text-slate-300 hover:bg-white/10 hover:text-white disabled:opacity-30"
-          aria-label="Próxima"
+          aria-label={t(["Próxima", "Next"])}
         >
           <ChevronRight className="h-4 w-4" />
         </button>
         <span className="mx-1 h-4 w-px bg-white/10" aria-hidden />
         <BotaoMovimento />
+        {/* Na abertura o seletor de idioma fica no topo; nas demais telas, aqui. */}
+        {i > 0 && <BotaoIdioma className="border-0" />}
       </nav>
     </div>
   );
