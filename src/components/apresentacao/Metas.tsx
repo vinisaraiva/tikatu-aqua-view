@@ -7,35 +7,36 @@ import { useT, type Bi } from "./idioma";
 import { Sonda3D } from "./Sonda3D";
 
 /**
- * Cena 10: a próxima etapa em 12 meses. Metas e formas de medição enviadas pelo Vinícius em
- * 11/11/2026 (sonda automática em ponto fixo + sondas portáteis nas visitas mensais).
+ * Cena 10: a próxima etapa em 12 meses. Plano combinado com o Vinícius em 11/11/2026:
+ * sondas portáteis com 2 bolsistas nos 8 pontos; sonda automática em local de acesso difícil,
+ * enviando dados pela API do Tikatu; relatórios gerados com a IA e conferidos pela equipe.
  */
 const FORMAS: { icon: typeof Activity; titulo: Bi; texto: Bi }[] = [
-  {
-    icon: Activity,
-    titulo: ["Sonda automática", "Automatic probe"],
-    texto: [
-      "Instalada em ponto fixo, mede sem parar e registra o que acontece entre uma visita e outra.",
-      "Installed at a fixed site, it measures non-stop and records what happens between visits.",
-    ],
-  },
   {
     icon: Footprints,
     titulo: ["Sondas portáteis", "Portable probes"],
     texto: [
-      "Levadas às visitas mensais, medem os 8 pontos dos 2 rios com o mesmo protocolo.",
-      "Taken on the monthly visits, they measure the 8 sites on the 2 rivers with the same protocol.",
+      "Com 2 bolsistas de graduação, medem todo mês os 8 pontos dos 2 rios, com o mesmo protocolo.",
+      "Carried by 2 undergraduate fellows, they measure the 8 sites on the 2 rivers every month, with the same protocol.",
+    ],
+  },
+  {
+    icon: Activity,
+    titulo: ["Sonda automática", "Automatic probe"],
+    texto: [
+      "Em um local de acesso difícil, mede sem parar e envia os dados à plataforma pela API do Tikatu.",
+      "At a hard-to-reach site, it measures non-stop and sends the data to the platform through the Tikatu API.",
     ],
   },
 ];
 
 const METAS: { valor: number; rotulo: Bi }[] = [
   { valor: 2, rotulo: ["rios acompanhados", "rivers monitored"] },
-  { valor: 8, rotulo: ["pontos fixos de monitoramento", "fixed monitoring sites"] },
-  { valor: 10, rotulo: ["ciclos mensais de visitas", "monthly visit cycles"] },
+  { valor: 8, rotulo: ["pontos com coleta mensal", "sites sampled monthly"] },
   { valor: 80, rotulo: ["registros de campo (ponto × visita)", "field records (site × visit)"] },
   { valor: 36, rotulo: ["amostras para laboratório", "laboratory samples"] },
-  { valor: 12, rotulo: ["voluntários capacitados", "volunteers trained"] },
+  { valor: 10, rotulo: ["boletins para a comunidade", "bulletins for the community"] },
+  { valor: 5, rotulo: ["relatórios bimestrais para gestores", "bimonthly reports for decision-makers"] },
 ];
 
 /** Número que conta de 0 até o valor quando aparece. */
@@ -71,8 +72,8 @@ export const Metas = () => {
         </h2>
         <p className="mt-4 max-w-3xl text-slate-300 sm:text-lg">
           {t([
-            "Acompanhar dois rios em oito pontos fixos, com uma sonda automática medindo sem parar e visitas mensais com sondas portáteis, conferir as medições em laboratório, capacitar voluntários e manter a infraestrutura digital do Tikatu.",
-            "Monitor two rivers at eight fixed sites, with an automatic probe measuring non-stop and monthly visits with portable probes, check the measurements in the laboratory, train volunteers and keep Tikatu's digital infrastructure running.",
+            "Acompanhar dois rios (previstos: Buranhém e dos Mangues), conferir as medições em laboratório, formar voluntários da comunidade e transformar os dados em relatórios para a comunidade e para gestores. A plataforma recebe os dois tipos de medição num só painel.",
+            "Monitor two rivers (planned: the Buranhém and the Mangues), check the measurements in the laboratory, train community volunteers and turn the data into reports for the community and for decision-makers. The platform takes in both kinds of measurement in a single dashboard.",
           ])}
         </p>
       </Reveal>
@@ -116,8 +117,8 @@ export const Metas = () => {
           </dl>
           <p className="mt-2 text-xs text-slate-400">
             {t([
-              "Meses 1 e 2: aquisição, preparação, formação e reconhecimento dos locais. Meses 3 a 12: os 10 ciclos de visitas.",
-              "Months 1–2: purchasing, preparation, training and site reconnaissance. Months 3–12: the 10 visit cycles.",
+              "Meses 1 e 2: aquisições, instalação, formação e reconhecimento dos locais. Meses 3 a 12: 10 ciclos mensais. Relatórios gerados com a IA e conferidos pela equipe.",
+              "Months 1–2: purchasing, installation, training and site reconnaissance. Months 3–12: 10 monthly cycles. Reports generated with AI and checked by the team.",
             ])}
           </p>
         </div>

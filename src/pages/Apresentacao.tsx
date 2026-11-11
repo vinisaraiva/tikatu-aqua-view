@@ -331,8 +331,8 @@ const ETAPAS_APOIO: { n: Bi; titulo: Bi; texto: Bi; evidencia: Bi }[] = [
     n: ["Meses 1–2", "Months 1–2"],
     titulo: ["Implantar", "Set up"],
     texto: [
-      "Aquisição dos equipamentos, instalação da sonda automática, formação dos voluntários e reconhecimento dos locais.",
-      "Equipment purchase, automatic probe installation, volunteer training and site reconnaissance.",
+      "Aquisições, instalação da sonda automática e integração pela API, seleção e formação dos bolsistas, oficina com a comunidade e reconhecimento dos locais.",
+      "Purchasing, automatic probe installation and API integration, selecting and training the fellows, a community workshop and site reconnaissance.",
     ],
     evidencia: ["Equipamentos e protocolos", "Equipment and protocols"],
   },
@@ -340,28 +340,28 @@ const ETAPAS_APOIO: { n: Bi; titulo: Bi; texto: Bi; evidencia: Bi }[] = [
     n: ["Meses 3–12", "Months 3–12"],
     titulo: ["Monitorar", "Monitor"],
     texto: [
-      "10 ciclos mensais: 20 saídas de campo nos 8 pontos, mais 4 de reserva; sonda automática medindo sem parar.",
-      "10 monthly cycles: 20 field trips to the 8 sites, plus 4 in reserve; automatic probe measuring non-stop.",
+      "10 ciclos mensais dos bolsistas nos 8 pontos (20 saídas, mais 4 de reserva); sonda automática enviando dados sem parar.",
+      "10 monthly cycles by the fellows at the 8 sites (20 trips, plus 4 in reserve); automatic probe sending data non-stop.",
     ],
-    evidencia: ["80 registros de campo", "80 field records"],
+    evidencia: ["80 registros + série contínua", "80 records + continuous series"],
   },
   {
     n: ["Ao longo da execução", "Throughout"],
     titulo: ["Conferir", "Verify"],
     texto: [
-      "4 rodadas de laboratório nos 8 pontos conferem as medições de campo.",
-      "4 laboratory rounds at the 8 sites check the field measurements.",
+      "4 rodadas de laboratório nos 8 pontos; leituras portáteis ao lado da sonda automática nas visitas de manutenção.",
+      "4 laboratory rounds at the 8 sites; portable readings next to the automatic probe during maintenance visits.",
     ],
     evidencia: ["32 amostras + 4 de controle", "32 samples + 4 for quality control"],
   },
   {
-    n: ["Meio e fim", "Midway and end"],
-    titulo: ["Prestar contas", "Report"],
+    n: ["Mensal e bimestral", "Monthly and bimonthly"],
+    titulo: ["Informar e prestar contas", "Inform and report"],
     texto: [
-      "Cobertura realizada, resultados, limitações e aplicação dos recursos.",
-      "Coverage achieved, results, limitations and use of funds.",
+      "Boletins para a comunidade e relatórios para gestores, gerados com a IA e conferidos pela equipe; no fim, o relatório final.",
+      "Bulletins for the community and reports for decision-makers, generated with AI and checked by the team; at the end, the final report.",
     ],
-    evidencia: ["Relatório intermediário e final", "Interim and final reports"],
+    evidencia: ["10 boletins, 5 relatórios e relatório final", "10 bulletins, 5 reports and a final report"],
   },
 ];
 
@@ -423,8 +423,8 @@ const ComoApoiar = () => {
               </p>
               <p className="mt-2 max-w-xl font-medium text-cyan-100">
                 {t([
-                  "O valor é uma referência: estamos abertos a negociar o escopo, para mais ou para menos.",
-                  "The amount is a reference: we are open to negotiating the scope, up or down.",
+                  "O valor é uma referência: estamos abertos a negociar o escopo, para mais ou para menos, como incluir um terceiro rio.",
+                  "The amount is a reference: we are open to negotiating the scope, up or down, such as adding a third river.",
                 ])}
               </p>
             </div>
