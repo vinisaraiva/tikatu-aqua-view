@@ -7,13 +7,13 @@ import { useMenosMovimento } from "@/components/apresentacao/useMenosMovimento";
 const FRENTES = [
   {
     titulo: "Ampliação do monitoramento em campo",
-    texto: "Sonda e turbidímetro, estrutura de campo, calibração, visitas, logística e frete.",
+    texto: "Sonda automática e turbidímetro, estrutura de campo, calibração, visitas, logística e frete.",
     valor: 57450,
     cor: "#67e8f9",
   },
   {
     titulo: "Novas tecnologias e infraestrutura digital",
-    texto: "Desenvolvimento e manutenção da plataforma, processamento de IA e equipamento.",
+    texto: "Integração da sonda automática à plataforma, desenvolvimento, processamento de IA e equipamento.",
     valor: 29428.2,
     cor: "#38bdf8",
   },
@@ -104,8 +104,8 @@ export const Investimento = () => {
           Ampliar a capacidade de monitorar os rios do território.
         </h2>
         <p className="mt-4 max-w-2xl text-slate-300 sm:text-lg">
-          Mais pontos, mais frequência e mais rios acompanhados, com medições validadas e uma rede de voluntários
-          formada.
+          Uma sonda automática instalada no rio, somada às sondas portáteis dos voluntários: mais pontos, mais
+          frequência e mais rios acompanhados, com medições validadas.
         </p>
       </Reveal>
 
