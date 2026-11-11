@@ -166,8 +166,8 @@ export const Sonda3D = () => {
       </div>
       <figcaption className="mt-3 text-xs text-slate-500">
         {t([
-          "Ilustração: medidor portátil genérico, não o equipamento do projeto. Arraste para girar. Modelo “Water Quality Meter”, de",
-          "Illustration: a generic portable meter, not the project's equipment. Drag to rotate. “Water Quality Meter” model by",
+          "Ilustração de um medidor portátil (modelo genérico, não o equipamento a ser adquirido). Arraste para girar. Modelo “Water Quality Meter”, de",
+          "Illustration of a portable meter (generic model, not the equipment to be purchased). Drag to rotate. “Water Quality Meter” model by",
         ])}{" "}
         <a
           href="https://sketchfab.com/3d-models/water-quality-meter-aa2fd13dda004eeca52ac1634dd07a60"

@@ -166,6 +166,23 @@ export const Palco = ({ cenas }: { cenas: Cena[] }) => {
   const travado = useRef(0);
   const t = useT();
 
+  // Como num slide: em telas maiores que 1366×768 tudo cresce junto (o tamanho base do texto
+  // acompanha a janela, até 24px). Abaixo disso, o Encaixe reduz a cena se precisar.
+  useEffect(() => {
+    const html = document.documentElement;
+    const anterior = html.style.fontSize;
+    const ajustar = () => {
+      const k = Math.min(window.innerWidth / 1366, window.innerHeight / 768);
+      html.style.fontSize = `${Math.min(24, Math.max(16, 16 * k)).toFixed(2)}px`;
+    };
+    ajustar();
+    window.addEventListener("resize", ajustar);
+    return () => {
+      window.removeEventListener("resize", ajustar);
+      html.style.fontSize = anterior;
+    };
+  }, []);
+
   const ir = useCallback(
     (delta: 1 | -1) => {
       setEstado((s) => {

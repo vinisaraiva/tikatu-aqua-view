@@ -80,8 +80,8 @@ const ETAPAS: Etapa[] = [
     icon: MessageSquareText,
     titulo: ["A Miãga interpreta", "Miãga interprets"],
     simples: [
-      "Uma assistente de IA explica, em linguagem simples, o que os dados mostram em cada ponto.",
-      "An AI assistant explains, in plain language, what the data show at each site.",
+      "Uma assistente de IA explica os dados em linguagem simples e ajuda a gerar relatórios para a comunidade e para gestores.",
+      "An AI assistant explains the data in plain language and helps produce reports for the community and for decision-makers.",
     ],
     tecnico: [
       "As explicações passam pela pré-verificação: só chegam a quem lê se os números baterem com o cálculo.",

@@ -4,63 +4,84 @@ import { ATRASO_TELA, Reveal, SceneLabel, usePalco } from "@/components/apresent
 import { useMenosMovimento } from "@/components/apresentacao/useMenosMovimento";
 import { formatar, useIdioma, useT, type Bi } from "@/components/apresentacao/idioma";
 
-/** Orçamento estimado agrupado em frentes (soma = TOTAL). Detalhe por item fica para quem pedir. */
-/** Cada frente com a entrega concreta que ela viabiliza. */
+/**
+ * Orçamento estimado em frentes (soma = TOTAL), cada uma com a entrega que viabiliza.
+ * Plano de 12 meses combinado com o Vinícius em 11/11/2026 (orçamento anterior + 2 bolsas).
+ * O detalhe por item fica para quem pedir.
+ */
 const FRENTES: { curto: Bi; titulo: Bi; texto: Bi; entrega: Bi; valor: number; pct: number; cor: string }[] = [
   {
     curto: ["Campo", "Field"],
-    titulo: ["Ampliação do monitoramento em campo", "Expanding field monitoring"],
+    titulo: ["Monitoramento em campo", "Field monitoring"],
     texto: [
-      "Sonda automática e turbidímetro, estrutura de campo, calibração, visitas, logística e frete.",
-      "Automatic probe and turbidimeter, field infrastructure, calibration, site visits, logistics and freight.",
+      "Sonda automática com envio de dados, sonda portátil de reserva e reposição, turbidímetro, estrutura de campo, calibração, saídas, logística e frete.",
+      "Automatic probe with data transmission, a spare portable probe, turbidimeter, field infrastructure, calibration, field trips, logistics and freight.",
     ],
-    entrega: ["Novas campanhas de coleta e mais pontos acompanhados.", "New sampling campaigns and more sites monitored."],
+    entrega: [
+      "2 rios, 8 pontos, 10 ciclos mensais e 80 registros, mais a série contínua da sonda automática.",
+      "2 rivers, 8 sites, 10 monthly cycles and 80 records, plus the automatic probe's continuous series.",
+    ],
     valor: 57450,
-    pct: 53,
+    pct: 46,
     cor: "#67e8f9",
   },
   {
     curto: ["Tecnologia", "Technology"],
-    titulo: ["Novas tecnologias e infraestrutura digital", "New technologies and digital infrastructure"],
+    titulo: ["Tecnologia e infraestrutura digital", "Technology and digital infrastructure"],
     texto: [
-      "Integração da sonda automática à plataforma, desenvolvimento, processamento de IA e equipamento.",
-      "Integrating the automatic probe into the platform, development, AI processing and equipment.",
+      "Integração da sonda automática pela API do Tikatu, melhorias na plataforma, IA para relatórios, operação digital, notebook e dispositivo de campo.",
+      "Integrating the automatic probe through the Tikatu API, platform improvements, AI for reports, digital operation, a laptop and a field device.",
     ],
     entrega: [
-      "Registros mais completos e as ferramentas avaliadas em uso real.",
-      "More complete records and the tools evaluated in real use.",
+      "Os dois tipos de medição num só painel, 10 boletins para a comunidade e 5 relatórios para gestores.",
+      "Both kinds of measurement in one dashboard, 10 community bulletins and 5 reports for decision-makers.",
     ],
     valor: 29428.2,
-    pct: 27,
+    pct: 24,
     cor: "#38bdf8",
   },
   {
     curto: ["Laboratório", "Laboratory"],
-    titulo: ["Validação laboratorial", "Laboratory validation"],
+    titulo: ["Análises laboratoriais complementares", "Complementary laboratory analyses"],
     texto: [
-      "Análises de referência para conferir as medições feitas em campo.",
-      "Reference analyses to check the measurements taken in the field.",
+      "As sondas são calibradas; o laboratório complementa as medições quando o protocolo pedir.",
+      "The probes are calibrated; the laboratory complements the measurements when the protocol calls for it.",
     ],
-    entrega: ["Medições de campo conferidas com análises de referência.", "Field measurements checked against reference analyses."],
+    entrega: ["Até 36 amostras: 32 principais e 4 de controle de qualidade.", "Up to 36 samples: 32 main and 4 for quality control."],
     valor: 18000,
-    pct: 16,
+    pct: 14,
     cor: "#efb08c",
   },
   {
-    curto: ["Voluntários", "Volunteers"],
-    titulo: ["Formação da rede de voluntários", "Training the volunteer network"],
+    curto: ["Bolsistas", "Fellows"],
+    titulo: ["Bolsistas de coleta", "Sampling fellows"],
     texto: [
-      "Formação e identificação dos voluntários que coletam os dados.",
-      "Training and identification of the volunteers who collect the data.",
+      "2 estudantes de graduação com bolsa por 12 meses, responsáveis pela coleta mensal com as sondas portáteis.",
+      "2 undergraduate students with a 12-month fellowship, responsible for the monthly sampling with the portable probes.",
     ],
-    entrega: ["Voluntários formados para coletas regulares.", "Volunteers trained for regular sampling."],
+    entrega: [
+      "Coleta regular nos 8 pontos durante os 10 ciclos, e estudantes formados em monitoramento.",
+      "Regular sampling at the 8 sites over the 10 cycles, and students trained in monitoring.",
+    ],
+    valor: 16800,
+    pct: 13,
+    cor: "#c4b5fd",
+  },
+  {
+    curto: ["Comunidade", "Community"],
+    titulo: ["Voluntários da comunidade", "Community volunteers"],
+    texto: [
+      "Oficinas de formação e identificação para quem quiser participar das coletas.",
+      "Training workshops and identification for anyone who wants to take part in the sampling.",
+    ],
+    entrega: ["2 oficinas (16 h) abertas à comunidade.", "2 workshops (16 h) open to the community."],
     valor: 3960,
-    pct: 4,
+    pct: 3,
     cor: "#5eead4",
   },
 ];
 // Percentuais inteiros que somam 100 (maiores restos).
-export const TOTAL = 108838.2;
+export const TOTAL = 125638.2;
 export const PASSOS_INVESTIMENTO = FRENTES.length;
 
 const R = 80;
@@ -170,8 +191,8 @@ export const Investimento = () => {
         </h2>
         <p className="mt-4 max-w-3xl text-slate-300 sm:text-lg">
           {t([
-            "Mais da metade vai para o campo. O restante fortalece a tecnologia, valida as medições e forma a rede de voluntários.",
-            "More than half goes to the field. The rest strengthens the technology, validates the measurements and trains the volunteer network.",
+            "Cada parte do apoio vira dado: medido no rio com sondas calibradas, complementado em laboratório e transformado em informação para a comunidade e para quem decide.",
+            "Every part of the support becomes data: measured in the river with calibrated probes, complemented in the laboratory and turned into information for the community and for decision-makers.",
           ])}
         </p>
       </Reveal>
@@ -221,7 +242,7 @@ export const Investimento = () => {
 
           {/* As quatro frentes: clicáveis, com a ativa marcada */}
           <div
-            className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4"
+            className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-5"
             role="tablist"
             aria-label={t(["Frentes do investimento", "Investment areas"])}
           >
@@ -237,8 +258,8 @@ export const Investimento = () => {
                   k === sel ? "border-white/30 bg-white/10" : "border-white/10 bg-white/[0.02] hover:bg-white/[0.06]"
                 }`}
               >
-                <span className="flex items-center gap-2 text-sm font-semibold text-white">
-                  <span className="block h-2 w-2 rounded-full" style={{ background: x.cor }} aria-hidden />
+                <span className="flex min-w-0 items-center gap-1.5 text-sm font-semibold text-white">
+                  <span className="block h-2 w-2 shrink-0 rounded-full" style={{ background: x.cor }} aria-hidden />
                   {t(x.curto)}
                 </span>
                 <span className="font-mono text-xs tabular-nums text-slate-400">{x.pct}%</span>
