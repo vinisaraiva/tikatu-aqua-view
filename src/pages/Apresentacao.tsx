@@ -417,7 +417,7 @@ const ProximosPassos = () => (
         <div className="mt-20 flex flex-col items-center rounded-3xl border border-cyan-300/30 bg-gradient-to-br from-cyan-400/15 via-teal-400/10 to-transparent px-6 py-12 text-center sm:px-12">
           <div className="rounded-2xl bg-white px-5 py-3">
             <img
-              src="/lovable-uploads/d62bdfd0-6fc8-4075-ac93-580e7557f424.png"
+              src="/apresentacao/logo-tikatu.webp"
               alt="Tikatu"
               className="h-10 w-auto"
               loading="lazy"
