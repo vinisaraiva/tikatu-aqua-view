@@ -202,11 +202,11 @@ export const Amostragem = () => {
     <section
       ref={ref}
       id="cena-2"
-      className="mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-center px-6 py-20"
+      className="mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-center px-6 py-20 md:[@media(max-height:760px)]:py-10"
       aria-label="O problema"
     >
       <Cabecalho />
-      <div className="mt-8 sm:mt-10">
+      <div className="mt-8 w-full sm:mt-10 md:[@media(max-height:760px)]:mt-6 md:[@media(max-height:760px)]:max-w-3xl">
         <Grafico coletas={coletas} tracado={tracado} />
       </div>
       <div className="mt-5 flex min-h-[3.5rem] flex-wrap items-center gap-4">

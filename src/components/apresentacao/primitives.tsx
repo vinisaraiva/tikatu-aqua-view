@@ -1,8 +1,18 @@
-import { useRef, type ReactNode } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { createContext, useContext, useEffect, useRef, type ReactNode, type RefObject } from "react";
+import { animate, motion, useMotionValue, useScroll, useTransform, type MotionValue } from "framer-motion";
 import { useMenosMovimento } from "./useMenosMovimento";
 
-/** Entrada suave ao aparecer na tela (desligada com prefers-reduced-motion). */
+/**
+ * Modo "telas": cada cena ocupa a janela inteira e as cenas trocam de lado (setas, roda do mouse,
+ * gesto). Dentro de uma tela, `passo` diz em que etapa a cena está (ex.: os 4 passos do fluxo).
+ */
+export const PalcoContext = createContext<{ ativo: boolean; passo: number }>({ ativo: false, passo: 0 });
+export const usePalco = () => useContext(PalcoContext);
+
+/** Atraso para as entradas começarem depois que a tela termina de deslizar. */
+export const ATRASO_TELA = 0.45;
+
+/** Entrada suave ao aparecer (desligada com menos movimento). No modo telas, repete a cada visita. */
 export const Reveal = ({
   children,
   delay = 0,
@@ -15,13 +25,27 @@ export const Reveal = ({
   className?: string;
 }) => {
   const reduce = useMenosMovimento();
+  const palco = usePalco();
+  const transition = { duration: 0.8, delay: delay + (palco.ativo ? ATRASO_TELA : 0), ease: [0.22, 1, 0.36, 1] };
+  if (palco.ativo) {
+    return (
+      <motion.div
+        className={className}
+        initial={reduce ? false : { opacity: 0, y }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={transition}
+      >
+        {children}
+      </motion.div>
+    );
+  }
   return (
     <motion.div
       className={className}
       initial={reduce ? false : { opacity: 0, y }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-10% 0px" }}
-      transition={{ duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] }}
+      transition={transition}
     >
       {children}
     </motion.div>
@@ -37,8 +61,28 @@ export const SceneLabel = ({ index, children }: { index: number; children: React
 );
 
 /**
- * Transição entre cenas, presa à rolagem: a cena que chega sobe e ganha opacidade; a que sai
- * esmaece. Só opacidade e deslocamento (nada de escala), para não pesar nem mexer no layout.
+ * Progresso 0→1 de uma cena. Na rolagem vertical, segue a rolagem; no modo telas, anima sozinho
+ * ao entrar na tela.
+ */
+export const useProgressoCena = (
+  ref: RefObject<HTMLElement>,
+  offset: NonNullable<Parameters<typeof useScroll>[0]>["offset"],
+): MotionValue<number> => {
+  const palco = usePalco();
+  const reduce = useMenosMovimento();
+  const { scrollYProgress } = useScroll({ target: ref, offset });
+  const proprio = useMotionValue(palco.ativo && !reduce ? 0 : 1);
+  useEffect(() => {
+    if (!palco.ativo || reduce) return;
+    const c = animate(proprio, 1, { duration: 1.6, delay: ATRASO_TELA, ease: [0.22, 1, 0.36, 1] });
+    return () => c.stop();
+  }, [palco.ativo, reduce, proprio]);
+  return palco.ativo ? proprio : scrollYProgress;
+};
+
+/**
+ * Transição entre cenas na rolagem vertical: a cena que chega sobe e ganha opacidade; a que sai
+ * esmaece. No modo telas quem faz a transição é o palco, então aqui não faz nada.
  */
 export const Transicao = ({ children }: { children: ReactNode }) => {
   const reduce = useMenosMovimento();

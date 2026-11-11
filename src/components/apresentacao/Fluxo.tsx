@@ -1,14 +1,16 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   AnimatePresence,
   motion,
+  useMotionValue,
   useMotionValueEvent,
   useScroll,
   useSpring,
   useTransform,
+  type MotionValue,
 } from "framer-motion";
 import { CloudUpload, Cpu, LayoutDashboard, Smartphone, type LucideIcon } from "lucide-react";
-import { SceneLabel } from "./primitives";
+import { ATRASO_TELA, SceneLabel, usePalco } from "./primitives";
 import { useMenosMovimento } from "./useMenosMovimento";
 
 interface Etapa {
@@ -44,6 +46,8 @@ const ETAPAS: Etapa[] = [
     tecnico: "Painel web com mapa, referência do CONAMA e status de cada leitura por ponto de coleta.",
   },
 ];
+
+export const PASSOS_FLUXO = ETAPAS.length;
 
 /** Ilustração de cada etapa. Passos 1 e 4 usam telas reais (Coleta e painel em produção). */
 const Ilustracao = ({ etapa }: { etapa: number }) => {
@@ -137,7 +141,7 @@ const Ilustracao = ({ etapa }: { etapa: number }) => {
   );
 };
 
-const Trilha = ({ ativa, progresso }: { ativa: number; progresso: ReturnType<typeof useSpring> | null }) => (
+const Trilha = ({ ativa, progresso }: { ativa: number; progresso: MotionValue<number> | null }) => (
   <div className="relative mx-auto mb-5 flex max-w-xl items-center justify-between sm:mb-8">
     <div className="absolute inset-x-6 top-1/2 h-0.5 -translate-y-1/2 bg-white/10" aria-hidden />
     {progresso && (
@@ -195,8 +199,78 @@ const FluxoEstatico = () => (
   </section>
 );
 
+/** Conteúdo da cena: título, trilha, texto e ilustração da etapa ativa. */
+const Conteudo = ({
+  ativa,
+  progresso,
+  tituloOpacity,
+}: {
+  ativa: number;
+  progresso: MotionValue<number>;
+  tituloOpacity?: MotionValue<number>;
+}) => (
+  <div className="mx-auto w-full max-w-5xl">
+    <motion.div style={tituloOpacity ? { opacity: tituloOpacity } : undefined}>
+      <SceneLabel index={4}>Como funciona</SceneLabel>
+      <h2 className="mb-4 text-2xl font-semibold text-white sm:mb-12 sm:text-5xl">Do rio ao painel, em quatro passos.</h2>
+    </motion.div>
+
+    <Trilha ativa={ativa} progresso={progresso} />
+
+    <div className="grid items-center gap-3 sm:gap-6 md:grid-cols-2 md:gap-12">
+      <div className="order-2 min-h-[11rem] text-center sm:min-h-[13rem] md:order-1 md:text-left" aria-live="polite">
+        <div className="mb-2 text-sm font-semibold text-cyan-300">
+          Passo {ativa + 1} de {ETAPAS.length}
+        </div>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={ativa}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20, transition: { duration: 0.18 } }}
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <TextoEtapa etapa={ETAPAS[ativa]} />
+          </motion.div>
+        </AnimatePresence>
+      </div>
+      <div className="order-1 flex min-h-[10rem] items-center sm:min-h-[14rem] md:order-2 md:min-h-[18rem]">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={ativa}
+            className="w-full"
+            initial={{ opacity: 0, scale: 0.92 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 1.04, transition: { duration: 0.18 } }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <Ilustracao etapa={ativa} />
+          </motion.div>
+        </AnimatePresence>
+      </div>
+    </div>
+  </div>
+);
+
+/** Modo telas: cada seta avança um passo, e a trilha se enche até o passo atual. */
+const FluxoTela = ({ passo }: { passo: number }) => {
+  const alvo = useMotionValue(0);
+  const progresso = useSpring(alvo, { stiffness: 90, damping: 22 });
+  useEffect(() => {
+    const t = window.setTimeout(() => alvo.set(passo / (ETAPAS.length - 1)), passo === 0 ? ATRASO_TELA * 1000 : 0);
+    return () => window.clearTimeout(t);
+  }, [passo, alvo]);
+  return (
+    <section id="cena-4" className="relative flex min-h-[100svh] flex-col justify-center px-6 py-16" aria-label="Como funciona">
+      <Conteudo ativa={passo} progresso={progresso} />
+      <p className="mt-6 text-center text-xs text-slate-500">Use → para avançar cada passo.</p>
+    </section>
+  );
+};
+
 export const Fluxo = () => {
   const reduce = useMenosMovimento();
+  const palco = usePalco();
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
   const suave = useSpring(scrollYProgress, { stiffness: 120, damping: 30, mass: 0.3 });
@@ -208,55 +282,14 @@ export const Fluxo = () => {
     setAtiva((atual) => (atual === i ? atual : i));
   });
 
+  if (palco.ativo) return <FluxoTela passo={Math.min(palco.passo, ETAPAS.length - 1)} />;
   if (reduce) return <FluxoEstatico />;
 
   return (
     // Seção alta + conteúdo "grudado": a rolagem vira a linha do tempo da animação.
     <section ref={ref} id="cena-4" data-paradas={ETAPAS.length} className="relative h-[420vh]" aria-label="Como funciona">
       <div className="sticky top-0 flex h-[100svh] flex-col justify-center overflow-hidden px-6">
-        <div className="mx-auto w-full max-w-5xl">
-          <motion.div style={{ opacity: tituloOpacity }}>
-            <SceneLabel index={4}>Como funciona</SceneLabel>
-            <h2 className="mb-4 text-2xl font-semibold text-white sm:mb-12 sm:text-5xl">
-              Do rio ao painel, em quatro passos.
-            </h2>
-          </motion.div>
-
-          <Trilha ativa={ativa} progresso={suave} />
-
-          <div className="grid items-center gap-3 sm:gap-6 md:grid-cols-2 md:gap-12">
-            <div className="order-2 min-h-[11rem] text-center sm:min-h-[13rem] md:order-1 md:text-left" aria-live="polite">
-              <div className="mb-2 text-sm font-semibold text-cyan-300">
-                Passo {ativa + 1} de {ETAPAS.length}
-              </div>
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={ativa}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20, transition: { duration: 0.18 } }}
-                  transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                >
-                  <TextoEtapa etapa={ETAPAS[ativa]} />
-                </motion.div>
-              </AnimatePresence>
-            </div>
-            <div className="order-1 flex min-h-[10rem] items-center sm:min-h-[14rem] md:order-2 md:min-h-[18rem]">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={ativa}
-                  className="w-full"
-                  initial={{ opacity: 0, scale: 0.92 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 1.04, transition: { duration: 0.18 } }}
-                  transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                >
-                  <Ilustracao etapa={ativa} />
-                </motion.div>
-              </AnimatePresence>
-            </div>
-          </div>
-        </div>
+        <Conteudo ativa={ativa} progresso={suave} tituloOpacity={tituloOpacity} />
       </div>
     </section>
   );

@@ -4,13 +4,14 @@ import { Link } from "react-router-dom";
 import { motion, useScroll, useSpring } from "framer-motion";
 import { ArrowUpRight, Building2, FlaskConical, Globe2, Ship } from "lucide-react";
 import { Hero } from "@/components/apresentacao/Hero";
-import { Fluxo } from "@/components/apresentacao/Fluxo";
+import { Fluxo, PASSOS_FLUXO } from "@/components/apresentacao/Fluxo";
 import { AoVivo, AppColeta } from "@/components/apresentacao/AoVivo";
 import { Reveal, SceneLabel, Transicao } from "@/components/apresentacao/primitives";
 import { Amostragem } from "@/components/apresentacao/Amostragem";
 import { Sonda3D } from "@/components/apresentacao/Sonda3D";
 import { Investimento } from "@/components/apresentacao/Investimento";
 import { useMenosMovimento } from "@/components/apresentacao/useMenosMovimento";
+import { AvisoMovimento, BotaoMovimento, Palco, useModoTelas, type Cena } from "@/components/apresentacao/Palco";
 
 const CENAS = [
   "Abertura",
@@ -490,18 +491,34 @@ const ComoApoiar = () => (
   </section>
 );
 
+const TELAS: Cena[] = [
+  { nome: "Abertura", el: <Hero />, cheia: true },
+  { nome: "O problema", el: <Amostragem /> },
+  { nome: "A origem", el: <Origem /> },
+  { nome: "Como funciona", el: <Fluxo />, passos: PASSOS_FLUXO },
+  { nome: "Painel ao vivo", el: <AoVivo /> },
+  { nome: "App de coleta", el: <AppColeta /> },
+  { nome: "Para quem", el: <ParaQuem /> },
+  { nome: "Equipe", el: <Equipe /> },
+  { nome: "Próxima etapa", el: <ProximosPassos /> },
+  { nome: "O investimento", el: <Investimento /> },
+  { nome: "Como apoiar", el: <ComoApoiar /> },
+];
+
 const Apresentacao = () => {
   const reduce = useMenosMovimento();
+  const telas = useModoTelas();
 
   // Rolagem suave só para os links internos (#cena-N) e só sem prefers-reduced-motion.
   useEffect(() => {
+    if (telas) return;
     const html = document.documentElement;
     const anterior = html.style.scrollBehavior;
     if (!reduce) html.style.scrollBehavior = "smooth";
     return () => {
       html.style.scrollBehavior = anterior;
     };
-  }, [reduce]);
+  }, [reduce, telas]);
 
   return (
     <>
@@ -512,40 +529,27 @@ const Apresentacao = () => {
         <meta name="theme-color" content="#021019" />
       </Helmet>
       <div className="min-h-screen bg-[#062a3d] font-sans text-slate-100 antialiased selection:bg-cyan-300/30">
-        <Navegacao />
-        <main className="overflow-x-clip">
-          <div className="bg-gradient-to-b from-[#021019] via-[#04202f] to-[#062a3d]">
-            <Hero />
-          </div>
-          <Transicao>
-            <Amostragem />
-          </Transicao>
-          <Transicao>
-            <Origem />
-          </Transicao>
-          <Fluxo />
-          <Transicao>
-            <AoVivo />
-          </Transicao>
-          <Transicao>
-            <AppColeta />
-          </Transicao>
-          <Transicao>
-            <ParaQuem />
-          </Transicao>
-          <Transicao>
-            <Equipe />
-          </Transicao>
-          <Transicao>
-            <ProximosPassos />
-          </Transicao>
-          <Transicao>
-            <Investimento />
-          </Transicao>
-          <Transicao>
-            <ComoApoiar />
-          </Transicao>
-        </main>
+        {telas ? (
+          // Telas largas: uma cena por tela, trocando de lado (setas, roda do mouse, gesto).
+          <Palco cenas={TELAS} />
+        ) : (
+          <>
+            <Navegacao />
+            <main className="overflow-x-clip">
+              <div className="bg-gradient-to-b from-[#021019] via-[#04202f] to-[#062a3d]">
+                <Hero />
+              </div>
+              {TELAS.slice(1).map((c) =>
+                // Fluxo é "grudado" na rolagem: sem transição para não interferir no sticky.
+                c.passos ? <div key={c.nome}>{c.el}</div> : <Transicao key={c.nome}>{c.el}</Transicao>,
+              )}
+            </main>
+            <div className="fixed bottom-3 left-3 z-40 rounded-full border border-white/10 bg-[#021019]/70 backdrop-blur">
+              <BotaoMovimento />
+            </div>
+          </>
+        )}
+        <AvisoMovimento />
       </div>
     </>
   );

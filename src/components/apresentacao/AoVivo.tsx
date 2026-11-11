@@ -4,12 +4,11 @@ import {
   motion,
   useInView,
   useMotionValue,
-  useScroll,
   useSpring,
   useTransform,
 } from "framer-motion";
 import { Gauge, MapPin, ShieldCheck } from "lucide-react";
-import { Reveal, SceneLabel } from "./primitives";
+import { Reveal, SceneLabel, useProgressoCena } from "./primitives";
 import { useMenosMovimento } from "./useMenosMovimento";
 
 /**
@@ -66,7 +65,7 @@ const Navegador = ({ children }: { children: ReactNode }) => (
 export const AoVivo = () => {
   const ref = useRef<HTMLElement>(null);
   const reduce = useMenosMovimento();
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "center center"] });
+  const scrollYProgress = useProgressoCena(ref, ["start end", "center center"]);
   const giro = useTransform(scrollYProgress, [0, 1], reduce ? [-8, -8] : [-28, -8]);
   const entrada = useTransform(scrollYProgress, [0, 1], reduce ? [1, 1] : [0.85, 1]);
   const tabelaY = useTransform(scrollYProgress, [0.3, 1], reduce ? [0, 0] : [80, 0]);

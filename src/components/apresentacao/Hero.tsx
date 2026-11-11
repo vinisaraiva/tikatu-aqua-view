@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, ChevronRight } from "lucide-react";
+import { usePalco } from "./primitives";
 import { useMenosMovimento } from "./useMenosMovimento";
 
 /** Camada de onda: o caminho se repete duas vezes para o loop horizontal não ter emenda. */
@@ -40,6 +41,7 @@ const WAVE_C =
 export const Hero = () => {
   const ref = useRef<HTMLElement>(null);
   const reduce = useMenosMovimento();
+  const palco = usePalco();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
 
   // Ao rolar, o texto afunda e some enquanto a água sobe: a "câmera" mergulha.
@@ -80,7 +82,7 @@ export const Hero = () => {
 
       <motion.div
         style={{ y: textY, opacity: textOpacity }}
-        className="relative z-10 mx-auto w-full max-w-6xl px-6 pb-36 pt-[36svh] text-center md:pb-36 md:pt-16 md:text-left"
+        className="relative z-10 mx-auto w-full max-w-6xl px-6 pb-36 pt-[36svh] text-center md:pb-36 md:pt-16 md:text-left md:[@media(max-height:760px)]:pb-24 md:[@media(max-height:760px)]:pt-8"
       >
         <motion.img
           src="/apresentacao/logo-tikatu.webp"
@@ -88,7 +90,7 @@ export const Hero = () => {
           initial={reduce ? false : { opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="mx-auto mb-8 h-10 w-auto md:mx-0 sm:h-12"
+          className="mx-auto mb-8 h-10 w-auto md:mx-0 sm:h-12 md:[@media(max-height:760px)]:mb-5"
         />
         <motion.p
           initial={reduce ? false : { opacity: 0, y: 12 }}
@@ -98,7 +100,7 @@ export const Hero = () => {
         >
           Financiamento de pesquisa aplicada
         </motion.p>
-        <h1 className="text-balance text-4xl font-bold leading-[1.05] tracking-tight text-[#0d3a5c] sm:text-6xl md:max-w-2xl md:text-7xl">
+        <h1 className="text-balance text-4xl font-bold leading-[1.05] tracking-tight text-[#0d3a5c] sm:text-6xl md:max-w-2xl md:text-7xl md:[@media(max-height:760px)]:text-6xl">
           {["Apoie a próxima", "etapa do Tikatu."].map((line, i) => (
             <motion.span
               key={line}
@@ -123,7 +125,7 @@ export const Hero = () => {
           initial={reduce ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1, delay: 1.2 }}
-          className="mx-auto mt-6 max-w-md text-pretty text-base text-slate-600 sm:text-lg md:mx-0"
+          className="mx-auto mt-6 max-w-md text-pretty md:[@media(max-height:760px)]:mt-4 text-base text-slate-600 sm:text-lg md:mx-0"
         >
           Ciência e tecnologia para compreender a qualidade da água e conferir o caminho da medição à
           interpretação.
@@ -132,7 +134,7 @@ export const Hero = () => {
           initial={reduce ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1, delay: 1.6 }}
-          className="mt-8 text-sm text-slate-600"
+          className="mt-8 text-sm text-slate-600 md:[@media(max-height:760px)]:mt-5"
         >
           <motion.div
             className="mx-auto mb-4 h-[3px] w-28 origin-left bg-[#c4552b] md:mx-0"
@@ -160,13 +162,13 @@ export const Hero = () => {
         style={{ opacity: textOpacity }}
         className="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-1 text-xs text-cyan-100/90"
       >
-        <span>Role para mergulhar</span>
-        <span className="hidden text-cyan-100/60 lg:block">ou use as setas ← → do teclado</span>
+        <span>{palco.ativo ? "Avance com → ou a roda do mouse" : "Role para mergulhar"}</span>
+        {!palco.ativo && <span className="hidden text-cyan-100/60 lg:block">ou use as setas ← → do teclado</span>}
         <motion.span
-          animate={reduce ? undefined : { y: [0, 6, 0] }}
+          animate={reduce ? undefined : palco.ativo ? { x: [0, 6, 0] } : { y: [0, 6, 0] }}
           transition={{ duration: 1.8, repeat: Infinity }}
         >
-          <ChevronDown className="h-5 w-5" />
+          {palco.ativo ? <ChevronRight className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
         </motion.span>
       </motion.a>
     </section>
