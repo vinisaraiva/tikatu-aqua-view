@@ -95,10 +95,10 @@ export const Hero = () => {
           transition={{ duration: 0.8 }}
           className="mb-6 text-xs font-semibold uppercase tracking-[0.35em] text-cyan-300/90"
         >
-          Tikatu · monitoramento cidadão da água
+          Tikatu · financiamento de pesquisa aplicada
         </motion.p>
         <h1 className="text-balance text-4xl font-semibold leading-[1.05] tracking-tight text-white sm:text-6xl md:text-7xl">
-          {["Toda água conta", "uma história."].map((line, i) => (
+          {["Apoie a próxima", "etapa do Tikatu."].map((line, i) => (
             <motion.span
               key={line}
               className="block"
@@ -115,7 +115,7 @@ export const Hero = () => {
             animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             transition={{ duration: 1.1, delay: 0.75, ease: [0.22, 1, 0.36, 1] }}
           >
-            Quase ninguém consegue lê-la.
+            Da medição à compreensão.
           </motion.span>
         </h1>
         <motion.p
@@ -124,8 +124,8 @@ export const Hero = () => {
           transition={{ duration: 1, delay: 1.3 }}
           className="mx-auto mt-8 max-w-xl text-pretty text-base text-slate-300 sm:text-lg"
         >
-          O Tikatu transforma voluntários com um celular numa rede de monitoramento da qualidade da água, do
-          rio ao painel público.
+          Ciência e tecnologia para compreender a qualidade da água e conferir o caminho da medição à
+          interpretação. Buscamos apoio para sondas, materiais e campanhas de campo.
         </motion.p>
       </motion.div>
 

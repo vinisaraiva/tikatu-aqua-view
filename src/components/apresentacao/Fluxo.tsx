@@ -22,8 +22,8 @@ const ETAPAS: Etapa[] = [
   {
     icon: Smartphone,
     titulo: "O voluntário coleta",
-    simples: "No ponto do rio, o voluntário abre o app Tikatu Coleta e registra a amostra da água.",
-    tecnico: "App de coleta com ponto georreferenciado, parâmetros medidos e data da leitura.",
+    simples: "No ponto do rio, o voluntário mede com a sonda e envia a leitura pelo app Tikatu Coleta.",
+    tecnico: "O app importa o arquivo XLSX da sonda, sem redigitar valores.",
   },
   {
     icon: CloudUpload,
@@ -34,38 +34,29 @@ const ETAPAS: Etapa[] = [
   {
     icon: Cpu,
     titulo: "A plataforma processa",
-    simples: "Os números brutos viram informação: cada leitura é organizada por rio, ponto e período.",
-    tecnico: "Cálculo de índices como o IQA (Qualidade da Água) e o IET (Estado Trófico).",
+    simples: "Os números brutos viram informação: cada leitura é organizada e comparada à referência legal.",
+    tecnico: "Comparação com a faixa do CONAMA e índices como o IQA (Qualidade da Água) e o IET (Estado Trófico).",
   },
   {
     icon: LayoutDashboard,
     titulo: "O painel mostra",
     simples: "Qualquer pessoa vê no mapa e nos gráficos como está a água daquele lugar.",
-    tecnico: "Painel web com mapa, séries históricas e índices por ponto de coleta.",
+    tecnico: "Painel web com mapa, referência do CONAMA e status de cada leitura por ponto de coleta.",
   },
 ];
 
-/** Ilustração de cada etapa, desenhada só com CSS (sem imagens pesadas). */
+/** Ilustração de cada etapa. Passos 1 e 4 usam telas reais (Coleta e painel em produção). */
 const Ilustracao = ({ etapa }: { etapa: number }) => {
   if (etapa === 0) {
     return (
-      <div className="mx-auto w-40 rounded-[1.8rem] border border-white/15 bg-slate-950/80 p-3 shadow-2xl shadow-cyan-500/10 sm:w-48">
-        <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-white/20" />
-        <div className="mb-2 text-[10px] font-semibold text-cyan-200">Tikatu Coleta</div>
-        {["Ponto", "pH", "Turbidez", "Temperatura"].map((c, i) => (
-          <motion.div
-            key={c}
-            initial={{ opacity: 0, x: -8 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.1 + i * 0.12 }}
-            className="mb-1.5 rounded-md bg-white/5 px-2 py-1.5 text-[10px] text-slate-300"
-          >
-            {c}
-            <span className="float-right h-1.5 w-8 translate-y-1 rounded bg-cyan-300/40" />
-          </motion.div>
-        ))}
-        <div className="mt-3 rounded-md bg-cyan-400 py-1.5 text-center text-[10px] font-semibold text-slate-950">
-          Enviar leitura
+      <div className="mx-auto w-24 rounded-[1.4rem] bg-[#0d1b24] p-1.5 shadow-2xl shadow-cyan-500/20 ring-1 ring-white/15 sm:w-56 sm:rounded-[2rem] sm:p-2">
+        <div className="overflow-hidden rounded-[1.6rem] bg-[#f6f7f9]">
+          <img
+            src="/apresentacao/coleta-importar.webp"
+            alt="Tela real do Tikatu Coleta para importar o arquivo XLSX da sonda"
+            className="block w-full"
+            loading="lazy"
+          />
         </div>
       </div>
     );
@@ -99,89 +90,55 @@ const Ilustracao = ({ etapa }: { etapa: number }) => {
     );
   }
   if (etapa === 2) {
-    const linhas = ["pH 7,1", "OD 6,8", "Turb. 12", "DBO 3,2", "PT 0,08"];
+    // Leituras reais de pH do Rio Chamagunga (25/08/2024), comparadas à faixa do CONAMA (6 a 9).
+    const linhas: [string, number][] = [["Ponto 2", 5], ["Ponto 3", 5.9], ["Ponto 4", 6], ["Ponto 5", 6.5], ["Ponto 6", 7]];
+    const cor = (v: number) => (v < 5.5 ? "bg-red-400" : v < 6.6 ? "bg-amber-400" : "bg-emerald-400");
     return (
-      <div className="mx-auto flex w-full max-w-xs items-center gap-4">
-        <div className="flex-1 space-y-1.5 font-mono text-[10px] text-slate-400">
-          {linhas.map((l, i) => (
-            <motion.div
-              key={l}
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: [0, 1, 1, 0.3], x: [-10, 0, 24, 40] }}
-              transition={{ duration: 2.6, delay: i * 0.25, repeat: Infinity, repeatDelay: 0.6 }}
-              className="rounded bg-white/5 px-2 py-1"
-            >
-              {l}
-            </motion.div>
-          ))}
-        </div>
-        <div className="flex h-28 w-28 shrink-0 flex-col items-center justify-center rounded-2xl bg-gradient-to-br from-teal-400/25 to-cyan-500/10 ring-1 ring-teal-300/40">
-          <Cpu className="mb-1 h-6 w-6 text-teal-200" />
-          <div className="text-[10px] uppercase tracking-wider text-teal-100/80">Índice</div>
-          <div className="text-2xl font-semibold text-white">IQA</div>
-        </div>
+      <div className="mx-auto w-full max-w-xs space-y-2">
+        <div className="text-[11px] uppercase tracking-wider text-teal-100/80">pH · faixa CONAMA 6 a 9</div>
+        {linhas.map(([ponto, v], i) => (
+          <motion.div
+            key={ponto}
+            initial={{ opacity: 0, x: -12 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.1 + i * 0.12 }}
+            className="flex items-center gap-3 rounded-lg bg-white/5 px-3 py-2 text-sm"
+          >
+            <span className="w-16 text-slate-300">{ponto}</span>
+            <span className="h-2 flex-1 overflow-hidden rounded-full bg-white/10">
+              <motion.span
+                className={`block h-full rounded-full ${cor(v)}`}
+                initial={{ width: 0 }}
+                animate={{ width: `${(v / 9) * 100}%` }}
+                transition={{ delay: 0.3 + i * 0.12, duration: 0.6 }}
+              />
+            </span>
+            <span className="w-8 text-right font-mono text-white">{v.toLocaleString("pt-BR")}</span>
+          </motion.div>
+        ))}
       </div>
     );
   }
   return (
-    <div className="mx-auto w-full max-w-xs rounded-xl border border-white/10 bg-slate-950/70 p-3 shadow-2xl shadow-cyan-500/10">
-      <div className="mb-2 flex gap-1.5">
-        <span className="h-2 w-2 rounded-full bg-white/20" />
-        <span className="h-2 w-2 rounded-full bg-white/20" />
-        <span className="h-2 w-2 rounded-full bg-white/20" />
+    <div className="mx-auto w-full max-w-[15rem] overflow-hidden rounded-xl bg-white sm:max-w-sm shadow-2xl shadow-cyan-500/20 ring-1 ring-white/15">
+      <div className="flex items-center gap-1.5 bg-slate-200 px-3 py-2">
+        <span className="h-2 w-2 rounded-full bg-slate-400" />
+        <span className="h-2 w-2 rounded-full bg-slate-400" />
+        <span className="h-2 w-2 rounded-full bg-slate-400" />
+        <span className="ml-2 truncate text-[10px] text-slate-600">tikatu.com.br/dashboard</span>
       </div>
-      <div className="grid grid-cols-3 gap-2">
-        <div className="col-span-2 h-24 rounded-md bg-gradient-to-br from-sky-900/80 to-teal-900/60 p-2">
-          <svg viewBox="0 0 100 60" className="h-full w-full" aria-hidden>
-            <path d="M0 40 C 20 35 30 20 50 25 S 80 45 100 15" stroke="rgb(103 232 249 / 0.6)" strokeWidth="2.5" fill="none" />
-            {[
-              [12, 38, "#4ade80"],
-              [42, 25, "#facc15"],
-              [70, 38, "#4ade80"],
-              [90, 20, "#fb923c"],
-            ].map(([x, y, c], i) => (
-              <motion.circle
-                key={i}
-                cx={x as number}
-                cy={y as number}
-                r="3"
-                fill={c as string}
-                animate={{ r: [3, 4.5, 3] }}
-                transition={{ duration: 1.6, delay: i * 0.3, repeat: Infinity }}
-              />
-            ))}
-          </svg>
-        </div>
-        <div className="space-y-2">
-          {["bg-emerald-400/70", "bg-yellow-300/70", "bg-cyan-300/70"].map((c, i) => (
-            <motion.div
-              key={c}
-              className={`h-[26px] rounded ${c}`}
-              initial={{ scaleX: 0 }}
-              animate={{ scaleX: 1 }}
-              style={{ originX: 0 }}
-              transition={{ delay: 0.2 + i * 0.15, duration: 0.6 }}
-            />
-          ))}
-        </div>
-      </div>
-      <svg viewBox="0 0 100 24" className="mt-2 h-10 w-full" aria-hidden>
-        <motion.path
-          d="M0 18 L12 14 L24 16 L36 9 L48 12 L60 6 L72 10 L84 5 L100 8"
-          fill="none"
-          stroke="rgb(45 212 191)"
-          strokeWidth="1.5"
-          initial={{ pathLength: 0 }}
-          animate={{ pathLength: 1 }}
-          transition={{ duration: 1.2 }}
-        />
-      </svg>
+      <img
+        src="/apresentacao/painel-ph.webp"
+        alt="Painel real: pH dos pontos do Rio Chamagunga e mapa de coleta"
+        className="block w-full"
+        loading="lazy"
+      />
     </div>
   );
 };
 
 const Trilha = ({ ativa, progresso }: { ativa: number; progresso: ReturnType<typeof useSpring> | null }) => (
-  <div className="relative mx-auto mb-8 flex max-w-xl items-center justify-between">
+  <div className="relative mx-auto mb-5 flex max-w-xl items-center justify-between sm:mb-8">
     <div className="absolute inset-x-6 top-1/2 h-0.5 -translate-y-1/2 bg-white/10" aria-hidden />
     {progresso && (
       <motion.div
@@ -211,9 +168,9 @@ const Trilha = ({ ativa, progresso }: { ativa: number; progresso: ReturnType<typ
 
 const TextoEtapa = ({ etapa }: { etapa: Etapa }) => (
   <>
-    <h3 className="text-2xl font-semibold text-white sm:text-3xl">{etapa.titulo}</h3>
-    <p className="mt-3 text-base text-slate-200 sm:text-lg">{etapa.simples}</p>
-    <p className="mt-3 inline-flex items-start gap-2 rounded-lg bg-white/5 px-3 py-2 text-left text-xs text-cyan-100/80 sm:text-sm">
+    <h3 className="text-xl font-semibold text-white sm:text-3xl">{etapa.titulo}</h3>
+    <p className="mt-2 text-[15px] text-slate-200 sm:mt-3 sm:text-lg">{etapa.simples}</p>
+    <p className="mt-2 inline-flex items-start gap-2 rounded-lg bg-white/5 px-3 py-2 text-left text-xs sm:mt-3 text-cyan-100/80 sm:text-sm">
       <span className="mt-0.5 shrink-0 rounded bg-cyan-300/20 px-1.5 text-[10px] font-semibold uppercase tracking-wider text-cyan-200">
         Por dentro
       </span>
@@ -260,15 +217,15 @@ export const Fluxo = () => {
         <div className="mx-auto w-full max-w-5xl">
           <motion.div style={{ opacity: tituloOpacity }}>
             <SceneLabel index={4}>Como funciona</SceneLabel>
-            <h2 className="mb-8 text-3xl font-semibold text-white sm:mb-12 sm:text-5xl">
+            <h2 className="mb-4 text-2xl font-semibold text-white sm:mb-12 sm:text-5xl">
               Do rio ao painel, em quatro passos.
             </h2>
           </motion.div>
 
           <Trilha ativa={ativa} progresso={suave} />
 
-          <div className="grid items-center gap-6 md:grid-cols-2 md:gap-12">
-            <div className="order-2 min-h-[13rem] text-center md:order-1 md:text-left" aria-live="polite">
+          <div className="grid items-center gap-3 sm:gap-6 md:grid-cols-2 md:gap-12">
+            <div className="order-2 min-h-[11rem] text-center sm:min-h-[13rem] md:order-1 md:text-left" aria-live="polite">
               <div className="mb-2 text-sm font-semibold text-cyan-300">
                 Passo {ativa + 1} de {ETAPAS.length}
               </div>
@@ -284,7 +241,7 @@ export const Fluxo = () => {
                 </motion.div>
               </AnimatePresence>
             </div>
-            <div className="order-1 flex min-h-[14rem] items-center md:order-2 md:min-h-[18rem]">
+            <div className="order-1 flex min-h-[10rem] items-center sm:min-h-[14rem] md:order-2 md:min-h-[18rem]">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={ativa}
