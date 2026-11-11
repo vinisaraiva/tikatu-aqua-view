@@ -393,6 +393,12 @@ const ProximosPassos = () => (
             Conhecer o Tikatu
             <ArrowUpRight className="h-4 w-4" />
           </a>
+          <a
+            href="mailto:contato@tikatu.com.br"
+            className="mt-4 text-sm text-cyan-100/90 underline-offset-4 hover:underline"
+          >
+            contato@tikatu.com.br
+          </a>
         </div>
       </Reveal>
 
