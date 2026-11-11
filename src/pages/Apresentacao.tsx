@@ -5,7 +5,7 @@ import { motion, useScroll, useSpring } from "framer-motion";
 import { ArrowUpRight, Building2, FlaskConical, Globe2, Ship } from "lucide-react";
 import { Hero } from "@/components/apresentacao/Hero";
 import { Fluxo } from "@/components/apresentacao/Fluxo";
-import { AoVivo } from "@/components/apresentacao/AoVivo";
+import { AoVivo, AppColeta } from "@/components/apresentacao/AoVivo";
 import { Reveal, SceneLabel } from "@/components/apresentacao/primitives";
 import { Amostragem } from "@/components/apresentacao/Amostragem";
 import { useMenosMovimento } from "@/components/apresentacao/useMenosMovimento";
@@ -15,7 +15,8 @@ const CENAS = [
   "O problema",
   "A origem",
   "Como funciona",
-  "Ao vivo",
+  "Painel ao vivo",
+  "App de coleta",
   "Para quem",
   "Equipe",
   "Próxima etapa",
@@ -243,9 +244,9 @@ const PUBLICOS = [
 ];
 
 const ParaQuem = () => (
-  <section id="cena-6" className="mx-auto max-w-6xl px-6 py-24 sm:py-36" aria-label="Para quem e por que importa">
+  <section id="cena-7" className="mx-auto max-w-6xl px-6 py-24 sm:py-36" aria-label="Para quem e por que importa">
     <Reveal>
-      <SceneLabel index={6}>Para quem e por que importa</SceneLabel>
+      <SceneLabel index={7}>Para quem e por que importa</SceneLabel>
       <h2 className="max-w-3xl text-3xl font-semibold leading-tight text-white sm:text-5xl">
         Um mesmo dado, quatro portas de valor.
       </h2>
@@ -302,9 +303,9 @@ const TRAJETORIA = [
 const Equipe = () => {
   const reduce = useMenosMovimento();
   return (
-    <section id="cena-7" className="mx-auto max-w-6xl px-6 py-24 sm:py-36" aria-label="Equipe">
+    <section id="cena-8" className="mx-auto max-w-6xl px-6 py-24 sm:py-36" aria-label="Equipe">
       <Reveal>
-        <SceneLabel index={7}>Equipe</SceneLabel>
+        <SceneLabel index={8}>Equipe</SceneLabel>
         <h2 className="text-3xl font-semibold leading-tight text-white sm:text-5xl">Tecnologia e pesquisa ambiental.</h2>
       </Reveal>
       <div className="mt-12 grid gap-6 md:grid-cols-2">
@@ -362,7 +363,7 @@ const ETAPAS_APOIO = [
 ];
 
 const ProximosPassos = () => (
-  <section id="cena-8" className="relative overflow-hidden pb-16 pt-24 sm:pt-36" aria-label="A próxima etapa">
+  <section id="cena-9" className="relative overflow-hidden pb-16 pt-24 sm:pt-36" aria-label="A próxima etapa">
     <div
       className="pointer-events-none absolute inset-0"
       style={{ background: "radial-gradient(70% 50% at 50% 100%, rgba(34,211,238,0.18), transparent 70%)" }}
@@ -370,7 +371,7 @@ const ProximosPassos = () => (
     />
     <div className="relative mx-auto max-w-6xl px-6">
       <Reveal>
-        <SceneLabel index={8}>A próxima etapa</SceneLabel>
+        <SceneLabel index={9}>A próxima etapa</SceneLabel>
         <h2 className="max-w-3xl text-3xl font-semibold leading-tight text-white sm:text-5xl">
           A próxima etapa acontece no campo.
         </h2>
@@ -484,6 +485,7 @@ const Apresentacao = () => {
           <Origem />
           <Fluxo />
           <AoVivo />
+          <AppColeta />
           <ParaQuem />
           <Equipe />
           <ProximosPassos />
