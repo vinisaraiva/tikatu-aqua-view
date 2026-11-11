@@ -347,12 +347,12 @@ const ETAPAS_APOIO: { n: Bi; titulo: Bi; texto: Bi; evidencia: Bi }[] = [
   },
   {
     n: ["Ao longo da execução", "Throughout"],
-    titulo: ["Conferir", "Verify"],
+    titulo: ["Controlar a qualidade", "Quality control"],
     texto: [
-      "4 rodadas de laboratório nos 8 pontos; leituras portáteis ao lado da sonda automática nas visitas de manutenção.",
-      "4 laboratory rounds at the 8 sites; portable readings next to the automatic probe during maintenance visits.",
+      "Sondas calibradas; análises de laboratório quando o protocolo pedir; leituras portáteis ao lado da sonda automática nas visitas de manutenção.",
+      "Calibrated probes; laboratory analyses when the protocol calls for them; portable readings next to the automatic probe during maintenance visits.",
     ],
-    evidencia: ["32 amostras + 4 de controle", "32 samples + 4 for quality control"],
+    evidencia: ["Calibrações e até 36 amostras", "Calibrations and up to 36 samples"],
   },
   {
     n: ["Mensal e bimestral", "Monthly and bimonthly"],

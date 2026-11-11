@@ -34,7 +34,7 @@ const METAS: { valor: number; rotulo: Bi }[] = [
   { valor: 2, rotulo: ["rios acompanhados", "rivers monitored"] },
   { valor: 8, rotulo: ["pontos com coleta mensal", "sites sampled monthly"] },
   { valor: 80, rotulo: ["registros de campo (ponto × visita)", "field records (site × visit)"] },
-  { valor: 36, rotulo: ["amostras para laboratório", "laboratory samples"] },
+  { valor: 36, rotulo: ["amostras de laboratório, se necessário", "laboratory samples, if needed"] },
   { valor: 10, rotulo: ["boletins para a comunidade", "bulletins for the community"] },
   { valor: 5, rotulo: ["relatórios bimestrais para gestores", "bimonthly reports for decision-makers"] },
 ];
@@ -72,8 +72,8 @@ export const Metas = () => {
         </h2>
         <p className="mt-4 max-w-3xl text-slate-300 sm:text-lg">
           {t([
-            "Acompanhar dois rios (previstos: Buranhém e dos Mangues), conferir as medições em laboratório, formar voluntários da comunidade e transformar os dados em relatórios para a comunidade e para gestores. A plataforma recebe os dois tipos de medição num só painel.",
-            "Monitor two rivers (planned: the Buranhém and the Mangues), check the measurements in the laboratory, train community volunteers and turn the data into reports for the community and for decision-makers. The platform takes in both kinds of measurement in a single dashboard.",
+            "Acompanhar dois rios (previstos: Buranhém e dos Mangues), complementar com análises de laboratório quando necessário, formar voluntários da comunidade e transformar os dados em relatórios para a comunidade e para gestores. A plataforma recebe os dois tipos de medição num só painel.",
+            "Monitor two rivers (planned: the Buranhém and the Mangues), complement with laboratory analyses when needed, train community volunteers and turn the data into reports for the community and for decision-makers. The platform takes in both kinds of measurement in a single dashboard.",
           ])}
         </p>
       </Reveal>

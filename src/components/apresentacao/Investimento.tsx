@@ -42,12 +42,12 @@ const FRENTES: { curto: Bi; titulo: Bi; texto: Bi; entrega: Bi; valor: number; p
   },
   {
     curto: ["Laboratório", "Laboratory"],
-    titulo: ["Validação laboratorial", "Laboratory validation"],
+    titulo: ["Análises laboratoriais complementares", "Complementary laboratory analyses"],
     texto: [
-      "Análises de referência para conferir as medições feitas em campo.",
-      "Reference analyses to check the measurements taken in the field.",
+      "As sondas são calibradas; o laboratório complementa as medições quando o protocolo pedir.",
+      "The probes are calibrated; the laboratory complements the measurements when the protocol calls for it.",
     ],
-    entrega: ["36 amostras: 32 principais e 4 de controle de qualidade.", "36 samples: 32 main and 4 for quality control."],
+    entrega: ["Até 36 amostras: 32 principais e 4 de controle de qualidade.", "Up to 36 samples: 32 main and 4 for quality control."],
     valor: 18000,
     pct: 14,
     cor: "#efb08c",
@@ -191,8 +191,8 @@ export const Investimento = () => {
         </h2>
         <p className="mt-4 max-w-3xl text-slate-300 sm:text-lg">
           {t([
-            "Cada parte do apoio vira dado: medido no rio, conferido em laboratório e transformado em informação para a comunidade e para quem decide.",
-            "Every part of the support becomes data: measured in the river, checked in the laboratory and turned into information for the community and for decision-makers.",
+            "Cada parte do apoio vira dado: medido no rio com sondas calibradas, complementado em laboratório e transformado em informação para a comunidade e para quem decide.",
+            "Every part of the support becomes data: measured in the river with calibrated probes, complemented in the laboratory and turned into information for the community and for decision-makers.",
           ])}
         </p>
       </Reveal>
