@@ -98,10 +98,10 @@ export const Hero = () => {
           transition={{ duration: 0.8, delay: 0.1 }}
           className="mb-5 text-xs font-semibold uppercase tracking-[0.3em] text-[#1b7fc0]"
         >
-          Financiamento de pesquisa aplicada
+          Pesquisa aplicada em qualidade da água
         </motion.p>
         <h1 className="text-balance text-4xl font-bold leading-[1.05] tracking-tight text-[#0d3a5c] sm:text-6xl md:max-w-2xl md:text-7xl md:[@media(max-height:760px)]:text-6xl">
-          {["Apoie a próxima", "etapa do Tikatu."].map((line, i) => (
+          {["Conheça", "o Tikatu."].map((line, i) => (
             <motion.span
               key={line}
               className="block"
@@ -127,8 +127,8 @@ export const Hero = () => {
           transition={{ duration: 1, delay: 1.2 }}
           className="mx-auto mt-6 max-w-md text-pretty md:[@media(max-height:760px)]:mt-4 text-base text-slate-600 sm:text-lg md:mx-0"
         >
-          Ciência e tecnologia para compreender a qualidade da água e conferir o caminho da medição à
-          interpretação.
+          Voluntários medem a água dos rios, a plataforma organiza os dados e o painel mostra como está cada
+          ponto.
         </motion.p>
         <motion.div
           initial={reduce ? false : { opacity: 0 }}
@@ -143,7 +143,7 @@ export const Hero = () => {
             transition={{ duration: 0.9, delay: 1.7, ease: [0.22, 1, 0.36, 1] }}
             aria-hidden
           />
-          <p className="text-base font-semibold text-[#0d3a5c]">Sondas · materiais · atividades de campo</p>
+          <p className="text-base font-semibold text-[#0d3a5c]">Buscamos apoio para a próxima etapa.</p>
           <p className="mt-3 font-medium text-[#0d3a5c]">Vinícius Saraiva Santos · UFSB</p>
           <p className="mt-1 text-slate-500">Orientação: Prof. Dr. Fabrício Berton Zanchi</p>
         </motion.div>
