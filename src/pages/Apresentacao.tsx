@@ -9,6 +9,7 @@ import { AoVivo, AppColeta } from "@/components/apresentacao/AoVivo";
 import { Reveal, SceneLabel, Transicao } from "@/components/apresentacao/primitives";
 import { Amostragem } from "@/components/apresentacao/Amostragem";
 import { Sonda3D } from "@/components/apresentacao/Sonda3D";
+import { Investimento } from "@/components/apresentacao/Investimento";
 import { useMenosMovimento } from "@/components/apresentacao/useMenosMovimento";
 
 const CENAS = [
@@ -21,6 +22,7 @@ const CENAS = [
   "Para quem",
   "Equipe",
   "Próxima etapa",
+  "O investimento",
   "Como apoiar",
 ];
 
@@ -418,7 +420,7 @@ const ProximosPassos = () => (
 
 const ComoApoiar = () => (
   <section
-    id="cena-10"
+    id="cena-11"
     className="relative flex min-h-[100svh] flex-col justify-center overflow-hidden py-16"
     aria-label="Como apoiar"
   >
@@ -429,7 +431,7 @@ const ComoApoiar = () => (
     />
     <div className="relative mx-auto w-full max-w-6xl px-6">
       <Reveal>
-        <SceneLabel index={10}>Como apoiar</SceneLabel>
+        <SceneLabel index={11}>Como apoiar</SceneLabel>
         <h2 className="max-w-3xl text-3xl font-semibold leading-tight text-white sm:text-4xl">
           Um plano. Quatro etapas que podem ser conferidas.
         </h2>
@@ -457,8 +459,8 @@ const ComoApoiar = () => (
           <div>
             <h3 className="text-2xl font-semibold text-white sm:text-4xl">Vamos viabilizar a próxima etapa?</h3>
             <p className="mt-3 max-w-xl text-slate-300">
-              Buscamos apoio para sondas, materiais e campanhas de campo. Próximo passo: definir a frente de apoio e seu
-              plano de aplicação.
+              Buscamos R$ 108.838,20 para ampliar o monitoramento no território. Próximo passo: definir a frente de
+              apoio e seu plano de aplicação.
             </p>
           </div>
           <div className="flex shrink-0 flex-col items-center gap-3">
@@ -482,7 +484,7 @@ const ComoApoiar = () => (
       </Reveal>
 
       <p className="mt-6 text-center text-xs text-slate-500">
-        Proposta de financiamento de pesquisa aplicada. Não fixa valor total nem representa oferta de serviço contratado.
+        Proposta de financiamento de pesquisa aplicada. Não representa oferta de serviço contratado.
       </p>
     </div>
   </section>
@@ -536,6 +538,9 @@ const Apresentacao = () => {
           </Transicao>
           <Transicao>
             <ProximosPassos />
+          </Transicao>
+          <Transicao>
+            <Investimento />
           </Transicao>
           <Transicao>
             <ComoApoiar />
