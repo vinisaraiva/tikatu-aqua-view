@@ -8,8 +8,8 @@ import { Fluxo, PASSOS_FLUXO } from "@/components/apresentacao/Fluxo";
 import { AoVivo, AppColeta } from "@/components/apresentacao/AoVivo";
 import { Reveal, SceneLabel, Transicao } from "@/components/apresentacao/primitives";
 import { Amostragem } from "@/components/apresentacao/Amostragem";
-import { Sonda3D } from "@/components/apresentacao/Sonda3D";
 import { Perguntas } from "@/components/apresentacao/Perguntas";
+import { Metas } from "@/components/apresentacao/Metas";
 import { Confiavel, PASSOS_CONFIAVEL } from "@/components/apresentacao/Confiavel";
 import { Investimento, PASSOS_INVESTIMENTO, TOTAL } from "@/components/apresentacao/Investimento";
 import { useMenosMovimento } from "@/components/apresentacao/useMenosMovimento";
@@ -304,96 +304,45 @@ const Equipe = () => {
   );
 };
 
-// Cada investimento ligado a uma entrega concreta.
-const RECURSOS: { titulo: Bi; texto: Bi }[] = [
+// Cronograma de 12 meses (metas enviadas pelo Vinícius em 11/11/2026).
+const ETAPAS_APOIO: { n: Bi; titulo: Bi; texto: Bi; evidencia: Bi }[] = [
   {
-    titulo: ["Sonda automática", "Automatic probe"],
-    texto: ["Medição contínua no rio, ao lado das coletas dos voluntários", "Continuous measurement in the river, alongside volunteer sampling"],
+    n: ["Meses 1–2", "Months 1–2"],
+    titulo: ["Implantar", "Set up"],
+    texto: [
+      "Aquisição dos equipamentos, instalação da sonda automática, formação dos voluntários e reconhecimento dos locais.",
+      "Equipment purchase, automatic probe installation, volunteer training and site reconnaissance.",
+    ],
+    evidencia: ["Equipamentos e protocolos", "Equipment and protocols"],
   },
   {
-    titulo: ["Campo e logística", "Field and logistics"],
-    texto: ["Novas campanhas e mais pontos acompanhados", "New campaigns and more sites monitored"],
+    n: ["Meses 3–12", "Months 3–12"],
+    titulo: ["Monitorar", "Monitor"],
+    texto: [
+      "10 ciclos mensais: 20 saídas de campo nos 8 pontos, mais 4 de reserva; sonda automática medindo sem parar.",
+      "10 monthly cycles: 20 field trips to the 8 sites, plus 4 in reserve; automatic probe measuring non-stop.",
+    ],
+    evidencia: ["80 registros de campo", "80 field records"],
   },
   {
-    titulo: ["Tecnologia e IA", "Technology and AI"],
-    texto: ["Registros mais completos e ferramentas avaliadas em uso real", "More complete records and tools evaluated in real use"],
+    n: ["Ao longo da execução", "Throughout"],
+    titulo: ["Conferir", "Verify"],
+    texto: [
+      "4 rodadas de laboratório nos 8 pontos conferem as medições de campo.",
+      "4 laboratory rounds at the 8 sites check the field measurements.",
+    ],
+    evidencia: ["32 amostras + 4 de controle", "32 samples + 4 for quality control"],
   },
   {
-    titulo: ["Validação e voluntários", "Validation and volunteers"],
-    texto: ["Medições conferidas em laboratório e rede formada", "Lab-checked measurements and a trained network"],
-  },
-];
-
-const ETAPAS_APOIO: { n: string; titulo: Bi; texto: Bi; evidencia: Bi }[] = [
-  {
-    n: "01",
-    titulo: ["Pactuar", "Agree"],
-    texto: ["Escolher a frente e dimensionar a etapa.", "Choose the area of support and size the stage."],
-    evidencia: ["Plano de aplicação", "Spending plan"],
-  },
-  {
-    n: "02",
-    titulo: ["Preparar", "Prepare"],
-    texto: ["Definir locais e métodos; adquirir materiais.", "Define sites and methods; purchase materials."],
-    evidencia: ["Protocolos e aquisições", "Protocols and purchases"],
-  },
-  {
-    n: "03",
-    titulo: ["Medir e verificar", "Measure and verify"],
-    texto: ["Executar as campanhas; conferir dados.", "Run the field campaigns; check the data."],
-    evidencia: ["Registros documentados", "Documented records"],
-  },
-  {
-    n: "04",
-    titulo: ["Compartilhar", "Share"],
-    texto: ["Produzir relatórios e devolutivas.", "Produce reports and share results back."],
-    evidencia: ["Relatórios de execução", "Implementation reports"],
+    n: ["Meio e fim", "Midway and end"],
+    titulo: ["Prestar contas", "Report"],
+    texto: [
+      "Cobertura realizada, resultados, limitações e aplicação dos recursos.",
+      "Coverage achieved, results, limitations and use of funds.",
+    ],
+    evidencia: ["Relatório intermediário e final", "Interim and final reports"],
   },
 ];
-
-const ProximosPassos = () => {
-  const t = useT();
-  return (
-    <section
-      id="cena-10"
-      className="relative mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-center px-6 py-16"
-      aria-label={t(["A próxima etapa", "The next stage"])}
-    >
-      <Reveal>
-        <SceneLabel index={10}>{t(["A próxima etapa", "The next stage"])}</SceneLabel>
-        <h2 className="max-w-3xl text-3xl font-semibold leading-tight text-white sm:text-5xl">
-          {t([
-            "A próxima etapa: mais rios medidos, com mais tecnologia.",
-            "The next stage: more rivers measured, with more technology.",
-          ])}
-        </h2>
-        <p className="mt-4 max-w-2xl text-slate-300 sm:text-lg">
-          {t([
-            "A plataforma e o app já funcionam. O financiamento permite ampliar a coleta, com uma sonda automática ao lado das portáteis, e avaliar em condições reais de uso as soluções que a pesquisa está construindo.",
-            "The platform and the app already work. The funding makes it possible to expand sampling, with an automatic probe alongside the portable ones, and to evaluate the solutions the research is building under real conditions of use.",
-          ])}
-        </p>
-      </Reveal>
-
-      <div className="mt-8 grid items-stretch gap-6 md:grid-cols-[1fr_1.1fr]">
-        <div className="grid content-center gap-3">
-          <div className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-300/80">
-            {t(["O que o apoio viabiliza", "What the support makes possible"])}
-          </div>
-          {RECURSOS.map((r, i) => (
-            <Reveal key={r.titulo[0]} delay={0.08 * i}>
-              <div className="flex h-full items-baseline justify-between gap-4 rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4">
-                <span className="shrink-0 font-semibold text-white">{t(r.titulo)}</span>
-                <span className="text-right text-sm text-slate-400">{t(r.texto)}</span>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-        <Sonda3D />
-      </div>
-    </section>
-  );
-};
 
 const ComoApoiar = () => {
   const t = useT();
@@ -414,14 +363,14 @@ const ComoApoiar = () => {
         <Reveal>
           <SceneLabel index={12}>{t(["Como apoiar", "How to support"])}</SceneLabel>
           <h2 className="max-w-3xl text-3xl font-semibold leading-tight text-white sm:text-4xl">
-            {t(["Um plano. Quatro etapas que podem ser conferidas.", "One plan. Four stages you can verify."])}
+            {t(["Um plano de 12 meses, com etapas que podem ser conferidas.", "A 12-month plan, with stages you can verify."])}
           </h2>
         </Reveal>
         <ol className="mt-6 grid gap-3 sm:grid-cols-2 md:grid-cols-4 md:gap-4">
           {ETAPAS_APOIO.map((e, i) => (
-            <Reveal key={e.n} delay={0.1 * i}>
+            <Reveal key={e.n[0]} delay={0.1 * i}>
               <li className="h-full rounded-2xl border border-white/10 bg-white/[0.03] p-4 sm:p-5">
-                <div className="font-mono text-sm text-cyan-300">{e.n}</div>
+                <div className="font-mono text-sm text-cyan-300">{t(e.n)}</div>
                 <div className="mt-1 text-lg font-semibold text-white">{t(e.titulo)}</div>
                 <p className="mt-1 text-sm text-slate-300">{t(e.texto)}</p>
                 <div className="mt-3 text-[11px] font-semibold uppercase tracking-wider text-[#efb08c]">
@@ -434,8 +383,8 @@ const ComoApoiar = () => {
         </ol>
         <p className="mt-3 text-xs text-slate-500">
           {t([
-            "Cronograma, marcos e formalização pactuados conforme os procedimentos institucionais. Entregas condicionadas ao escopo aprovado; resultados científicos e impacto não são garantidos.",
-            "Schedule, milestones and formal arrangements agreed according to institutional procedures. Deliverables depend on the approved scope; scientific results and impact are not guaranteed.",
+            "Metas propostas; formalização conforme os procedimentos institucionais. Resultados científicos e impacto não são garantidos.",
+            "Proposed targets; formal arrangements follow institutional procedures. Scientific results and impact are not guaranteed.",
           ])}
         </p>
 
@@ -447,8 +396,14 @@ const ComoApoiar = () => {
               </h3>
               <p className="mt-3 max-w-xl text-slate-300">
                 {t([
-                  `Buscamos R$ ${total} para ampliar o monitoramento no território. Próximo passo: definir a frente de apoio e seu plano de aplicação.`,
-                  `We are seeking R$ ${total} to expand monitoring in the region. Next step: choose the area of support and its spending plan.`,
+                  `Buscamos R$ ${total} para 12 meses de pesquisa no território.`,
+                  `We are seeking R$ ${total} for 12 months of research in the region.`,
+                ])}
+              </p>
+              <p className="mt-2 max-w-xl font-medium text-cyan-100">
+                {t([
+                  "O valor é uma referência: estamos abertos a negociar o escopo, para mais ou para menos.",
+                  "The amount is a reference: we are open to negotiating the scope, up or down.",
                 ])}
               </p>
             </div>
@@ -495,7 +450,7 @@ const TELAS: Cena[] = [
   { nome: ["App de coleta", "Sampling app"], el: <AppColeta />, transicao: "mare" },
   { nome: ["Para quem", "Who it is for"], el: <ParaQuem />, transicao: "iris" },
   { nome: ["Equipe", "Team"], el: <Equipe />, transicao: "cortina" },
-  { nome: ["Próxima etapa", "Next stage"], el: <ProximosPassos />, transicao: "mare" },
+  { nome: ["Próxima etapa", "Next stage"], el: <Metas />, transicao: "mare" },
   { nome: ["O investimento", "The investment"], el: <Investimento />, passos: PASSOS_INVESTIMENTO, transicao: "mergulho" },
   { nome: ["Como apoiar", "How to support"], el: <ComoApoiar />, transicao: "iris" },
 ];
