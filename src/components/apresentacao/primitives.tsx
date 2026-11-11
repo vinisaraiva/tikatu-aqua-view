@@ -1,5 +1,5 @@
-import type { ReactNode } from "react";
-import { motion } from "framer-motion";
+import { useRef, type ReactNode } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { useMenosMovimento } from "./useMenosMovimento";
 
 /** Entrada suave ao aparecer na tela (desligada com prefers-reduced-motion). */
@@ -35,3 +35,21 @@ export const SceneLabel = ({ index, children }: { index: number; children: React
     <span>{children}</span>
   </div>
 );
+
+/**
+ * Transição entre cenas, presa à rolagem: a cena que chega sobe e ganha opacidade; a que sai
+ * esmaece. Só opacidade e deslocamento (nada de escala), para não pesar nem mexer no layout.
+ */
+export const Transicao = ({ children }: { children: ReactNode }) => {
+  const reduce = useMenosMovimento();
+  const ref = useRef<HTMLDivElement>(null);
+  const entrada = useScroll({ target: ref, offset: ["start end", "start 0.4"] }).scrollYProgress;
+  const saida = useScroll({ target: ref, offset: ["end 0.6", "end start"] }).scrollYProgress;
+  const opacity = useTransform([entrada, saida], ([e, s]: number[]) => (reduce ? 1 : Math.min(0.15 + e * 0.85, 1 - s * 0.8)));
+  const y = useTransform(entrada, [0, 1], reduce ? [0, 0] : [70, 0]);
+  return (
+    <motion.div ref={ref} style={{ opacity, y }}>
+      {children}
+    </motion.div>
+  );
+};

@@ -6,7 +6,7 @@ import { ArrowUpRight, Building2, FlaskConical, Globe2, Ship } from "lucide-reac
 import { Hero } from "@/components/apresentacao/Hero";
 import { Fluxo } from "@/components/apresentacao/Fluxo";
 import { AoVivo, AppColeta } from "@/components/apresentacao/AoVivo";
-import { Reveal, SceneLabel } from "@/components/apresentacao/primitives";
+import { Reveal, SceneLabel, Transicao } from "@/components/apresentacao/primitives";
 import { Amostragem } from "@/components/apresentacao/Amostragem";
 import { Sonda3D } from "@/components/apresentacao/Sonda3D";
 import { useMenosMovimento } from "@/components/apresentacao/useMenosMovimento";
@@ -21,6 +21,7 @@ const CENAS = [
   "Para quem",
   "Equipe",
   "Próxima etapa",
+  "Como apoiar",
 ];
 
 /** Barra de progresso no topo + pontos de navegação entre cenas (desktop). */
@@ -55,16 +56,35 @@ const Navegacao = () => {
       CENAS.forEach((_, i) => {
         const el = document.getElementById(`cena-${i + 1}`);
         if (!el) return;
-        const topo = Math.round(el.getBoundingClientRect().top + window.scrollY);
+        // offsetTop ignora as transformações da transição entre cenas.
+        let topo = 0;
+        for (let p: HTMLElement | null = el; p; p = p.offsetParent as HTMLElement | null) topo += p.offsetTop;
         const n = Number(el.dataset.paradas ?? 1);
-        const curso = el.offsetHeight - window.innerHeight;
+        const vh = window.innerHeight;
+        const curso = el.offsetHeight - vh;
         if (n > 1 && curso > 0) {
           for (let k = 0; k < n; k++) lista.push(Math.round(topo + (curso * (k + 0.15)) / n));
         } else {
           lista.push(topo);
+          // Cena mais alta que a tela: paradas extras para mostrar o resto do conteúdo.
+          if (curso > vh * 0.08) {
+            const passo = vh * 0.7;
+            for (let y = topo + passo; y < topo + curso; y += passo) lista.push(Math.round(y));
+            lista.push(Math.round(topo + curso));
+          }
         }
       });
-      return lista;
+      // Ordena e junta paradas muito próximas (evita "pulinhos" de poucos pixels).
+      const minimo = window.innerHeight * 0.2;
+      // Mantém o início de cada cena; a última parada (fim da página) sempre fica.
+      const ordenada = lista.sort((x, y) => x - y);
+      const final: number[] = [];
+      ordenada.forEach((v, i) => {
+        const ultima = i === ordenada.length - 1;
+        if (!final.length || v - final[final.length - 1] >= minimo) final.push(v);
+        else if (ultima) final[final.length - 1] = v;
+      });
+      return final;
     };
     const onKey = (e: KeyboardEvent) => {
       if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
@@ -149,7 +169,7 @@ const ENTREGAS = [
 ];
 
 const Origem = () => (
-  <section id="cena-3" className="relative overflow-hidden py-24 sm:py-36" aria-label="A origem">
+  <section id="cena-3" className="relative flex min-h-[100svh] flex-col justify-center overflow-hidden py-16" aria-label="A origem">
     <div
       className="pointer-events-none absolute inset-0"
       style={{ background: "radial-gradient(50% 60% at 15% 50%, rgba(45,212,191,0.10), transparent 70%)" }}
@@ -245,18 +265,18 @@ const PUBLICOS = [
 ];
 
 const ParaQuem = () => (
-  <section id="cena-7" className="mx-auto max-w-6xl px-6 py-24 sm:py-36" aria-label="Para quem e por que importa">
+  <section id="cena-7" className="mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-center px-6 py-16" aria-label="Para quem e por que importa">
     <Reveal>
       <SceneLabel index={7}>Para quem e por que importa</SceneLabel>
       <h2 className="max-w-3xl text-3xl font-semibold leading-tight text-white sm:text-5xl">
         Um mesmo dado, quatro portas de valor.
       </h2>
     </Reveal>
-    <div className="mt-12 grid gap-4 sm:grid-cols-2">
+    <div className="mt-8 grid gap-4 sm:grid-cols-2">
       {PUBLICOS.map(({ icon: Icon, titulo, texto, link, linkTexto }, i) => (
         <Reveal key={titulo} delay={0.08 * i}>
-          <div className="group flex h-full flex-col rounded-2xl border border-white/10 bg-white/[0.03] p-6 transition-colors hover:border-cyan-300/40 hover:bg-white/[0.06]">
-            <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-cyan-400/15 text-cyan-200">
+          <div className="group flex h-full flex-col rounded-2xl border border-white/10 bg-white/[0.03] p-5 transition-colors hover:border-cyan-300/40 hover:bg-white/[0.06]">
+            <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-400/15 text-cyan-200">
               <Icon className="h-5 w-5" />
             </div>
             <h3 className="text-xl font-semibold text-white">{titulo}</h3>
@@ -265,7 +285,7 @@ const ParaQuem = () => (
               to={link}
               target="_blank"
               rel="noopener"
-              className="mt-5 inline-flex items-center gap-1 text-sm font-medium text-cyan-300 hover:text-cyan-200"
+              className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-cyan-300 hover:text-cyan-200"
             >
               {linkTexto}
               <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
@@ -304,12 +324,12 @@ const TRAJETORIA = [
 const Equipe = () => {
   const reduce = useMenosMovimento();
   return (
-    <section id="cena-8" className="mx-auto max-w-6xl px-6 py-24 sm:py-36" aria-label="Equipe">
+    <section id="cena-8" className="mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-center px-6 py-16" aria-label="Equipe">
       <Reveal>
         <SceneLabel index={8}>Equipe</SceneLabel>
         <h2 className="text-3xl font-semibold leading-tight text-white sm:text-5xl">Tecnologia e pesquisa ambiental.</h2>
       </Reveal>
-      <div className="mt-12 grid gap-6 md:grid-cols-2">
+      <div className="mt-8 grid gap-6 md:grid-cols-2">
         {EQUIPE.map((p, i) => (
           <Reveal key={p.nome} delay={0.1 * i}>
             <div className="h-full rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
@@ -324,7 +344,7 @@ const Equipe = () => {
           </Reveal>
         ))}
       </div>
-      <div className="relative mt-14">
+      <div className="relative mt-10">
         <motion.div
           className="absolute left-0 right-0 top-1.5 h-0.5 origin-left bg-[#efb08c]"
           initial={reduce ? false : { scaleX: 0 }}
@@ -364,95 +384,104 @@ const ETAPAS_APOIO = [
 ];
 
 const ProximosPassos = () => (
-  <section id="cena-9" className="relative overflow-hidden pb-16 pt-24 sm:pt-36" aria-label="A próxima etapa">
+  <section
+    id="cena-9"
+    className="relative mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-center px-6 py-16"
+    aria-label="A próxima etapa"
+  >
+    <Reveal>
+      <SceneLabel index={9}>A próxima etapa</SceneLabel>
+      <h2 className="max-w-3xl text-3xl font-semibold leading-tight text-white sm:text-5xl">
+        A próxima etapa acontece no campo.
+      </h2>
+      <p className="mt-4 max-w-2xl text-slate-300 sm:text-lg">
+        A base computacional já existe. Falta ampliar a capacidade de medir, registrar e validar em contexto.
+      </p>
+    </Reveal>
+
+    <div className="mt-8 grid items-stretch gap-6 md:grid-cols-[1fr_1.1fr]">
+      <div className="grid content-center gap-3">
+        <div className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-300/80">O que o apoio viabiliza</div>
+        {RECURSOS.map((r, i) => (
+          <Reveal key={r.titulo} delay={0.08 * i}>
+            <div className="flex h-full items-baseline justify-between gap-4 rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4">
+              <span className="font-semibold text-white">{r.titulo}</span>
+              <span className="text-right text-sm text-slate-400">{r.texto}</span>
+            </div>
+          </Reveal>
+        ))}
+      </div>
+      <Sonda3D />
+    </div>
+  </section>
+);
+
+const ComoApoiar = () => (
+  <section
+    id="cena-10"
+    className="relative flex min-h-[100svh] flex-col justify-center overflow-hidden py-16"
+    aria-label="Como apoiar"
+  >
     <div
       className="pointer-events-none absolute inset-0"
       style={{ background: "radial-gradient(70% 50% at 50% 100%, rgba(34,211,238,0.18), transparent 70%)" }}
       aria-hidden
     />
-    <div className="relative mx-auto max-w-6xl px-6">
+    <div className="relative mx-auto w-full max-w-6xl px-6">
       <Reveal>
-        <SceneLabel index={9}>A próxima etapa</SceneLabel>
-        <h2 className="max-w-3xl text-3xl font-semibold leading-tight text-white sm:text-5xl">
-          A próxima etapa acontece no campo.
-        </h2>
-        <p className="mt-4 max-w-2xl text-slate-300 sm:text-lg">
-          A base computacional já existe. Falta ampliar a capacidade de medir, registrar e validar em contexto.
-        </p>
-      </Reveal>
-
-      <div className="mt-10 grid items-stretch gap-6 md:grid-cols-[1fr_1.1fr]">
-        <div className="grid content-center gap-3">
-          <div className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-300/80">O que o apoio viabiliza</div>
-          {RECURSOS.map((r, i) => (
-            <Reveal key={r.titulo} delay={0.08 * i}>
-              <div className="flex h-full items-baseline justify-between gap-4 rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4">
-                <span className="font-semibold text-white">{r.titulo}</span>
-                <span className="text-right text-sm text-slate-400">{r.texto}</span>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-        <Sonda3D />
-      </div>
-
-      <Reveal delay={0.1}>
-        <h3 className="mt-16 text-2xl font-semibold text-white sm:text-3xl">
+        <SceneLabel index={10}>Como apoiar</SceneLabel>
+        <h2 className="max-w-3xl text-3xl font-semibold leading-tight text-white sm:text-4xl">
           Um plano. Quatro etapas que podem ser conferidas.
-        </h3>
+        </h2>
       </Reveal>
-      <ol className="mt-8 grid gap-4 md:grid-cols-4">
+      <ol className="mt-6 grid gap-3 sm:grid-cols-2 md:grid-cols-4 md:gap-4">
         {ETAPAS_APOIO.map((e, i) => (
           <Reveal key={e.n} delay={0.1 * i}>
-            <li className="h-full rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+            <li className="h-full rounded-2xl border border-white/10 bg-white/[0.03] p-4 sm:p-5">
               <div className="font-mono text-sm text-cyan-300">{e.n}</div>
-              <div className="mt-2 text-lg font-semibold text-white">{e.titulo}</div>
+              <div className="mt-1 text-lg font-semibold text-white">{e.titulo}</div>
               <p className="mt-1 text-sm text-slate-300">{e.texto}</p>
-              <div className="mt-4 text-[11px] font-semibold uppercase tracking-wider text-[#efb08c]">Evidência</div>
+              <div className="mt-3 text-[11px] font-semibold uppercase tracking-wider text-[#efb08c]">Evidência</div>
               <div className="text-sm text-white">{e.evidencia}</div>
             </li>
           </Reveal>
         ))}
       </ol>
-      <p className="mt-4 text-xs text-slate-500">
+      <p className="mt-3 text-xs text-slate-500">
         Cronograma, marcos e formalização pactuados conforme os procedimentos institucionais. Entregas condicionadas ao
         escopo aprovado; resultados científicos e impacto não são garantidos.
       </p>
 
       <Reveal delay={0.1}>
-        <div className="mt-20 flex flex-col items-center rounded-3xl border border-cyan-300/30 bg-gradient-to-br from-cyan-400/15 via-teal-400/10 to-transparent px-6 py-12 text-center sm:px-12">
-          <div className="rounded-2xl bg-white px-5 py-3">
-            <img
-              src="/apresentacao/logo-tikatu.webp"
-              alt="Tikatu"
-              className="h-10 w-auto"
-              loading="lazy"
-            />
+        <div className="mt-8 flex flex-col items-center gap-6 rounded-3xl border border-cyan-300/30 bg-gradient-to-br from-cyan-400/15 via-teal-400/10 to-transparent px-6 py-8 text-center md:flex-row md:justify-between md:px-10 md:text-left">
+          <div>
+            <h3 className="text-2xl font-semibold text-white sm:text-4xl">Vamos viabilizar a próxima etapa?</h3>
+            <p className="mt-3 max-w-xl text-slate-300">
+              Buscamos apoio para sondas, materiais e campanhas de campo. Próximo passo: definir a frente de apoio e seu
+              plano de aplicação.
+            </p>
           </div>
-          <h3 className="mt-8 text-3xl font-semibold text-white sm:text-5xl">Vamos viabilizar a próxima etapa?</h3>
-          <p className="mt-4 max-w-xl text-slate-300 sm:text-lg">
-            Buscamos apoio para sondas, materiais e campanhas de campo. Próximo passo: definir a frente de apoio e seu
-            plano de aplicação.
-          </p>
-          <a
-            href="https://www.tikatu.com.br"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-8 inline-flex items-center gap-2 rounded-full bg-cyan-300 px-6 py-3 font-semibold text-slate-950 transition-colors hover:bg-cyan-200"
-          >
-            Conhecer o Tikatu
-            <ArrowUpRight className="h-4 w-4" />
-          </a>
-          <a
-            href="mailto:contato@tikatu.com.br"
-            className="mt-4 text-sm text-cyan-100/90 underline-offset-4 hover:underline"
-          >
-            contato@tikatu.com.br
-          </a>
+          <div className="flex shrink-0 flex-col items-center gap-3">
+            <div className="rounded-2xl bg-[#f4f2ea] px-4 py-2.5">
+              <img src="/apresentacao/logo-tikatu.webp" alt="Tikatu" className="h-8 w-auto" loading="lazy" />
+            </div>
+            <a
+              href="https://www.tikatu.com.br"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-full bg-cyan-300 px-6 py-3 font-semibold text-slate-950 transition-colors hover:bg-cyan-200"
+            >
+              Conhecer o Tikatu
+              <ArrowUpRight className="h-4 w-4" />
+            </a>
+            <a href="mailto:contato@tikatu.com.br" className="text-sm text-cyan-100/90 underline-offset-4 hover:underline">
+              contato@tikatu.com.br
+            </a>
+          </div>
         </div>
       </Reveal>
 
-      <p className="mt-16 text-center text-xs text-slate-500">
+      <p className="mt-6 text-center text-xs text-slate-500">
         Proposta de financiamento de pesquisa aplicada. Não fixa valor total nem representa oferta de serviço contratado.
       </p>
     </div>
@@ -486,14 +515,31 @@ const Apresentacao = () => {
           <div className="bg-gradient-to-b from-[#021019] via-[#04202f] to-[#062a3d]">
             <Hero />
           </div>
-          <Amostragem />
-          <Origem />
+          <Transicao>
+            <Amostragem />
+          </Transicao>
+          <Transicao>
+            <Origem />
+          </Transicao>
           <Fluxo />
-          <AoVivo />
-          <AppColeta />
-          <ParaQuem />
-          <Equipe />
-          <ProximosPassos />
+          <Transicao>
+            <AoVivo />
+          </Transicao>
+          <Transicao>
+            <AppColeta />
+          </Transicao>
+          <Transicao>
+            <ParaQuem />
+          </Transicao>
+          <Transicao>
+            <Equipe />
+          </Transicao>
+          <Transicao>
+            <ProximosPassos />
+          </Transicao>
+          <Transicao>
+            <ComoApoiar />
+          </Transicao>
         </main>
       </div>
     </>
