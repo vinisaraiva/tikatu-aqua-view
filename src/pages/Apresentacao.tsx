@@ -9,6 +9,7 @@ import { AoVivo, AppColeta } from "@/components/apresentacao/AoVivo";
 import { Reveal, SceneLabel, Transicao } from "@/components/apresentacao/primitives";
 import { Amostragem } from "@/components/apresentacao/Amostragem";
 import { Sonda3D } from "@/components/apresentacao/Sonda3D";
+import { Origem } from "@/components/apresentacao/Origem";
 import { Investimento, PASSOS_INVESTIMENTO } from "@/components/apresentacao/Investimento";
 import { useMenosMovimento } from "@/components/apresentacao/useMenosMovimento";
 import { AvisoMovimento, BotaoMovimento, Palco, useModoTelas, type Cena } from "@/components/apresentacao/Palco";
@@ -144,98 +145,6 @@ const Navegacao = () => {
     </>
   );
 };
-
-/** Cena 3: origem e o que já foi construído (roteiro de 10/11/2026; situação dos artigos atualizada pelo Vinícius em 11/11/2026). */
-const ENTREGAS = [
-  {
-    estado: "Publicado",
-    titulo: "Plataforma Tikatu",
-    onde: "International Journal of River Basin Management · 2025",
-    link: "https://doi.org/10.1080/15715124.2025.2528958",
-  },
-  {
-    estado: "Software disponível",
-    titulo: "tikatuwq no CRAN",
-    onde: "Rotinas abertas, documentação e exemplos reprodutíveis",
-    link: "https://cran.r-project.org/package=tikatuwq",
-  },
-  {
-    estado: "Publicado",
-    titulo: "Artigo da biblioteca tikatuwq",
-    onde: "International Journal of River Basin Management · outubro de 2026",
-    link: "https://doi.org/10.1080/15715124.2026.2754836",
-  },
-  {
-    estado: "Publicado",
-    titulo: "Frequência amostral no Buranhém",
-    onde: "Earth Science Informatics · 11/11/2026",
-  },
-];
-
-const Origem = () => (
-  <section id="cena-3" className="relative flex min-h-[100svh] flex-col justify-center overflow-hidden py-16" aria-label="A origem">
-    <div
-      className="pointer-events-none absolute inset-0"
-      style={{ background: "radial-gradient(50% 60% at 15% 50%, rgba(45,212,191,0.10), transparent 70%)" }}
-      aria-hidden
-    />
-    <div className="relative mx-auto grid max-w-6xl gap-12 px-6 md:grid-cols-[1fr_1.25fr]">
-      <Reveal>
-        <SceneLabel index={3}>A origem</SceneLabel>
-        <h2 className="text-3xl font-semibold leading-tight text-white sm:text-5xl">Uma base que já existe.</h2>
-        <p className="mt-5 text-lg leading-relaxed text-slate-300">
-          O Tikatu nasceu no mestrado em Ciências e Tecnologias Ambientais, com a construção da plataforma e a validação
-          inicial no Rio Chamagunga, em Porto Seguro. Hoje é uma pesquisa de doutorado em Biossistemas na UFSB:
-        </p>
-        <p className="mt-4 border-l-2 border-cyan-300/50 pl-4 text-slate-200">
-          “Do dado à decisão: desenvolvimento e avaliação do ecossistema Tikatu para monitoramento, análise
-          computacional e interpretação auditável da qualidade da água.”
-        </p>
-      </Reveal>
-      <div>
-        <Reveal delay={0.1}>
-          <div className="mb-4 text-xs font-semibold uppercase tracking-[0.25em] text-cyan-300/80">
-            Entregas que sustentam o percurso
-          </div>
-        </Reveal>
-        <ul className="divide-y divide-white/10 border-y border-white/10">
-          {ENTREGAS.map((e, i) => (
-            <Reveal key={e.titulo} delay={0.1 + i * 0.08}>
-              <li className="flex items-start gap-4 py-5">
-                <span
-                  className={`mt-1 w-28 shrink-0 text-[11px] font-semibold uppercase tracking-wider ${
-                    e.estado === "Aceito" ? "text-[#efb08c]" : "text-emerald-300"
-                  }`}
-                >
-                  {e.estado}
-                </span>
-                <div className="flex-1">
-                  <div className="font-semibold text-white">
-                    {e.link ? (
-                      <a
-                        href={e.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 hover:text-cyan-200"
-                      >
-                        {e.titulo}
-                        <ArrowUpRight className="h-4 w-4" />
-                      </a>
-                    ) : (
-                      e.titulo
-                    )}
-                  </div>
-                  <div className="mt-1 text-sm text-slate-400">{e.onde}</div>
-                </div>
-              </li>
-            </Reveal>
-          ))}
-        </ul>
-        <p className="mt-3 text-xs text-slate-500">Três artigos publicados e um software aberto (situação em 11/11/2026).</p>
-      </div>
-    </div>
-  </section>
-);
 
 const PUBLICOS = [
   {
