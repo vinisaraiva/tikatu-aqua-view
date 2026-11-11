@@ -2,11 +2,12 @@ import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import { motion, useScroll, useSpring } from "framer-motion";
-import { ArrowUpRight, Building2, FlaskConical, Globe2, Mail, Ship, UserRound } from "lucide-react";
+import { ArrowUpRight, Building2, FlaskConical, Globe2, Ship } from "lucide-react";
 import { Hero } from "@/components/apresentacao/Hero";
 import { Fluxo } from "@/components/apresentacao/Fluxo";
 import { AoVivo } from "@/components/apresentacao/AoVivo";
-import { Lacuna, Provisorio, Reveal, SceneLabel } from "@/components/apresentacao/primitives";
+import { Reveal, SceneLabel } from "@/components/apresentacao/primitives";
+import { Amostragem } from "@/components/apresentacao/Amostragem";
 import { useMenosMovimento } from "@/components/apresentacao/useMenosMovimento";
 
 const CENAS = [
@@ -17,7 +18,7 @@ const CENAS = [
   "Ao vivo",
   "Para quem",
   "Equipe",
-  "Próximos passos",
+  "Próxima etapa",
 ];
 
 /** Barra de progresso no topo + pontos de navegação entre cenas (desktop). */
@@ -75,52 +76,31 @@ const Navegacao = () => {
   );
 };
 
-/** Cena 2: os números ficam como lacunas até haver fonte. */
-const PROBLEMAS = [
+/** Cena 3: origem e o que já foi construído (fonte: roteiro do projeto de 10/11/2026). */
+const ENTREGAS = [
   {
-    numero: "XX%",
-    texto: "dos corpos d’água da região sem monitoramento regular",
-    falta: "Fonte sugerida: ANA / órgão estadual de meio ambiente",
+    estado: "Publicado",
+    titulo: "Plataforma Tikatu",
+    onde: "International Journal of River Basin Management · 2025",
+    link: "https://doi.org/10.1080/15715124.2025.2528958",
   },
   {
-    numero: "X vezes",
-    texto: "por ano é a frequência típica da coleta oficial em cada ponto",
-    falta: "Fonte sugerida: rede de monitoramento oficial da bacia",
+    estado: "Software disponível",
+    titulo: "tikatuwq no CRAN",
+    onde: "Rotinas abertas, documentação e exemplos reprodutíveis",
+    link: "https://cran.r-project.org/package=tikatuwq",
   },
   {
-    numero: "R$ XX",
-    texto: "é o custo estimado de uma campanha de coleta tradicional",
-    falta: "Fonte sugerida: orçamento de laboratório ou edital público",
+    estado: "Aceito",
+    titulo: "Artigo da biblioteca tikatuwq",
+    onde: "International Journal of River Basin Management · aceite em 22/10/2026",
+  },
+  {
+    estado: "Aceito",
+    titulo: "Frequência amostral no Buranhém",
+    onde: "Earth Science Informatics · aceite em 07/11/2026",
   },
 ];
-
-const Problema = () => (
-  <section id="cena-2" className="mx-auto max-w-6xl px-6 py-24 sm:py-36" aria-label="O problema">
-    <Reveal>
-      <SceneLabel index={2}>O problema</SceneLabel>
-      <h2 className="max-w-3xl text-3xl font-semibold leading-tight text-white sm:text-5xl">
-        Saber se a água está boa é caro, lento e raro.
-      </h2>
-      <p className="mt-5 max-w-2xl text-lg text-slate-300">
-        A análise depende de equipes técnicas e laboratório, então os pontos são poucos e as coletas, espaçadas.
-        Quando o dado chega, muitas vezes o rio já mudou.
-      </p>
-    </Reveal>
-
-    <div className="mt-14 grid gap-4 md:grid-cols-3">
-      {PROBLEMAS.map((p, i) => (
-        <Reveal key={p.texto} delay={0.12 * i}>
-          <div className="relative h-full rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.06] to-transparent p-6">
-            <Provisorio className="mb-5">Provisório · sem fonte</Provisorio>
-            <div className="text-5xl font-semibold tracking-tight text-amber-200 sm:text-6xl">{p.numero}</div>
-            <p className="mt-3 text-slate-200">{p.texto}</p>
-            <p className="mt-4 text-xs text-amber-100/70">{p.falta}</p>
-          </div>
-        </Reveal>
-      ))}
-    </div>
-  </section>
-);
 
 const Origem = () => (
   <section id="cena-3" className="relative overflow-hidden py-24 sm:py-36" aria-label="A origem">
@@ -129,28 +109,60 @@ const Origem = () => (
       style={{ background: "radial-gradient(50% 60% at 15% 50%, rgba(45,212,191,0.10), transparent 70%)" }}
       aria-hidden
     />
-    <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-6 md:grid-cols-[1fr_1.2fr]">
+    <div className="relative mx-auto grid max-w-6xl gap-12 px-6 md:grid-cols-[1fr_1.25fr]">
       <Reveal>
         <SceneLabel index={3}>A origem</SceneLabel>
-        <h2 className="text-3xl font-semibold leading-tight text-white sm:text-5xl">
-          E se quem mora perto do rio pudesse medir a água?
-        </h2>
+        <h2 className="text-3xl font-semibold leading-tight text-white sm:text-5xl">Uma base que já existe.</h2>
+        <p className="mt-5 text-lg leading-relaxed text-slate-300">
+          O Tikatu nasceu no mestrado em Ciências e Tecnologias Ambientais, com a construção da plataforma e a validação
+          inicial no Rio Chamagunga, em Porto Seguro. Hoje é uma pesquisa de doutorado em Biossistemas na UFSB:
+        </p>
+        <p className="mt-4 border-l-2 border-cyan-300/50 pl-4 text-slate-200">
+          “Do dado à decisão: desenvolvimento e avaliação do ecossistema Tikatu para monitoramento, análise
+          computacional e interpretação auditável da qualidade da água.”
+        </p>
       </Reveal>
-      <Reveal delay={0.15}>
-        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
-          <Provisorio className="mb-5">Texto provisório</Provisorio>
-          <p className="text-lg leading-relaxed text-slate-200">
-            O Tikatu nasceu <Lacuna>[onde e quando: ex. cidade, ano, instituição]</Lacuna> a partir de{" "}
-            <Lacuna>[o episódio ou a percepção que motivou o projeto]</Lacuna>.
-          </p>
-          <p className="mt-4 text-lg leading-relaxed text-slate-200">
-            A ideia central: <Lacuna>[uma frase do Vinícius sobre o porquê do projeto]</Lacuna>.
-          </p>
-          <p className="mt-6 border-l-2 border-cyan-300/50 pl-4 text-sm text-slate-400">
-            O nome “Tikatu” <Lacuna>[significado ou origem do nome, se for contar]</Lacuna>.
-          </p>
-        </div>
-      </Reveal>
+      <div>
+        <Reveal delay={0.1}>
+          <div className="mb-4 text-xs font-semibold uppercase tracking-[0.25em] text-cyan-300/80">
+            Entregas que sustentam o percurso
+          </div>
+        </Reveal>
+        <ul className="divide-y divide-white/10 border-y border-white/10">
+          {ENTREGAS.map((e, i) => (
+            <Reveal key={e.titulo} delay={0.1 + i * 0.08}>
+              <li className="flex items-start gap-4 py-5">
+                <span
+                  className={`mt-1 w-28 shrink-0 text-[11px] font-semibold uppercase tracking-wider ${
+                    e.estado === "Aceito" ? "text-[#efb08c]" : "text-emerald-300"
+                  }`}
+                >
+                  {e.estado}
+                </span>
+                <div className="flex-1">
+                  <div className="font-semibold text-white">
+                    {e.link ? (
+                      <a
+                        href={e.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 hover:text-cyan-200"
+                      >
+                        {e.titulo}
+                        <ArrowUpRight className="h-4 w-4" />
+                      </a>
+                    ) : (
+                      e.titulo
+                    )}
+                  </div>
+                  <div className="mt-1 text-sm text-slate-400">{e.onde}</div>
+                </div>
+              </li>
+            </Reveal>
+          ))}
+        </ul>
+        <p className="mt-3 text-xs text-slate-500">Aceite e publicação são situações distintas.</p>
+      </div>
     </div>
   </section>
 );
@@ -219,38 +231,94 @@ const ParaQuem = () => (
   </section>
 );
 
-const Equipe = () => (
-  <section id="cena-7" className="mx-auto max-w-6xl px-6 py-24 sm:py-36" aria-label="Equipe">
-    <Reveal>
-      <SceneLabel index={7}>Equipe</SceneLabel>
-      <div className="flex flex-wrap items-end gap-4">
-        <h2 className="text-3xl font-semibold leading-tight text-white sm:text-5xl">Quem faz o Tikatu.</h2>
-        <Provisorio className="mb-2">Equipe a confirmar</Provisorio>
-      </div>
-    </Reveal>
-    <div className="mt-12 grid grid-cols-2 gap-4 md:grid-cols-4">
-      {[1, 2, 3, 4].map((n, i) => (
-        <Reveal key={n} delay={0.08 * i}>
-          <div className="rounded-2xl border border-dashed border-white/15 bg-white/[0.02] p-5 text-center">
-            <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-white/5 text-slate-500">
-              <UserRound className="h-9 w-9" />
+const EQUIPE = [
+  {
+    papel: "Idealização e desenvolvimento",
+    nome: "Vinícius Saraiva Santos",
+    linhas: [
+      "Administração e Análise de Sistemas",
+      "Técnico em TI do IFBA, Campus Porto Seguro",
+      "Mestre em Ciências e Tecnologias Ambientais",
+      "Doutorando em Biossistemas pela UFSB",
+    ],
+  },
+  {
+    papel: "Orientação científica",
+    nome: "Fabrício Berton Zanchi",
+    linhas: ["Professor doutor da UFSB", "Programa de Pós-Graduação em Biossistemas", "Vínculo de pesquisa: NuPEcoTropic"],
+  },
+];
+
+const TRAJETORIA = [
+  { fase: "TI", texto: "Experiência profissional" },
+  { fase: "Mestrado", texto: "Construção da plataforma" },
+  { fase: "Doutorado", texto: "Avaliação do ecossistema" },
+];
+
+const Equipe = () => {
+  const reduce = useMenosMovimento();
+  return (
+    <section id="cena-7" className="mx-auto max-w-6xl px-6 py-24 sm:py-36" aria-label="Equipe">
+      <Reveal>
+        <SceneLabel index={7}>Equipe</SceneLabel>
+        <h2 className="text-3xl font-semibold leading-tight text-white sm:text-5xl">Tecnologia e pesquisa ambiental.</h2>
+      </Reveal>
+      <div className="mt-12 grid gap-6 md:grid-cols-2">
+        {EQUIPE.map((p, i) => (
+          <Reveal key={p.nome} delay={0.1 * i}>
+            <div className="h-full rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
+              <div className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-300/80">{p.papel}</div>
+              <div className="mt-3 text-2xl font-semibold text-white">{p.nome}</div>
+              <ul className="mt-4 space-y-1.5 text-slate-300">
+                {p.linhas.map((l) => (
+                  <li key={l}>{l}</li>
+                ))}
+              </ul>
             </div>
-            <div className="font-semibold text-amber-100/90">[Nome {n}]</div>
-            <div className="mt-1 text-sm text-slate-400">[Função · formação]</div>
-          </div>
-        </Reveal>
-      ))}
-    </div>
-    <Reveal delay={0.2}>
-      <p className="mt-8 text-sm text-slate-400">
-        Parceiros e instituições: <Lacuna>[logos ou nomes, se puderem ser citados]</Lacuna>
-      </p>
-    </Reveal>
-  </section>
-);
+          </Reveal>
+        ))}
+      </div>
+      <div className="relative mt-14">
+        <motion.div
+          className="absolute left-0 right-0 top-1.5 h-0.5 origin-left bg-[#efb08c]"
+          initial={reduce ? false : { scaleX: 0 }}
+          whileInView={{ scaleX: 1 }}
+          viewport={{ once: true, margin: "-10% 0px" }}
+          transition={{ duration: 1.6, ease: [0.22, 1, 0.36, 1] }}
+          aria-hidden
+        />
+        <ol className="relative grid grid-cols-3 gap-4">
+          {TRAJETORIA.map((t, i) => (
+            <Reveal key={t.fase} delay={0.3 + i * 0.25}>
+              <li>
+                <span className="block h-3.5 w-3.5 rounded-full bg-[#efb08c] ring-4 ring-[#062a3d]" aria-hidden />
+                <div className="mt-4 font-semibold text-white sm:text-lg">{t.fase}</div>
+                <div className="text-sm text-slate-400">{t.texto}</div>
+              </li>
+            </Reveal>
+          ))}
+        </ol>
+      </div>
+    </section>
+  );
+};
+
+const RECURSOS = [
+  { titulo: "Instrumentação", texto: "Sondas e acessórios de medição" },
+  { titulo: "Materiais e calibração", texto: "Soluções, frascos e consumíveis" },
+  { titulo: "Campo e logística", texto: "Transporte e deslocamentos da equipe" },
+  { titulo: "Validação", texto: "Comparações e análises de referência" },
+];
+
+const ETAPAS_APOIO = [
+  { n: "01", titulo: "Pactuar", texto: "Escolher a frente e dimensionar a etapa.", evidencia: "Plano de aplicação" },
+  { n: "02", titulo: "Preparar", texto: "Definir locais e métodos; adquirir materiais.", evidencia: "Protocolos e aquisições" },
+  { n: "03", titulo: "Medir e verificar", texto: "Executar as campanhas; conferir dados.", evidencia: "Registros documentados" },
+  { n: "04", titulo: "Compartilhar", texto: "Produzir relatórios e devolutivas.", evidencia: "Relatórios de execução" },
+];
 
 const ProximosPassos = () => (
-  <section id="cena-8" className="relative overflow-hidden pb-16 pt-24 sm:pt-36" aria-label="Próximos passos">
+  <section id="cena-8" className="relative overflow-hidden pb-16 pt-24 sm:pt-36" aria-label="A próxima etapa">
     <div
       className="pointer-events-none absolute inset-0"
       style={{ background: "radial-gradient(70% 50% at 50% 100%, rgba(34,211,238,0.18), transparent 70%)" }}
@@ -258,48 +326,51 @@ const ProximosPassos = () => (
     />
     <div className="relative mx-auto max-w-6xl px-6">
       <Reveal>
-        <SceneLabel index={8}>Próximos passos</SceneLabel>
+        <SceneLabel index={8}>A próxima etapa</SceneLabel>
         <h2 className="max-w-3xl text-3xl font-semibold leading-tight text-white sm:text-5xl">
-          Daqui, o rio só aumenta.
+          A próxima etapa acontece no campo.
         </h2>
+        <p className="mt-4 max-w-2xl text-slate-300 sm:text-lg">
+          A base computacional já existe. Falta ampliar a capacidade de medir, registrar e validar em contexto.
+        </p>
       </Reveal>
 
-      <div className="mt-12 grid gap-4 md:grid-cols-3">
-        {["Próximos 6 meses", "Em 12 meses", "Em 24 meses"].map((prazo, i) => (
-          <Reveal key={prazo} delay={0.1 * i}>
-            <div className="h-full rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-              <div className="text-sm font-semibold text-cyan-300">{prazo}</div>
-              <p className="mt-3 text-slate-200">
-                <Lacuna>[meta: ex. nº de pontos, cidades, parcerias]</Lacuna>
-              </p>
+      <div className="mt-10 grid gap-3 sm:grid-cols-2">
+        {RECURSOS.map((r, i) => (
+          <Reveal key={r.titulo} delay={0.08 * i}>
+            <div className="flex h-full items-baseline justify-between gap-4 rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4">
+              <span className="font-semibold text-white">{r.titulo}</span>
+              <span className="text-right text-sm text-slate-400">{r.texto}</span>
             </div>
           </Reveal>
         ))}
       </div>
 
       <Reveal delay={0.1}>
-        <div className="mt-16 rounded-3xl border border-cyan-300/30 bg-gradient-to-br from-cyan-400/15 via-teal-400/10 to-transparent p-8 sm:p-12">
-          <Provisorio className="mb-6">Pedido a confirmar</Provisorio>
-          <h3 className="text-2xl font-semibold text-white sm:text-4xl">O que buscamos</h3>
-          <div className="mt-6 grid gap-6 sm:grid-cols-3">
-            <div>
-              <div className="text-xs uppercase tracking-wider text-slate-400">Valor</div>
-              <div className="mt-1 text-3xl font-semibold text-amber-200">R$ [—]</div>
-            </div>
-            <div>
-              <div className="text-xs uppercase tracking-wider text-slate-400">Modalidade</div>
-              <div className="mt-1 text-lg text-amber-100/90">[investimento, patrocínio, parceria…]</div>
-            </div>
-            <div>
-              <div className="text-xs uppercase tracking-wider text-slate-400">Uso dos recursos</div>
-              <div className="mt-1 text-lg text-amber-100/90">[ex.: kits, expansão, equipe]</div>
-            </div>
-          </div>
-        </div>
+        <h3 className="mt-16 text-2xl font-semibold text-white sm:text-3xl">
+          Um plano. Quatro etapas que podem ser conferidas.
+        </h3>
       </Reveal>
+      <ol className="mt-8 grid gap-4 md:grid-cols-4">
+        {ETAPAS_APOIO.map((e, i) => (
+          <Reveal key={e.n} delay={0.1 * i}>
+            <li className="h-full rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+              <div className="font-mono text-sm text-cyan-300">{e.n}</div>
+              <div className="mt-2 text-lg font-semibold text-white">{e.titulo}</div>
+              <p className="mt-1 text-sm text-slate-300">{e.texto}</p>
+              <div className="mt-4 text-[11px] font-semibold uppercase tracking-wider text-[#efb08c]">Evidência</div>
+              <div className="text-sm text-white">{e.evidencia}</div>
+            </li>
+          </Reveal>
+        ))}
+      </ol>
+      <p className="mt-4 text-xs text-slate-500">
+        Cronograma, marcos e formalização pactuados conforme os procedimentos institucionais. Entregas condicionadas ao
+        escopo aprovado; resultados científicos e impacto não são garantidos.
+      </p>
 
       <Reveal delay={0.1}>
-        <div className="mt-16 flex flex-col items-center text-center">
+        <div className="mt-20 flex flex-col items-center rounded-3xl border border-cyan-300/30 bg-gradient-to-br from-cyan-400/15 via-teal-400/10 to-transparent px-6 py-12 text-center sm:px-12">
           <div className="rounded-2xl bg-white px-5 py-3">
             <img
               src="/lovable-uploads/d62bdfd0-6fc8-4075-ac93-580e7557f424.png"
@@ -308,21 +379,25 @@ const ProximosPassos = () => (
               loading="lazy"
             />
           </div>
-          <p className="mt-6 text-2xl font-semibold text-white sm:text-3xl">Vamos conversar?</p>
-          <div className="mt-5 flex flex-col items-center gap-3 sm:flex-row">
-            <span className="inline-flex items-center gap-2 rounded-full border border-dashed border-amber-300/50 px-5 py-3 text-amber-100/90">
-              <Mail className="h-4 w-4" />
-              [e-mail de contato]
-            </span>
-            <span className="inline-flex items-center gap-2 rounded-full border border-dashed border-amber-300/50 px-5 py-3 text-amber-100/90">
-              [WhatsApp ou agenda]
-            </span>
-          </div>
+          <h3 className="mt-8 text-3xl font-semibold text-white sm:text-5xl">Vamos viabilizar a próxima etapa?</h3>
+          <p className="mt-4 max-w-xl text-slate-300 sm:text-lg">
+            Buscamos apoio para sondas, materiais e campanhas de campo. Próximo passo: definir a frente de apoio e seu
+            plano de aplicação.
+          </p>
+          <a
+            href="https://www.tikatu.com.br"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-8 inline-flex items-center gap-2 rounded-full bg-cyan-300 px-6 py-3 font-semibold text-slate-950 transition-colors hover:bg-cyan-200"
+          >
+            Conhecer o Tikatu
+            <ArrowUpRight className="h-4 w-4" />
+          </a>
         </div>
       </Reveal>
 
-      <p className="mt-20 text-center text-xs text-slate-500">
-        Tikatu · plataforma de monitoramento da qualidade da água
+      <p className="mt-16 text-center text-xs text-slate-500">
+        Proposta de financiamento de pesquisa aplicada. Não fixa valor total nem representa oferta de serviço contratado.
       </p>
     </div>
   </section>
@@ -346,7 +421,7 @@ const Apresentacao = () => {
       <Helmet>
         <title>Tikatu · Apresentação</title>
         <meta name="robots" content="noindex, nofollow" />
-        <meta name="description" content="Apresentação do Tikatu: monitoramento cidadão da qualidade da água." />
+        <meta name="description" content="Tikatu: apoio à próxima etapa da pesquisa em qualidade da água." />
         <meta name="theme-color" content="#021019" />
       </Helmet>
       <div className="min-h-screen bg-[#062a3d] font-sans text-slate-100 antialiased selection:bg-cyan-300/30">
@@ -355,7 +430,7 @@ const Apresentacao = () => {
           <div className="bg-gradient-to-b from-[#021019] via-[#04202f] to-[#062a3d]">
             <Hero />
           </div>
-          <Problema />
+          <Amostragem />
           <Origem />
           <Fluxo />
           <AoVivo />

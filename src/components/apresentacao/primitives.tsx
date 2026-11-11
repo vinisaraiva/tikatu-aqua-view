@@ -1,35 +1,6 @@
 import type { ReactNode } from "react";
 import { motion } from "framer-motion";
-import { cn } from "@/lib/utils";
 import { useMenosMovimento } from "./useMenosMovimento";
-
-/**
- * Selo visível para todo conteúdo que ainda não foi confirmado pelo Vinícius.
- * Nada marcado com este selo deve ser lido como fato.
- */
-export const Provisorio = ({ children = "PROVISÓRIO", className }: { children?: ReactNode; className?: string }) => (
-  <span
-    className={cn(
-      "inline-flex items-center gap-1.5 rounded-full border border-dashed border-amber-300/70 bg-amber-300/10 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-amber-200",
-      className,
-    )}
-  >
-    <span className="h-1.5 w-1.5 rounded-full bg-amber-300" aria-hidden />
-    {children}
-  </span>
-);
-
-/** Bloco de texto reservado: mostra o que deve entrar ali. */
-export const Lacuna = ({ children, className }: { children: ReactNode; className?: string }) => (
-  <span
-    className={cn(
-      "rounded-md border border-dashed border-amber-300/50 [-webkit-box-decoration-break:clone] [box-decoration-break:clone] bg-amber-300/[0.06] px-1.5 py-0.5 text-amber-100/90",
-      className,
-    )}
-  >
-    {children}
-  </span>
-);
 
 /** Entrada suave ao aparecer na tela (desligada com prefers-reduced-motion). */
 export const Reveal = ({
