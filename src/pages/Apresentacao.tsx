@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import { motion, useScroll, useSpring } from "framer-motion";
@@ -42,6 +42,50 @@ const Navegacao = () => {
     secoes.forEach((s) => obs.observe(s));
     return () => obs.disconnect();
   }, []);
+
+  // Setas ← → (e PageUp/PageDown) pulam de cena em cena, como no deck. Cenas com
+  // data-paradas="N" (rolagem "grudada") ganham N paradas, uma por passo.
+  const reduce = useMenosMovimento();
+  const alvo = useRef<{ y: number; quando: number } | null>(null);
+  useEffect(() => {
+    const paradas = () => {
+      const lista: number[] = [];
+      CENAS.forEach((_, i) => {
+        const el = document.getElementById(`cena-${i + 1}`);
+        if (!el) return;
+        const topo = Math.round(el.getBoundingClientRect().top + window.scrollY);
+        const n = Number(el.dataset.paradas ?? 1);
+        const curso = el.offsetHeight - window.innerHeight;
+        if (n > 1 && curso > 0) {
+          for (let k = 0; k < n; k++) lista.push(Math.round(topo + (curso * (k + 0.15)) / n));
+        } else {
+          lista.push(topo);
+        }
+      });
+      return lista;
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+      const t = e.target as HTMLElement | null;
+      if (t && (t.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(t.tagName))) return;
+      const frente = e.key === "ArrowRight" || e.key === "PageDown";
+      const tras = e.key === "ArrowLeft" || e.key === "PageUp";
+      if (!frente && !tras) return;
+      e.preventDefault();
+      // Durante a rolagem suave, conta a partir do destino anterior (permite apertar várias vezes).
+      const recente = alvo.current && performance.now() - alvo.current.quando < 900;
+      const y = recente && alvo.current ? alvo.current.y : window.scrollY;
+      const lista = paradas();
+      const destino = frente
+        ? lista.find((p) => p > y + 8)
+        : [...lista].reverse().find((p) => p < y - 8);
+      if (destino === undefined) return;
+      alvo.current = { y: destino, quando: performance.now() };
+      window.scrollTo({ top: destino, behavior: reduce ? "auto" : "smooth" });
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [reduce]);
 
   return (
     <>

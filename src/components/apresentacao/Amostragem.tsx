@@ -1,5 +1,5 @@
-import { useMemo, useRef, useState } from "react";
-import { motion, useMotionValueEvent, useScroll, useTransform, type MotionValue } from "framer-motion";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { animate, motion, useInView, useMotionValue, type MotionValue } from "framer-motion";
 import { SceneLabel } from "./primitives";
 import { useMenosMovimento } from "./useMenosMovimento";
 
@@ -65,7 +65,7 @@ const Grafico = ({
           strokeWidth="3.5"
           initial={{ opacity: 0, scale: 0.4 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: i * 0.04, duration: 0.35 }}
+          transition={{ delay: i * 0.12, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
         />
       ))}
       <text x={X0} y={BASE + 30} fontSize="14" fill="rgba(255,255,255,0.5)" letterSpacing="1.5">
@@ -107,6 +107,42 @@ const Rodape = () => (
   </p>
 );
 
+/** Botões 3 / 12 coletas (e "Rever", na versão animada). */
+const Controles = ({
+  coletas,
+  escolher,
+  rever,
+}: {
+  coletas: 0 | 3 | 12;
+  escolher: (n: 3 | 12) => void;
+  rever?: () => void;
+}) => (
+  <div className="flex flex-wrap items-center gap-3">
+    {([3, 12] as const).map((n) => (
+      <button
+        key={n}
+        type="button"
+        onClick={() => escolher(n)}
+        aria-pressed={coletas === n}
+        className={`rounded-full border px-5 py-2.5 text-sm font-semibold transition-colors ${
+          coletas === n ? "border-cyan-300 bg-cyan-300 text-slate-950" : "border-cyan-300/60 text-cyan-200"
+        }`}
+      >
+        {n} coletas
+      </button>
+    ))}
+    {rever && (
+      <button
+        type="button"
+        onClick={rever}
+        className="rounded-full px-4 py-2.5 text-sm text-cyan-100/80 underline-offset-4 hover:underline"
+      >
+        Rever animação
+      </button>
+    )}
+  </div>
+);
+
 /** Versão sem movimento: o visitante alterna 3 e 12 coletas. */
 const Estatica = () => {
   const [coletas, setColetas] = useState<3 | 12>(3);
@@ -116,20 +152,8 @@ const Estatica = () => {
       <div className="mt-10">
         <Grafico coletas={coletas} tracado={1} />
       </div>
-      <div className="mt-6 flex flex-wrap items-center gap-3">
-        {([3, 12] as const).map((n) => (
-          <button
-            key={n}
-            type="button"
-            onClick={() => setColetas(n)}
-            aria-pressed={coletas === n}
-            className={`rounded-full border px-5 py-2.5 text-sm font-semibold transition-colors ${
-              coletas === n ? "border-cyan-300 bg-cyan-300 text-slate-950" : "border-cyan-300/60 text-cyan-200"
-            }`}
-          >
-            {n} coletas
-          </button>
-        ))}
+      <div className="mt-6 flex flex-wrap items-center gap-4">
+        <Controles coletas={coletas} escolher={setColetas} />
         <Status coletas={coletas} />
       </div>
       <Rodape />
@@ -137,35 +161,81 @@ const Estatica = () => {
   );
 };
 
+/**
+ * Versão animada: ao entrar na tela, a linha do rio se desenha sozinha; depois aparecem 3 coletas
+ * e, em seguida, 12. No fim, o apresentador pode alternar 3/12 ou rever.
+ */
 export const Amostragem = () => {
   const reduce = useMenosMovimento();
   const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
-  const tracado = useTransform(scrollYProgress, [0.02, 0.32], [0, 1]);
+  const visto = useInView(ref, { amount: 0.45, once: true });
+  const tracado = useMotionValue(0);
   const [coletas, setColetas] = useState<0 | 3 | 12>(0);
+  const [fim, setFim] = useState(false);
+  const [rodada, setRodada] = useState(0);
 
-  useMotionValueEvent(scrollYProgress, "change", (v) => {
-    const c = v < 0.34 ? 0 : v < 0.64 ? 3 : 12;
-    setColetas((atual) => (atual === c ? atual : c));
-  });
+  useEffect(() => {
+    if (!visto || reduce) return;
+    const linha = animate(tracado, 1, { delay: 0.6, duration: 2.6, ease: [0.45, 0, 0.2, 1] });
+    const t3 = window.setTimeout(() => setColetas(3), 3600);
+    const t12 = window.setTimeout(() => {
+      setColetas(12);
+      setFim(true);
+    }, 6800);
+    return () => {
+      linha.stop();
+      window.clearTimeout(t3);
+      window.clearTimeout(t12);
+    };
+  }, [visto, reduce, rodada, tracado]);
 
   if (reduce) return <Estatica />;
 
+  const rever = () => {
+    tracado.set(0);
+    setColetas(0);
+    setFim(false);
+    setRodada((r) => r + 1);
+  };
+
   return (
-    // A rolagem vira a linha do tempo: desenha o rio, depois 3 coletas, depois 12.
-    <section ref={ref} id="cena-2" className="relative h-[320vh]" aria-label="O problema">
-      <div className="sticky top-0 flex h-[100svh] flex-col justify-center overflow-hidden px-6">
-        <div className="mx-auto w-full max-w-6xl">
-          <Cabecalho />
-          <div className="mt-8 sm:mt-10">
-            <Grafico coletas={coletas} tracado={tracado} />
-          </div>
-          <div className="mt-5 min-h-[3.5rem]" aria-live="polite">
-            <Status coletas={coletas} />
-          </div>
-          <Rodape />
-        </div>
+    <section
+      ref={ref}
+      id="cena-2"
+      className="mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-center px-6 py-20"
+      aria-label="O problema"
+    >
+      <Cabecalho />
+      <div className="mt-8 sm:mt-10">
+        <Grafico coletas={coletas} tracado={tracado} />
       </div>
+      <div className="mt-5 flex min-h-[3.5rem] flex-wrap items-center gap-4">
+        <motion.div
+          key={coletas}
+          aria-live="polite"
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: coletas ? 0.3 + coletas * 0.12 : 0, duration: 0.4 }}
+        >
+          <Status coletas={coletas} />
+        </motion.div>
+        <motion.div
+          initial={false}
+          animate={{ opacity: fim ? 1 : 0 }}
+          transition={{ duration: 0.5 }}
+          className={fim ? "" : "pointer-events-none"}
+        >
+          <Controles
+            coletas={coletas}
+            escolher={(n) => {
+              tracado.set(1);
+              setColetas(n);
+            }}
+            rever={rever}
+          />
+        </motion.div>
+      </div>
+      <Rodape />
     </section>
   );
 };

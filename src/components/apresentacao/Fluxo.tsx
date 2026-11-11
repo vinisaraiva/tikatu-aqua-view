@@ -212,7 +212,7 @@ export const Fluxo = () => {
 
   return (
     // Seção alta + conteúdo "grudado": a rolagem vira a linha do tempo da animação.
-    <section ref={ref} id="cena-4" className="relative h-[420vh]" aria-label="Como funciona">
+    <section ref={ref} id="cena-4" data-paradas={ETAPAS.length} className="relative h-[420vh]" aria-label="Como funciona">
       <div className="sticky top-0 flex h-[100svh] flex-col justify-center overflow-hidden px-6">
         <div className="mx-auto w-full max-w-5xl">
           <motion.div style={{ opacity: tituloOpacity }}>

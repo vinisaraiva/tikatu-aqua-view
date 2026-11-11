@@ -53,6 +53,7 @@ export const Hero = () => {
   const textY = useTransform(scrollYProgress, [0, 1], reduce ? [0, 0] : [0, 180]);
   const textOpacity = useTransform(scrollYProgress, [0, 0.6], reduce ? [1, 1] : [1, 0]);
   const waterY = useTransform(scrollYProgress, [0, 1], reduce ? ["0%", "0%"] : ["0%", "-55%"]);
+  const videoScale = useTransform(scrollYProgress, [0, 1], reduce ? [1, 1] : [1, 1.12]);
 
   return (
     <section
@@ -61,12 +62,33 @@ export const Hero = () => {
       className="relative flex min-h-[100svh] items-center justify-center overflow-hidden"
       aria-label="Abertura"
     >
-      {/* Luz atravessando a água */}
+      {/* Rio de fundo (mesmo vídeo do deck). Sem movimento: só o quadro parado. */}
+      <motion.div style={{ scale: videoScale }} className="absolute inset-0" aria-hidden>
+        {reduce ? (
+          <img src="/apresentacao/rio-poster.webp" alt="" className="h-full w-full object-cover" />
+        ) : (
+          <video
+            className="h-full w-full object-cover"
+            src="/apresentacao/rio.mp4"
+            poster="/apresentacao/rio-poster.webp"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+          />
+        )}
+      </motion.div>
+      {/* Véus para o texto ficar legível sobre o vídeo */}
+      <div
+        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#021019]/80 via-[#021019]/45 to-[#04202f]/90 md:bg-gradient-to-r md:from-[#021019]/95 md:via-[#021019]/60 md:to-[#021019]/10"
+        aria-hidden
+      />
       <div
         className="pointer-events-none absolute inset-0 opacity-70"
         style={{
           background:
-            "radial-gradient(60% 50% at 50% 0%, rgba(103,232,249,0.18), transparent 70%), radial-gradient(40% 40% at 80% 30%, rgba(45,212,191,0.12), transparent 70%)",
+            "radial-gradient(60% 50% at 30% 0%, rgba(103,232,249,0.14), transparent 70%)",
         }}
         aria-hidden
       />
@@ -87,15 +109,23 @@ export const Hero = () => {
 
       <motion.div
         style={{ y: textY, opacity: textOpacity }}
-        className="relative z-10 mx-auto max-w-4xl px-6 text-center"
+        className="relative z-10 mx-auto w-full max-w-6xl px-6 pb-28 pt-16 text-center md:pb-36 md:text-left"
       >
+        <motion.img
+          src="/lovable-uploads/d62bdfd0-6fc8-4075-ac93-580e7557f424.png"
+          alt="Tikatu"
+          initial={reduce ? false : { opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="mx-auto mb-8 h-9 w-auto rounded-lg bg-white/95 px-3 py-1.5 md:mx-0 sm:h-11"
+        />
         <motion.p
           initial={reduce ? false : { opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           className="mb-6 text-xs font-semibold uppercase tracking-[0.35em] text-cyan-300/90"
         >
-          Tikatu · financiamento de pesquisa aplicada
+          Financiamento de pesquisa aplicada
         </motion.p>
         <h1 className="text-balance text-4xl font-semibold leading-[1.05] tracking-tight text-white sm:text-6xl md:text-7xl">
           {["Apoie a próxima", "etapa do Tikatu."].map((line, i) => (
@@ -122,15 +152,25 @@ export const Hero = () => {
           initial={reduce ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1, delay: 1.3 }}
-          className="mx-auto mt-8 max-w-xl text-pretty text-base text-slate-300 sm:text-lg"
+          className="mx-auto mt-8 max-w-xl text-pretty text-base text-slate-200 sm:text-lg md:mx-0"
         >
           Ciência e tecnologia para compreender a qualidade da água e conferir o caminho da medição à
           interpretação. Buscamos apoio para sondas, materiais e campanhas de campo.
         </motion.p>
+        <motion.div
+          initial={reduce ? false : { opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1, delay: 1.7 }}
+          className="mt-10 text-sm text-slate-300"
+        >
+          <div className="mx-auto mb-4 h-0.5 w-24 bg-[#e07a4a] md:mx-0" aria-hidden />
+          <p className="font-semibold text-white">Vinícius Saraiva Santos · UFSB</p>
+          <p className="mt-1 text-slate-400">Orientação: Prof. Dr. Fabrício Berton Zanchi</p>
+        </motion.div>
       </motion.div>
 
       {/* Água subindo */}
-      <motion.div style={{ y: waterY }} className="absolute inset-x-0 bottom-0 h-[38vh]" aria-hidden>
+      <motion.div style={{ y: waterY }} className="absolute inset-x-0 bottom-0 h-[24vh]" aria-hidden>
         <Wave d={WAVE_A} fill="rgba(34,211,238,0.18)" duration={22} className="bottom-6" reduce={reduce} />
         <Wave d={WAVE_B} fill="rgba(14,165,233,0.28)" duration={16} className="bottom-2" reduce={reduce} />
         <Wave d={WAVE_C} fill="#062a3d" duration={11} className="bottom-0" reduce={reduce} />
@@ -143,6 +183,7 @@ export const Hero = () => {
         className="absolute bottom-8 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-1 text-xs text-cyan-100/80"
       >
         <span>Role para mergulhar</span>
+        <span className="hidden text-cyan-100/60 lg:block">ou use as setas ← → do teclado</span>
         <motion.span
           animate={reduce ? undefined : { y: [0, 6, 0] }}
           transition={{ duration: 1.8, repeat: Infinity }}
