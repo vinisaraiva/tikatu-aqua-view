@@ -134,7 +134,6 @@ export const Investimento = () => {
   const reduce = useMenosMovimento();
   const palco = usePalco();
   const t = useT();
-  const l = useIdioma();
   const ref = useRef<HTMLDivElement>(null);
   const ativo = useInView(ref, { amount: 0.4, once: true });
   const [desenhado, setDesenhado] = useState(reduce);
@@ -201,11 +200,12 @@ export const Investimento = () => {
                 exit={{ opacity: 0, x: -30, transition: { duration: 0.2 } }}
                 transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
               >
-                <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                {/* Só o percentual: o valor de cada frente fica no detalhamento, sob solicitação. */}
+                <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
                   <span className="font-mono text-6xl font-semibold tabular-nums sm:text-7xl" style={{ color: f.cor }}>
                     {f.pct}%
                   </span>
-                  <span className="font-mono text-xl tabular-nums text-white sm:text-2xl">R$ {formatar(f.valor, l, 2)}</span>
+                  <span className="text-sm text-slate-400">{t(["do total", "of the total"])}</span>
                 </div>
                 <h3 className="mt-4 text-2xl font-semibold text-white sm:text-3xl">{t(f.titulo)}</h3>
                 <p className="mt-3 text-base text-slate-300 sm:text-lg">{t(f.texto)}</p>
