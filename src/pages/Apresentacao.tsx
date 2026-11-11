@@ -8,6 +8,7 @@ import { Fluxo } from "@/components/apresentacao/Fluxo";
 import { AoVivo, AppColeta } from "@/components/apresentacao/AoVivo";
 import { Reveal, SceneLabel } from "@/components/apresentacao/primitives";
 import { Amostragem } from "@/components/apresentacao/Amostragem";
+import { Sonda3D } from "@/components/apresentacao/Sonda3D";
 import { useMenosMovimento } from "@/components/apresentacao/useMenosMovimento";
 
 const CENAS = [
@@ -380,15 +381,19 @@ const ProximosPassos = () => (
         </p>
       </Reveal>
 
-      <div className="mt-10 grid gap-3 sm:grid-cols-2">
-        {RECURSOS.map((r, i) => (
-          <Reveal key={r.titulo} delay={0.08 * i}>
-            <div className="flex h-full items-baseline justify-between gap-4 rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4">
-              <span className="font-semibold text-white">{r.titulo}</span>
-              <span className="text-right text-sm text-slate-400">{r.texto}</span>
-            </div>
-          </Reveal>
-        ))}
+      <div className="mt-10 grid items-stretch gap-6 md:grid-cols-[1fr_1.1fr]">
+        <div className="grid content-center gap-3">
+          <div className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-300/80">O que o apoio viabiliza</div>
+          {RECURSOS.map((r, i) => (
+            <Reveal key={r.titulo} delay={0.08 * i}>
+              <div className="flex h-full items-baseline justify-between gap-4 rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4">
+                <span className="font-semibold text-white">{r.titulo}</span>
+                <span className="text-right text-sm text-slate-400">{r.texto}</span>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+        <Sonda3D />
       </div>
 
       <Reveal delay={0.1}>
