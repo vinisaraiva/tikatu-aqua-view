@@ -9,16 +9,18 @@ import {
   useTransform,
   type MotionValue,
 } from "framer-motion";
-import { CloudUpload, Cpu, LayoutDashboard, Smartphone, type LucideIcon } from "lucide-react";
+import { CloudUpload, Cpu, LayoutDashboard, MessageSquareText, Smartphone, type LucideIcon } from "lucide-react";
 import { ATRASO_TELA, SceneLabel, usePalco } from "./primitives";
 import { useMenosMovimento } from "./useMenosMovimento";
 import { formatar, useIdioma, useT, type Bi } from "./idioma";
+import { Situacao, type TipoSituacao } from "./Situacao";
 
 interface Etapa {
   icon: LucideIcon;
   titulo: Bi;
   simples: Bi;
   tecnico: Bi;
+  situacao: TipoSituacao;
 }
 
 const ETAPAS: Etapa[] = [
@@ -33,6 +35,7 @@ const ETAPAS: Etapa[] = [
       "O app importa o arquivo XLSX da sonda, sem redigitar valores.",
       "The app imports the probe's XLSX file, with no retyping of values.",
     ],
+    situacao: "disponivel",
   },
   {
     icon: CloudUpload,
@@ -45,6 +48,7 @@ const ETAPAS: Etapa[] = [
       "Envio para um banco Supabase (Postgres) compartilhado entre o app e a plataforma.",
       "Sent to a Supabase (Postgres) database shared by the app and the platform.",
     ],
+    situacao: "disponivel",
   },
   {
     icon: Cpu,
@@ -57,6 +61,7 @@ const ETAPAS: Etapa[] = [
       "Comparação com a faixa do CONAMA e índices como o IQA (Qualidade da Água) e o IET (Estado Trófico).",
       "Compared with the range set by CONAMA (Brazil's environmental council) and indices such as the WQI (Water Quality Index) and TSI (Trophic State Index).",
     ],
+    situacao: "disponivel",
   },
   {
     icon: LayoutDashboard,
@@ -69,6 +74,20 @@ const ETAPAS: Etapa[] = [
       "Painel web com mapa, referência do CONAMA e status de cada leitura por ponto de coleta.",
       "Web dashboard with a map, the CONAMA reference and the status of each reading per sampling site.",
     ],
+    situacao: "disponivel",
+  },
+  {
+    icon: MessageSquareText,
+    titulo: ["A Miãga interpreta", "Miãga interprets"],
+    simples: [
+      "Uma assistente de IA explica, em linguagem simples, o que os dados mostram em cada ponto.",
+      "An AI assistant explains, in plain language, what the data show at each site.",
+    ],
+    tecnico: [
+      "As explicações passam pela pré-verificação: só chegam a quem lê se os números baterem com o cálculo.",
+      "Explanations go through the pre-check: they only reach readers if the numbers match the calculation.",
+    ],
+    situacao: "desenvolvimento",
   },
 ];
 
@@ -155,6 +174,36 @@ const Ilustracao = ({ etapa }: { etapa: number }) => {
       </div>
     );
   }
+  if (etapa === 4) {
+    return (
+      <div className="mx-auto w-full max-w-sm space-y-3">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="ml-auto w-fit max-w-[85%] rounded-2xl rounded-br-sm bg-white/10 px-4 py-2 text-sm text-slate-100"
+        >
+          {t(["Como está a água no Ponto 2?", "How is the water at Site 2?"])}
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="w-fit max-w-[90%] rounded-2xl rounded-bl-sm border border-cyan-300/30 bg-cyan-300/10 px-4 py-3 text-sm text-cyan-50"
+        >
+          {t([
+            "Na coleta de 25/08/2024, o pH ficou em 5,0, abaixo do mínimo de 6 do CONAMA.",
+            "In the 25 Aug 2024 sample, pH was 5.0, below the CONAMA minimum of 6.",
+          ])}
+          <span className="mt-2 flex items-center gap-1.5 text-[11px] text-emerald-200">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-300" aria-hidden />
+            {t(["Números conferidos com o cálculo", "Numbers checked against the calculation"])}
+          </span>
+        </motion.div>
+        <p className="text-center text-[11px] text-slate-500">{t(["Exemplo ilustrativo", "Illustrative example"])}</p>
+      </div>
+    );
+  }
   return (
     <div className="mx-auto w-full max-w-[15rem] overflow-hidden rounded-xl bg-white sm:max-w-sm shadow-2xl shadow-cyan-500/20 ring-1 ring-white/15">
       <div className="flex items-center gap-1.5 bg-slate-200 px-3 py-2">
@@ -209,7 +258,10 @@ const TextoEtapa = ({ etapa }: { etapa: Etapa }) => {
   const t = useT();
   return (
   <>
-    <h3 className="text-xl font-semibold text-white sm:text-3xl">{t(etapa.titulo)}</h3>
+    <div className="flex flex-wrap items-center justify-center gap-2 md:justify-start">
+      <h3 className="text-xl font-semibold text-white sm:text-3xl">{t(etapa.titulo)}</h3>
+      <Situacao tipo={etapa.situacao} />
+    </div>
     <p className="mt-2 text-[15px] text-slate-200 sm:mt-3 sm:text-lg">{t(etapa.simples)}</p>
     <p className="mt-2 inline-flex items-start gap-2 rounded-lg bg-white/5 px-3 py-2 text-left text-xs sm:mt-3 text-cyan-100/80 sm:text-sm">
       <span className="mt-0.5 shrink-0 rounded bg-cyan-300/20 px-1.5 text-[10px] font-semibold uppercase tracking-wider text-cyan-200">
@@ -222,14 +274,14 @@ const TextoEtapa = ({ etapa }: { etapa: Etapa }) => {
 };
 
 /** Versão estática para quem pede menos movimento. */
-const TITULO: Bi = ["Do rio ao painel, em quatro passos.", "From river to dashboard, in four steps."];
+const TITULO: Bi = ["Do campo às pessoas, em cinco passos.", "From the field to people, in five steps."];
 const ROTULO: Bi = ["Como funciona", "How it works"];
 
 const FluxoEstatico = () => {
   const t = useT();
   return (
-    <section id="cena-4" className="mx-auto max-w-5xl px-6 py-24" aria-label={t(ROTULO)}>
-      <SceneLabel index={4}>{t(ROTULO)}</SceneLabel>
+    <section id="cena-6" className="mx-auto max-w-5xl px-6 py-24" aria-label={t(ROTULO)}>
+      <SceneLabel index={6}>{t(ROTULO)}</SceneLabel>
       <h2 className="mb-12 text-3xl font-semibold text-white sm:text-5xl">{t(TITULO)}</h2>
       <ol className="grid gap-10 md:grid-cols-2">
         {ETAPAS.map((e, i) => (
@@ -259,7 +311,7 @@ const Conteudo = ({
   return (
   <div className="mx-auto w-full max-w-5xl">
     <motion.div style={tituloOpacity ? { opacity: tituloOpacity } : undefined}>
-      <SceneLabel index={4}>{t(ROTULO)}</SceneLabel>
+      <SceneLabel index={6}>{t(ROTULO)}</SceneLabel>
       <h2 className="mb-4 text-2xl font-semibold text-white sm:mb-12 sm:text-5xl">{t(TITULO)}</h2>
     </motion.div>
 
@@ -311,7 +363,7 @@ const FluxoTela = ({ passo }: { passo: number }) => {
     return () => window.clearTimeout(t);
   }, [passo, alvo]);
   return (
-    <section id="cena-4" className="relative flex min-h-[100svh] flex-col justify-center px-6 py-16" aria-label={t(ROTULO)}>
+    <section id="cena-6" className="relative flex min-h-[100svh] flex-col justify-center px-6 py-16" aria-label={t(ROTULO)}>
       <Conteudo ativa={passo} progresso={progresso} />
       <p className="mt-6 text-center text-xs text-slate-500">
         {t(["Use → para avançar cada passo.", "Press → to go through each step."])}
@@ -340,7 +392,7 @@ export const Fluxo = () => {
 
   return (
     // Seção alta + conteúdo "grudado": a rolagem vira a linha do tempo da animação.
-    <section ref={ref} id="cena-4" data-paradas={ETAPAS.length} className="relative h-[420vh]" aria-label={t(ROTULO)}>
+    <section ref={ref} id="cena-6" data-paradas={ETAPAS.length} className="relative h-[520vh]" aria-label={t(ROTULO)}>
       <div className="sticky top-0 flex h-[100svh] flex-col justify-center overflow-hidden px-6">
         <Conteudo ativa={ativa} progresso={suave} tituloOpacity={tituloOpacity} />
       </div>

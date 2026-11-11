@@ -5,7 +5,8 @@ import { useMenosMovimento } from "@/components/apresentacao/useMenosMovimento";
 import { formatar, useIdioma, useT, type Bi } from "@/components/apresentacao/idioma";
 
 /** Orçamento estimado agrupado em frentes (soma = TOTAL). Detalhe por item fica para quem pedir. */
-const FRENTES: { curto: Bi; titulo: Bi; texto: Bi; valor: number; pct: number; cor: string }[] = [
+/** Cada frente com a entrega concreta que ela viabiliza. */
+const FRENTES: { curto: Bi; titulo: Bi; texto: Bi; entrega: Bi; valor: number; pct: number; cor: string }[] = [
   {
     curto: ["Campo", "Field"],
     titulo: ["Ampliação do monitoramento em campo", "Expanding field monitoring"],
@@ -13,6 +14,7 @@ const FRENTES: { curto: Bi; titulo: Bi; texto: Bi; valor: number; pct: number; c
       "Sonda automática e turbidímetro, estrutura de campo, calibração, visitas, logística e frete.",
       "Automatic probe and turbidimeter, field infrastructure, calibration, site visits, logistics and freight.",
     ],
+    entrega: ["Novas campanhas de coleta e mais pontos acompanhados.", "New sampling campaigns and more sites monitored."],
     valor: 57450,
     pct: 53,
     cor: "#67e8f9",
@@ -23,6 +25,10 @@ const FRENTES: { curto: Bi; titulo: Bi; texto: Bi; valor: number; pct: number; c
     texto: [
       "Integração da sonda automática à plataforma, desenvolvimento, processamento de IA e equipamento.",
       "Integrating the automatic probe into the platform, development, AI processing and equipment.",
+    ],
+    entrega: [
+      "Registros mais completos e as ferramentas avaliadas em uso real.",
+      "More complete records and the tools evaluated in real use.",
     ],
     valor: 29428.2,
     pct: 27,
@@ -35,6 +41,7 @@ const FRENTES: { curto: Bi; titulo: Bi; texto: Bi; valor: number; pct: number; c
       "Análises de referência para conferir as medições feitas em campo.",
       "Reference analyses to check the measurements taken in the field.",
     ],
+    entrega: ["Medições de campo conferidas com análises de referência.", "Field measurements checked against reference analyses."],
     valor: 18000,
     pct: 16,
     cor: "#efb08c",
@@ -46,6 +53,7 @@ const FRENTES: { curto: Bi; titulo: Bi; texto: Bi; valor: number; pct: number; c
       "Formação e identificação dos voluntários que coletam os dados.",
       "Training and identification of the volunteers who collect the data.",
     ],
+    entrega: ["Voluntários formados para coletas regulares.", "Volunteers trained for regular sampling."],
     valor: 3960,
     pct: 4,
     cor: "#5eead4",
@@ -152,12 +160,12 @@ export const Investimento = () => {
 
   return (
     <section
-      id="cena-10"
+      id="cena-11"
       className="mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-center px-6 py-16"
       aria-label={t(["O investimento", "The investment"])}
     >
       <Reveal>
-        <SceneLabel index={10}>{t(["O investimento", "The investment"])}</SceneLabel>
+        <SceneLabel index={11}>{t(["O investimento", "The investment"])}</SceneLabel>
         <h2 className="max-w-3xl text-3xl font-semibold leading-tight text-white sm:text-5xl">
           {t(["Para onde vai o apoio.", "Where the support goes."])}
         </h2>
@@ -201,6 +209,12 @@ export const Investimento = () => {
                 </div>
                 <h3 className="mt-4 text-2xl font-semibold text-white sm:text-3xl">{t(f.titulo)}</h3>
                 <p className="mt-3 text-base text-slate-300 sm:text-lg">{t(f.texto)}</p>
+                <p className="mt-4 flex items-baseline gap-2 border-t border-white/10 pt-3 text-base text-white sm:text-lg">
+                  <span className="shrink-0 text-[11px] font-semibold uppercase tracking-wider" style={{ color: f.cor }}>
+                    {t(["Entrega", "Delivers"])}
+                  </span>
+                  {t(f.entrega)}
+                </p>
               </motion.div>
             </AnimatePresence>
           </div>

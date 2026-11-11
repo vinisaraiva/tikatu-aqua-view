@@ -7,7 +7,7 @@ import {
   useSpring,
   useTransform,
 } from "framer-motion";
-import { Gauge, MapPin, ShieldCheck } from "lucide-react";
+import { ArrowUpRight, Gauge, MapPin, ShieldCheck } from "lucide-react";
 import { Reveal, SceneLabel, useProgressoCena } from "./primitives";
 import { useMenosMovimento } from "./useMenosMovimento";
 import { useT, type Bi } from "./idioma";
@@ -94,22 +94,34 @@ export const AoVivo = () => {
   return (
     <section
       ref={ref}
-      id="cena-5"
+      id="cena-2"
       className="mx-auto grid min-h-[100svh] max-w-7xl content-center items-center gap-10 px-6 py-20 lg:grid-cols-[0.8fr_1.5fr] lg:gap-12"
-      aria-label={t(["O painel ao vivo", "The live dashboard"])}
+      aria-label={t(["O que já existe", "What already exists"])}
     >
       <Reveal>
-        <SceneLabel index={5}>{t(["O painel ao vivo", "The live dashboard"])}</SceneLabel>
+        <SceneLabel index={2}>{t(["O que já existe", "What already exists"])}</SceneLabel>
         <h2 className="text-3xl font-semibold text-white sm:text-5xl">
           {t(["Dados reais.", "Real data."])}{" "}
           <span className="block text-cyan-200">{t(["Painel no ar.", "Live dashboard."])}</span>
         </h2>
         <p className="mt-4 text-slate-300">
           {t([
-            "O pH dos pontos do Rio Chamagunga, em Porto Seguro, comparado à faixa do CONAMA, com o mapa dos pontos de coleta.",
-            "pH at the Chamagunga River sites in Porto Seguro, compared with the CONAMA range, with a map of the sampling sites.",
+            "O Tikatu começou reunindo dados e tornando a qualidade da água acessível. Aqui, o pH dos pontos do Rio Chamagunga, em Porto Seguro, comparado à faixa do CONAMA.",
+            "Tikatu began by bringing data together and making water quality accessible. Here, pH at the Chamagunga River sites in Porto Seguro, compared with the CONAMA range.",
           ])}
         </p>
+        <a
+          href="https://doi.org/10.1080/15715124.2025.2528958"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-3 inline-flex items-center gap-1 text-xs text-slate-400 hover:text-cyan-200"
+        >
+          {t([
+            "Criada no mestrado e publicada no International Journal of River Basin Management (2025)",
+            "Built during a master's degree and published in the International Journal of River Basin Management (2025)",
+          ])}
+          <ArrowUpRight className="h-3.5 w-3.5 shrink-0" />
+        </a>
         <ul className="mt-6 grid grid-cols-3 gap-2 lg:grid-cols-1 lg:gap-3">
           {FATOS.map(({ icon: Icon, valor, rotulo }) => (
             <li
@@ -186,7 +198,7 @@ export const AppColeta = () => {
   return (
     <section
       ref={ref}
-      id="cena-6"
+      id="cena-7"
       className="mx-auto grid min-h-[100svh] max-w-6xl items-center gap-10 px-6 py-20 md:grid-cols-[1fr_1.1fr] md:gap-16"
       aria-label={t(["O app de coleta", "The sampling app"])}
     >
@@ -219,7 +231,7 @@ export const AppColeta = () => {
 
       <div className="order-1 md:order-2">
         <Reveal>
-          <SceneLabel index={6}>{t(["O app de coleta", "The sampling app"])}</SceneLabel>
+          <SceneLabel index={7}>{t(["O app de coleta", "The sampling app"])}</SceneLabel>
           <h2 className="text-3xl font-semibold text-white sm:text-5xl">
             {t(["No rio, o voluntário usa o ", "At the river, volunteers use the "])}
             <span className="text-cyan-200">{t(["Tikatu Coleta.", "Tikatu Coleta app."])}</span>

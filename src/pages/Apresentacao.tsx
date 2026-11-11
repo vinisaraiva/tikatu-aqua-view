@@ -9,7 +9,8 @@ import { AoVivo, AppColeta } from "@/components/apresentacao/AoVivo";
 import { Reveal, SceneLabel, Transicao } from "@/components/apresentacao/primitives";
 import { Amostragem } from "@/components/apresentacao/Amostragem";
 import { Sonda3D } from "@/components/apresentacao/Sonda3D";
-import { Origem } from "@/components/apresentacao/Origem";
+import { Perguntas } from "@/components/apresentacao/Perguntas";
+import { Confiavel, PASSOS_CONFIAVEL } from "@/components/apresentacao/Confiavel";
 import { Investimento, PASSOS_INVESTIMENTO, TOTAL } from "@/components/apresentacao/Investimento";
 import { useMenosMovimento } from "@/components/apresentacao/useMenosMovimento";
 import { AvisoMovimento, BotaoMovimento, Palco, useModoTelas, type Cena } from "@/components/apresentacao/Palco";
@@ -183,12 +184,12 @@ const ParaQuem = () => {
   const t = useT();
   return (
     <section
-      id="cena-7"
+      id="cena-8"
       className="mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-center px-6 py-16"
       aria-label={t(["Para quem e por que importa", "Who it is for and why it matters"])}
     >
       <Reveal>
-        <SceneLabel index={7}>{t(["Para quem e por que importa", "Who it is for and why it matters"])}</SceneLabel>
+        <SceneLabel index={8}>{t(["Para quem e por que importa", "Who it is for and why it matters"])}</SceneLabel>
         <h2 className="max-w-3xl text-3xl font-semibold leading-tight text-white sm:text-5xl">
           {t(["Um mesmo dado, quatro portas de valor.", "One dataset, four doors to value."])}
         </h2>
@@ -253,12 +254,12 @@ const Equipe = () => {
   const t = useT();
   return (
     <section
-      id="cena-8"
+      id="cena-9"
       className="mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-center px-6 py-16"
       aria-label={t(["Equipe", "Team"])}
     >
       <Reveal>
-        <SceneLabel index={8}>{t(["Equipe", "Team"])}</SceneLabel>
+        <SceneLabel index={9}>{t(["Equipe", "Team"])}</SceneLabel>
         <h2 className="text-3xl font-semibold leading-tight text-white sm:text-5xl">
           {t(["Tecnologia e pesquisa ambiental.", "Technology and environmental research."])}
         </h2>
@@ -303,22 +304,23 @@ const Equipe = () => {
   );
 };
 
+// Cada investimento ligado a uma entrega concreta.
 const RECURSOS: { titulo: Bi; texto: Bi }[] = [
   {
     titulo: ["Sonda automática", "Automatic probe"],
-    texto: ["Mede no rio, somada às sondas portáteis dos voluntários", "Measures in the river, alongside the volunteers' portable probes"],
+    texto: ["Medição contínua no rio, ao lado das coletas dos voluntários", "Continuous measurement in the river, alongside volunteer sampling"],
   },
   {
     titulo: ["Campo e logística", "Field and logistics"],
-    texto: ["Estrutura, calibração, visitas e deslocamentos", "Infrastructure, calibration, site visits and travel"],
+    texto: ["Novas campanhas e mais pontos acompanhados", "New campaigns and more sites monitored"],
   },
   {
     titulo: ["Tecnologia e IA", "Technology and AI"],
-    texto: ["Integração da sonda, plataforma e processamento de dados", "Probe integration, platform and data processing"],
+    texto: ["Registros mais completos e ferramentas avaliadas em uso real", "More complete records and tools evaluated in real use"],
   },
   {
     titulo: ["Validação e voluntários", "Validation and volunteers"],
-    texto: ["Análises de laboratório e formação da rede", "Laboratory analyses and training the network"],
+    texto: ["Medições conferidas em laboratório e rede formada", "Lab-checked measurements and a trained network"],
   },
 ];
 
@@ -353,12 +355,12 @@ const ProximosPassos = () => {
   const t = useT();
   return (
     <section
-      id="cena-9"
+      id="cena-10"
       className="relative mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-center px-6 py-16"
       aria-label={t(["A próxima etapa", "The next stage"])}
     >
       <Reveal>
-        <SceneLabel index={9}>{t(["A próxima etapa", "The next stage"])}</SceneLabel>
+        <SceneLabel index={10}>{t(["A próxima etapa", "The next stage"])}</SceneLabel>
         <h2 className="max-w-3xl text-3xl font-semibold leading-tight text-white sm:text-5xl">
           {t([
             "A próxima etapa: mais rios medidos, com mais tecnologia.",
@@ -367,8 +369,8 @@ const ProximosPassos = () => {
         </h2>
         <p className="mt-4 max-w-2xl text-slate-300 sm:text-lg">
           {t([
-            "A plataforma e o app já funcionam. Agora é levar o monitoramento a mais pontos e rios, com uma sonda automática ao lado das portáteis, e evoluir a tecnologia que transforma as medições em informação validada.",
-            "The platform and the app already work. The next step is to take monitoring to more sites and rivers, with an automatic probe alongside the portable ones, and to advance the technology that turns measurements into validated information.",
+            "A plataforma e o app já funcionam. O financiamento permite ampliar a coleta, com uma sonda automática ao lado das portáteis, e avaliar em condições reais de uso as soluções que a pesquisa está construindo.",
+            "The platform and the app already work. The funding makes it possible to expand sampling, with an automatic probe alongside the portable ones, and to evaluate the solutions the research is building under real conditions of use.",
           ])}
         </p>
       </Reveal>
@@ -399,7 +401,7 @@ const ComoApoiar = () => {
   const total = formatar(TOTAL, l, 2);
   return (
     <section
-      id="cena-11"
+      id="cena-12"
       className="relative flex min-h-[100svh] flex-col justify-center overflow-hidden py-16"
       aria-label={t(["Como apoiar", "How to support"])}
     >
@@ -410,7 +412,7 @@ const ComoApoiar = () => {
       />
       <div className="relative mx-auto w-full max-w-6xl px-6">
         <Reveal>
-          <SceneLabel index={11}>{t(["Como apoiar", "How to support"])}</SceneLabel>
+          <SceneLabel index={12}>{t(["Como apoiar", "How to support"])}</SceneLabel>
           <h2 className="max-w-3xl text-3xl font-semibold leading-tight text-white sm:text-4xl">
             {t(["Um plano. Quatro etapas que podem ser conferidas.", "One plan. Four stages you can verify."])}
           </h2>
@@ -481,13 +483,16 @@ const ComoApoiar = () => {
   );
 };
 
+// Roteiro: o que já existe → onde e com que frequência medir → como conferir e explicar →
+// como chega ao campo e às pessoas → equipe → o que o financiamento permite.
 const TELAS: Cena[] = [
   { nome: ["Abertura", "Opening"], el: <Hero />, cheia: true },
-  { nome: ["O problema", "The problem"], el: <Amostragem />, transicao: "mare" },
-  { nome: ["A origem", "The origin"], el: <Origem />, transicao: "cortina" },
+  { nome: ["O que já existe", "What already exists"], el: <AoVivo />, transicao: "mare" },
+  { nome: ["As perguntas", "The questions"], el: <Perguntas />, transicao: "cortina" },
+  { nome: ["Com que frequência", "How often"], el: <Amostragem />, transicao: "deslizar" },
+  { nome: ["Informação confiável", "Reliable information"], el: <Confiavel />, passos: PASSOS_CONFIAVEL, transicao: "mergulho" },
   { nome: ["Como funciona", "How it works"], el: <Fluxo />, passos: PASSOS_FLUXO, transicao: "deslizar" },
-  { nome: ["Painel ao vivo", "Live dashboard"], el: <AoVivo />, transicao: "mergulho" },
-  { nome: ["App de coleta", "Sampling app"], el: <AppColeta />, transicao: "deslizar" },
+  { nome: ["App de coleta", "Sampling app"], el: <AppColeta />, transicao: "mare" },
   { nome: ["Para quem", "Who it is for"], el: <ParaQuem />, transicao: "iris" },
   { nome: ["Equipe", "Team"], el: <Equipe />, transicao: "cortina" },
   { nome: ["Próxima etapa", "Next stage"], el: <ProximosPassos />, transicao: "mare" },

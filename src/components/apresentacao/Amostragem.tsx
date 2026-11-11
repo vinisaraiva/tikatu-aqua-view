@@ -107,7 +107,7 @@ const Cabecalho = () => {
   const t = useT();
   return (
     <>
-      <SceneLabel index={2}>{t(["O problema", "The problem"])}</SceneLabel>
+      <SceneLabel index={4}>{t(["Com que frequência?", "How often?"])}</SceneLabel>
       <h2 className="max-w-3xl text-3xl font-semibold leading-tight text-white sm:text-5xl">
         {t(["Entre duas coletas, algo pode mudar.", "Between two samples, things can change."])}
       </h2>
@@ -126,8 +126,8 @@ const Rodape = () => {
   return (
     <p className="mt-4 text-xs text-slate-500">
       {t([
-        "Exemplo didático, não é série real. O estudo do Rio Buranhém analisa essa relação com cálculo exato de probabilidades.",
-        "Teaching example, not a real time series. The Buranhém River study analyses this relationship with exact probability calculations.",
+        "Exemplo didático, não é série real. O estudo do Rio Buranhém (Earth Science Informatics, 2026) analisa essa relação com cálculo exato de probabilidades.",
+        "Teaching example, not a real time series. The Buranhém River study (Earth Science Informatics, 2026) analyses this relationship with exact probability calculations.",
       ])}
     </p>
   );
@@ -176,7 +176,7 @@ const Controles = ({
 const Estatica = () => {
   const [coletas, setColetas] = useState<3 | 12>(3);
   return (
-    <section id="cena-2" className="mx-auto max-w-6xl px-6 py-24">
+    <section id="cena-4" className="mx-auto max-w-6xl px-6 py-24">
       <Cabecalho />
       <div className="mt-10">
         <Grafico coletas={coletas} tracado={1} />
@@ -230,7 +230,7 @@ export const Amostragem = () => {
   return (
     <section
       ref={ref}
-      id="cena-2"
+      id="cena-4"
       className="mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-center px-6 py-20 md:[@media(max-height:760px)]:py-10"
     >
       <Cabecalho />
