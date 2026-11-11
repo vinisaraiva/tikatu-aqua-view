@@ -300,6 +300,27 @@ const Equipe = () => {
           ))}
         </ol>
       </div>
+
+      {/* Quem está por trás: universidade, projeto e grupo de pesquisa (o NuPEcoTropic não tem logo). */}
+      <Reveal delay={0.9}>
+        <div className="mt-10 flex flex-wrap items-center gap-4 border-t border-white/10 pt-6">
+          <span className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+            {t(["Realização", "Carried out by"])}
+          </span>
+          <img
+            src="/apresentacao/logo-ufsb.webp"
+            alt={t(["UFSB, Universidade Federal do Sul da Bahia", "UFSB, Federal University of Southern Bahia"])}
+            className="h-12 w-auto rounded-lg"
+          />
+          <span className="rounded-lg bg-[#f4f2ea] px-3 py-2">
+            <img src="/apresentacao/logo-tikatu.webp" alt="Tikatu" className="h-8 w-auto" />
+          </span>
+          <span className="rounded-lg border border-white/15 px-4 py-2.5 text-white">
+            <span className="block text-lg font-semibold leading-none">NuPEcoTropic</span>
+            <span className="mt-1 block text-[11px] text-slate-400">{t(["Grupo de pesquisa", "Research group"])}</span>
+          </span>
+        </div>
+      </Reveal>
     </section>
   );
 };
