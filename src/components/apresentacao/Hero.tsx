@@ -3,6 +3,8 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { usePalco } from "./primitives";
 import { useMenosMovimento } from "./useMenosMovimento";
+import { useT } from "./idioma";
+import { BotaoIdioma } from "./BotaoIdioma";
 
 /** Camada de onda: o caminho se repete duas vezes para o loop horizontal não ter emenda. */
 const Wave = ({
@@ -42,6 +44,7 @@ export const Hero = () => {
   const ref = useRef<HTMLElement>(null);
   const reduce = useMenosMovimento();
   const palco = usePalco();
+  const t = useT();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
 
   // Ao rolar, o texto afunda e some enquanto a água sobe: a "câmera" mergulha.
@@ -56,8 +59,11 @@ export const Hero = () => {
       ref={ref}
       id="cena-1"
       className="relative flex min-h-[100svh] items-start overflow-hidden bg-[#f4f2ea] md:items-center"
-      aria-label="Abertura"
+      aria-label={t(["Abertura", "Opening"])}
     >
+      {/* Idioma: português ou inglês (troca a apresentação inteira) */}
+      <BotaoIdioma claro className="absolute right-4 top-4 z-20 md:right-6 md:top-5" />
+
       {/* Rio (mesmo vídeo do deck): faixa no topo no celular, metade direita no desktop. */}
       <div className="absolute inset-x-0 top-0 h-[42svh] overflow-hidden md:inset-y-0 md:left-auto md:right-0 md:h-full md:w-[62%]" aria-hidden>
         <motion.div style={{ scale: videoScale }} className="h-full w-full">
@@ -98,10 +104,10 @@ export const Hero = () => {
           transition={{ duration: 0.8, delay: 0.1 }}
           className="mb-5 text-xs font-semibold uppercase tracking-[0.3em] text-[#1b7fc0]"
         >
-          Pesquisa aplicada em qualidade da água
+          {t(["Pesquisa aplicada em qualidade da água", "Applied research in water quality"])}
         </motion.p>
         <h1 className="text-balance text-4xl font-bold leading-[1.05] tracking-tight text-[#0d3a5c] sm:text-6xl md:max-w-2xl md:text-7xl md:[@media(max-height:760px)]:text-6xl">
-          {["Conheça", "o Tikatu."].map((line, i) => (
+          {(t(["Conheça|o Tikatu.", "Meet|Tikatu."]) as string).split("|").map((line, i) => (
             <motion.span
               key={line}
               className="block"
@@ -119,7 +125,7 @@ export const Hero = () => {
           transition={{ duration: 1, delay: 0.75, ease: [0.22, 1, 0.36, 1] }}
           className="mt-3 text-2xl font-semibold text-[#1b7fc0] sm:text-3xl"
         >
-          Da medição à compreensão.
+          {t(["Da medição à compreensão.", "From measurement to understanding."])}
         </motion.p>
         <motion.p
           initial={reduce ? false : { opacity: 0 }}
@@ -127,8 +133,10 @@ export const Hero = () => {
           transition={{ duration: 1, delay: 1.2 }}
           className="mx-auto mt-6 max-w-md text-pretty md:[@media(max-height:760px)]:mt-4 text-base text-slate-600 sm:text-lg md:mx-0"
         >
-          Voluntários medem a água dos rios, a plataforma organiza os dados e o painel mostra como está cada
-          ponto.
+          {t([
+            "Voluntários medem a água dos rios, a plataforma organiza os dados e o painel mostra como está cada ponto.",
+            "Volunteers measure the water in rivers, the platform organises the data and the dashboard shows the condition of each site.",
+          ])}
         </motion.p>
         <motion.div
           initial={reduce ? false : { opacity: 0 }}
@@ -143,9 +151,13 @@ export const Hero = () => {
             transition={{ duration: 0.9, delay: 1.7, ease: [0.22, 1, 0.36, 1] }}
             aria-hidden
           />
-          <p className="text-base font-semibold text-[#0d3a5c]">Buscamos apoio para a próxima etapa.</p>
+          <p className="text-base font-semibold text-[#0d3a5c]">
+            {t(["Buscamos apoio para a próxima etapa.", "We are seeking support for the next stage."])}
+          </p>
           <p className="mt-3 font-medium text-[#0d3a5c]">Vinícius Saraiva Santos · UFSB</p>
-          <p className="mt-1 text-slate-500">Orientação: Prof. Dr. Fabrício Berton Zanchi</p>
+          <p className="mt-1 text-slate-500">
+            {t(["Orientação: Prof. Dr. Fabrício Berton Zanchi", "Supervisor: Dr. Fabrício Berton Zanchi"])}
+          </p>
         </motion.div>
       </motion.div>
 
@@ -162,8 +174,12 @@ export const Hero = () => {
         style={{ opacity: textOpacity }}
         className="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-1 text-xs text-cyan-100/90"
       >
-        <span>{palco.ativo ? "Avance com → ou a roda do mouse" : "Role para mergulhar"}</span>
-        {!palco.ativo && <span className="hidden text-cyan-100/60 lg:block">ou use as setas ← → do teclado</span>}
+        <span>{palco.ativo
+            ? t(["Avance com → ou a roda do mouse", "Advance with → or the mouse wheel"])
+            : t(["Role para mergulhar", "Scroll to dive in"])}</span>
+        {!palco.ativo && <span className="hidden text-cyan-100/60 lg:block">
+            {t(["ou use as setas ← → do teclado", "or use the ← → keys"])}
+          </span>}
         <motion.span
           animate={reduce ? undefined : palco.ativo ? { x: [0, 6, 0] } : { y: [0, 6, 0] }}
           transition={{ duration: 1.8, repeat: Infinity }}

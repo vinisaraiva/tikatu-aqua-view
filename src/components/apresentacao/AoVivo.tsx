@@ -10,23 +10,40 @@ import {
 import { Gauge, MapPin, ShieldCheck } from "lucide-react";
 import { Reveal, SceneLabel, useProgressoCena } from "./primitives";
 import { useMenosMovimento } from "./useMenosMovimento";
+import { useT, type Bi } from "./idioma";
 
 /**
  * Cenas 5 e 6. Capturas reais (10/11/2026): painel em produção com o pH do Rio Chamagunga
  * (6 pontos, coleta de 25/08/2024) e telas do Tikatu Coleta 1.6.2 com usuário de teste
  * (código do voluntário ocultado). Nenhuma consulta ao banco é feita por esta página.
  */
-const FATOS = [
-  { icon: MapPin, valor: "6", rotulo: "pontos de coleta no Rio Chamagunga" },
-  { icon: Gauge, valor: "13", rotulo: "parâmetros disponíveis no painel" },
-  { icon: ShieldCheck, valor: "CONAMA", rotulo: "referência legal em cada gráfico" },
+const FATOS: { icon: typeof MapPin; valor: string; rotulo: Bi }[] = [
+  { icon: MapPin, valor: "6", rotulo: ["pontos de coleta no Rio Chamagunga", "sampling sites on the Chamagunga River"] },
+  { icon: Gauge, valor: "13", rotulo: ["parâmetros disponíveis no painel", "parameters available in the dashboard"] },
+  { icon: ShieldCheck, valor: "CONAMA", rotulo: ["referência legal em cada gráfico", "legal reference in every chart"] },
 ];
 
-const TELAS = [
-  { src: "/apresentacao/coleta-inicio.webp", titulo: "Lembrete de coleta", legenda: "Dia, horário e janela de coleta de cada voluntário." },
-  { src: "/apresentacao/coleta-importar.webp", titulo: "Importa a sonda", legenda: "Lê o arquivo XLSX da sonda, sem redigitar valores." },
-  { src: "/apresentacao/coleta-historico.webp", titulo: "Histórico", legenda: "Cada coleta enviada, com os parâmetros medidos." },
-  { src: "/apresentacao/coleta-perfil.webp", titulo: "Perfil e avisos", legenda: "Ponto de coleta e notificações no aparelho." },
+const TELAS: { src: string; titulo: Bi; legenda: Bi }[] = [
+  {
+    src: "/apresentacao/coleta-inicio.webp",
+    titulo: ["Lembrete de coleta", "Sampling reminder"],
+    legenda: ["Dia, horário e janela de coleta de cada voluntário.", "Each volunteer's sampling day, time and window."],
+  },
+  {
+    src: "/apresentacao/coleta-importar.webp",
+    titulo: ["Importa a sonda", "Imports the probe"],
+    legenda: ["Lê o arquivo XLSX da sonda, sem redigitar valores.", "Reads the probe's XLSX file, with no retyping."],
+  },
+  {
+    src: "/apresentacao/coleta-historico.webp",
+    titulo: ["Histórico", "History"],
+    legenda: ["Cada coleta enviada, com os parâmetros medidos.", "Every sample sent, with the measured parameters."],
+  },
+  {
+    src: "/apresentacao/coleta-perfil.webp",
+    titulo: ["Perfil e avisos", "Profile and alerts"],
+    legenda: ["Ponto de coleta e notificações no aparelho.", "Sampling site and notifications on the phone."],
+  },
 ];
 const INTERVALO = 3600;
 
@@ -72,31 +89,36 @@ export const AoVivo = () => {
   const tabelaOp = useTransform(scrollYProgress, [0.3, 0.9], reduce ? [1, 1] : [0, 1]);
   const { srx, sry, mover, sair } = useInclinacao(reduce);
   const ry = useTransform([giro, sry], ([g, s]: number[]) => g + s);
+  const t = useT();
 
   return (
     <section
       ref={ref}
       id="cena-5"
       className="mx-auto grid min-h-[100svh] max-w-7xl content-center items-center gap-10 px-6 py-20 lg:grid-cols-[0.8fr_1.5fr] lg:gap-12"
-      aria-label="O painel ao vivo"
+      aria-label={t(["O painel ao vivo", "The live dashboard"])}
     >
       <Reveal>
-        <SceneLabel index={5}>O painel ao vivo</SceneLabel>
+        <SceneLabel index={5}>{t(["O painel ao vivo", "The live dashboard"])}</SceneLabel>
         <h2 className="text-3xl font-semibold text-white sm:text-5xl">
-          Dados reais. <span className="block text-cyan-200">Painel no ar.</span>
+          {t(["Dados reais.", "Real data."])}{" "}
+          <span className="block text-cyan-200">{t(["Painel no ar.", "Live dashboard."])}</span>
         </h2>
         <p className="mt-4 text-slate-300">
-          O pH dos pontos do Rio Chamagunga, em Porto Seguro, comparado à faixa do CONAMA, com o mapa dos pontos de coleta.
+          {t([
+            "O pH dos pontos do Rio Chamagunga, em Porto Seguro, comparado à faixa do CONAMA, com o mapa dos pontos de coleta.",
+            "pH at the Chamagunga River sites in Porto Seguro, compared with the CONAMA range, with a map of the sampling sites.",
+          ])}
         </p>
         <ul className="mt-6 grid grid-cols-3 gap-2 lg:grid-cols-1 lg:gap-3">
           {FATOS.map(({ icon: Icon, valor, rotulo }) => (
             <li
-              key={rotulo}
+              key={rotulo[0]}
               className="rounded-xl border border-white/10 bg-white/[0.04] p-3 lg:flex lg:items-center lg:gap-4 lg:px-4"
             >
               <Icon className="mb-2 h-4 w-4 shrink-0 text-cyan-300 lg:mb-0 lg:h-5 lg:w-5" />
               <span className="block text-lg font-semibold text-white sm:text-2xl lg:min-w-[6.5rem]">{valor}</span>
-              <span className="mt-0.5 block text-[11px] leading-tight text-slate-400 sm:text-sm">{rotulo}</span>
+              <span className="mt-0.5 block text-[11px] leading-tight text-slate-400 sm:text-sm">{t(rotulo)}</span>
             </li>
           ))}
         </ul>
@@ -110,7 +132,10 @@ export const AoVivo = () => {
           <Navegador>
             <img
               src="/apresentacao/painel-ph.webp"
-              alt="Painel do Tikatu: pH dos pontos 2 a 6 do Rio Chamagunga comparados à faixa do CONAMA e mapa com os 6 pontos de coleta"
+              alt={t([
+                "Painel do Tikatu: pH dos pontos 2 a 6 do Rio Chamagunga comparados à faixa do CONAMA e mapa com os 6 pontos de coleta",
+                "Tikatu dashboard: pH at sites 2 to 6 on the Chamagunga River compared with the CONAMA range, and a map of the 6 sampling sites",
+              ])}
               className="block w-full"
               loading="lazy"
             />
@@ -122,7 +147,10 @@ export const AoVivo = () => {
         >
           <img
             src="/apresentacao/painel-leituras.webp"
-            alt="Tabela de leituras de pH do Rio Chamagunga em 25/08/2024 com status CONAMA e verificação de anomalia"
+            alt={t([
+              "Tabela de leituras de pH do Rio Chamagunga em 25/08/2024 com status CONAMA e verificação de anomalia",
+              "Table of pH readings on the Chamagunga River on 25 Aug 2024 with CONAMA status and anomaly check",
+            ])}
             className="block w-full"
             loading="lazy"
           />
@@ -130,8 +158,10 @@ export const AoVivo = () => {
       </div>
 
       <p className="text-xs text-slate-500 lg:col-span-2">
-        Captura do painel em produção em 10/11/2026 (Rio Chamagunga, pH, coleta de 25/08/2024). Cada leitura chega com
-        ponto, data e hora, status em relação ao CONAMA e verificação de anomalia.
+        {t([
+          "Captura do painel em produção em 10/11/2026 (Rio Chamagunga, pH, coleta de 25/08/2024). Cada leitura chega com ponto, data e hora, status em relação ao CONAMA e verificação de anomalia.",
+          "Screenshot of the live dashboard on 10 Nov 2026 (Chamagunga River, pH, sampled on 25 Aug 2024). Each reading arrives with site, date and time, CONAMA status and an anomaly check. Interface in Portuguese.",
+        ])}
       </p>
     </section>
   );
@@ -145,6 +175,7 @@ export const AppColeta = () => {
   const [i, setI] = useState(0);
   const [pausa, setPausa] = useState(false);
   const { srx, sry, mover, sair } = useInclinacao(reduce);
+  const t = useT();
 
   useEffect(() => {
     if (reduce || !visivel || pausa) return;
@@ -157,7 +188,7 @@ export const AppColeta = () => {
       ref={ref}
       id="cena-6"
       className="mx-auto grid min-h-[100svh] max-w-6xl items-center gap-10 px-6 py-20 md:grid-cols-[1fr_1.1fr] md:gap-16"
-      aria-label="O app de coleta"
+      aria-label={t(["O app de coleta", "The sampling app"])}
     >
       <div className="order-2 flex justify-center [perspective:1200px] md:order-1" onMouseMove={mover} onMouseLeave={sair}>
         <motion.div style={{ rotateX: srx, rotateY: sry }}>
@@ -172,7 +203,7 @@ export const AppColeta = () => {
                 <motion.img
                   key={TELAS[i].src}
                   src={TELAS[i].src}
-                  alt={`Tela real do Tikatu Coleta: ${TELAS[i].titulo}`}
+                  alt={`${t(["Tela real do Tikatu Coleta", "Real Tikatu Coleta screen"])}: ${t(TELAS[i].titulo)}`}
                   className="absolute left-0 top-0 block w-full"
                   initial={reduce ? false : { x: "30%", opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
@@ -188,17 +219,21 @@ export const AppColeta = () => {
 
       <div className="order-1 md:order-2">
         <Reveal>
-          <SceneLabel index={6}>O app de coleta</SceneLabel>
+          <SceneLabel index={6}>{t(["O app de coleta", "The sampling app"])}</SceneLabel>
           <h2 className="text-3xl font-semibold text-white sm:text-5xl">
-            No rio, o voluntário usa o <span className="text-cyan-200">Tikatu Coleta.</span>
+            {t(["No rio, o voluntário usa o ", "At the river, volunteers use the "])}
+            <span className="text-cyan-200">{t(["Tikatu Coleta.", "Tikatu Coleta app."])}</span>
           </h2>
           <p className="mt-4 text-slate-300">
-            Versão 1.6.2. O app envia as leituras para o mesmo banco de dados do painel.
+            {t([
+              "Versão 1.6.2. O app envia as leituras para o mesmo banco de dados do painel.",
+              "Version 1.6.2. The app sends readings to the same database as the dashboard.",
+            ])}
           </p>
         </Reveal>
         <ul className="mt-6 space-y-2" onMouseEnter={() => setPausa(true)} onMouseLeave={() => setPausa(false)}>
-          {TELAS.map((t, k) => (
-            <li key={t.src}>
+          {TELAS.map((tela, k) => (
+            <li key={tela.src}>
               <button
                 type="button"
                 onClick={() => setI(k)}
@@ -207,8 +242,8 @@ export const AppColeta = () => {
                   k === i ? "border-cyan-300/50 bg-cyan-300/10" : "border-white/10 bg-white/[0.02] hover:bg-white/[0.05]"
                 }`}
               >
-                <span className={`block font-semibold ${k === i ? "text-white" : "text-slate-300"}`}>{t.titulo}</span>
-                <span className="mt-0.5 hidden text-sm text-slate-400 sm:block">{t.legenda}</span>
+                <span className={`block font-semibold ${k === i ? "text-white" : "text-slate-300"}`}>{t(tela.titulo)}</span>
+                <span className="mt-0.5 hidden text-sm text-slate-400 sm:block">{t(tela.legenda)}</span>
                 {k === i && !reduce && !pausa && visivel && (
                   <motion.span
                     key={`barra-${i}`}
@@ -223,7 +258,12 @@ export const AppColeta = () => {
             </li>
           ))}
         </ul>
-        <p className="mt-4 text-xs text-slate-500">Telas reais com usuário de teste; código do voluntário ocultado.</p>
+        <p className="mt-4 text-xs text-slate-500">
+          {t([
+            "Telas reais com usuário de teste; código do voluntário ocultado.",
+            "Real screens with a test user; volunteer code hidden. App interface in Portuguese.",
+          ])}
+        </p>
       </div>
     </section>
   );

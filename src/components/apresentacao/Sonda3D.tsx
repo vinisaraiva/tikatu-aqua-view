@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useInView } from "framer-motion";
 import { useMenosMovimento } from "./useMenosMovimento";
+import { useT } from "./idioma";
 
 /**
  * Medidor de qualidade da água em 3D (modelo "Water Quality Meter", de Dreamsoft Innovations, CC BY 4.0,
@@ -14,6 +15,7 @@ export const Sonda3D = () => {
   const visivelRef = useRef(false);
   visivelRef.current = visivel;
   const reduce = useMenosMovimento();
+  const t = useT();
   const [estado, setEstado] = useState<"carregando" | "pronto" | "erro">("carregando");
 
   useEffect(() => {
@@ -149,17 +151,24 @@ export const Sonda3D = () => {
         ref={caixa}
         className="relative min-h-[18rem] flex-1 cursor-grab overflow-hidden rounded-3xl border border-white/10 bg-[radial-gradient(60%_55%_at_50%_45%,rgba(34,211,238,0.18),transparent_70%)] active:cursor-grabbing sm:min-h-[24rem]"
         role="img"
-        aria-label="Modelo 3D de um medidor de qualidade da água portátil, com aparelho de leitura e sonda"
+        aria-label={t([
+          "Modelo 3D de um medidor de qualidade da água portátil, com aparelho de leitura e sonda",
+          "3D model of a portable water quality meter, with a reading unit and probe",
+        ])}
       >
         {estado !== "pronto" && (
           <div className="absolute inset-0 flex items-center justify-center text-sm text-slate-400">
-            {estado === "erro" ? "Não foi possível carregar o modelo 3D." : "Carregando modelo 3D…"}
+            {estado === "erro"
+              ? t(["Não foi possível carregar o modelo 3D.", "Could not load the 3D model."])
+              : t(["Carregando modelo 3D…", "Loading 3D model…"])}
           </div>
         )}
       </div>
       <figcaption className="mt-3 text-xs text-slate-500">
-        Ilustração: medidor portátil genérico, não o equipamento do projeto. Arraste para girar. Modelo “Water Quality
-        Meter”, de{" "}
+        {t([
+          "Ilustração: medidor portátil genérico, não o equipamento do projeto. Arraste para girar. Modelo “Water Quality Meter”, de",
+          "Illustration: a generic portable meter, not the project's equipment. Drag to rotate. “Water Quality Meter” model by",
+        ])}{" "}
         <a
           href="https://sketchfab.com/3d-models/water-quality-meter-aa2fd13dda004eeca52ac1634dd07a60"
           target="_blank"

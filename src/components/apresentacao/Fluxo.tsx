@@ -12,38 +12,63 @@ import {
 import { CloudUpload, Cpu, LayoutDashboard, Smartphone, type LucideIcon } from "lucide-react";
 import { ATRASO_TELA, SceneLabel, usePalco } from "./primitives";
 import { useMenosMovimento } from "./useMenosMovimento";
+import { formatar, useIdioma, useT, type Bi } from "./idioma";
 
 interface Etapa {
   icon: LucideIcon;
-  titulo: string;
-  simples: string;
-  tecnico: string;
+  titulo: Bi;
+  simples: Bi;
+  tecnico: Bi;
 }
 
 const ETAPAS: Etapa[] = [
   {
     icon: Smartphone,
-    titulo: "O voluntário coleta",
-    simples: "No ponto do rio, o voluntário mede com a sonda e envia a leitura pelo app Tikatu Coleta.",
-    tecnico: "O app importa o arquivo XLSX da sonda, sem redigitar valores.",
+    titulo: ["O voluntário coleta", "The volunteer samples"],
+    simples: [
+      "No ponto do rio, o voluntário mede com a sonda e envia a leitura pelo app Tikatu Coleta.",
+      "At the river site, the volunteer measures with the probe and sends the reading through the Tikatu Coleta app.",
+    ],
+    tecnico: [
+      "O app importa o arquivo XLSX da sonda, sem redigitar valores.",
+      "The app imports the probe's XLSX file, with no retyping of values.",
+    ],
   },
   {
     icon: CloudUpload,
-    titulo: "O dado sobe",
-    simples: "A leitura é enviada para a nuvem do Tikatu, sem planilha nem papel no meio do caminho.",
-    tecnico: "Envio para um banco Supabase (Postgres) compartilhado entre o app e a plataforma.",
+    titulo: ["O dado sobe", "The data goes up"],
+    simples: [
+      "A leitura é enviada para a nuvem do Tikatu, sem planilha nem papel no meio do caminho.",
+      "The reading is sent to the Tikatu cloud, with no spreadsheet or paper along the way.",
+    ],
+    tecnico: [
+      "Envio para um banco Supabase (Postgres) compartilhado entre o app e a plataforma.",
+      "Sent to a Supabase (Postgres) database shared by the app and the platform.",
+    ],
   },
   {
     icon: Cpu,
-    titulo: "A plataforma processa",
-    simples: "Os números brutos viram informação: cada leitura é organizada e comparada à referência legal.",
-    tecnico: "Comparação com a faixa do CONAMA e índices como o IQA (Qualidade da Água) e o IET (Estado Trófico).",
+    titulo: ["A plataforma processa", "The platform processes"],
+    simples: [
+      "Os números brutos viram informação: cada leitura é organizada e comparada à referência legal.",
+      "Raw numbers become information: each reading is organised and compared with the legal standard.",
+    ],
+    tecnico: [
+      "Comparação com a faixa do CONAMA e índices como o IQA (Qualidade da Água) e o IET (Estado Trófico).",
+      "Compared with the range set by CONAMA (Brazil's environmental council) and indices such as the WQI (Water Quality Index) and TSI (Trophic State Index).",
+    ],
   },
   {
     icon: LayoutDashboard,
-    titulo: "O painel mostra",
-    simples: "Qualquer pessoa vê no mapa e nos gráficos como está a água daquele lugar.",
-    tecnico: "Painel web com mapa, referência do CONAMA e status de cada leitura por ponto de coleta.",
+    titulo: ["O painel mostra", "The dashboard shows"],
+    simples: [
+      "Qualquer pessoa vê no mapa e nos gráficos como está a água daquele lugar.",
+      "Anyone can see on the map and charts how the water is doing at that site.",
+    ],
+    tecnico: [
+      "Painel web com mapa, referência do CONAMA e status de cada leitura por ponto de coleta.",
+      "Web dashboard with a map, the CONAMA reference and the status of each reading per sampling site.",
+    ],
   },
 ];
 
@@ -51,13 +76,18 @@ export const PASSOS_FLUXO = ETAPAS.length;
 
 /** Ilustração de cada etapa. Passos 1 e 4 usam telas reais (Coleta e painel em produção). */
 const Ilustracao = ({ etapa }: { etapa: number }) => {
+  const t = useT();
+  const l = useIdioma();
   if (etapa === 0) {
     return (
       <div className="mx-auto w-24 rounded-[1.4rem] bg-[#0d1b24] p-1.5 shadow-2xl shadow-cyan-500/20 ring-1 ring-white/15 sm:w-56 sm:rounded-[2rem] sm:p-2">
         <div className="overflow-hidden rounded-[1.6rem] bg-[#f6f7f9]">
           <img
             src="/apresentacao/coleta-importar.webp"
-            alt="Tela real do Tikatu Coleta para importar o arquivo XLSX da sonda"
+            alt={t([
+              "Tela real do Tikatu Coleta para importar o arquivo XLSX da sonda",
+              "Real Tikatu Coleta screen for importing the probe's XLSX file",
+            ])}
             className="block w-full"
             loading="lazy"
           />
@@ -95,11 +125,11 @@ const Ilustracao = ({ etapa }: { etapa: number }) => {
   }
   if (etapa === 2) {
     // Leituras reais de pH do Rio Chamagunga (25/08/2024), comparadas à faixa do CONAMA (6 a 9).
-    const linhas: [string, number][] = [["Ponto 2", 5], ["Ponto 3", 5.9], ["Ponto 4", 6], ["Ponto 5", 6.5], ["Ponto 6", 7]];
+    const linhas: [number, number][] = [[2, 5], [3, 5.9], [4, 6], [5, 6.5], [6, 7]];
     const cor = (v: number) => (v < 5.5 ? "bg-red-400" : v < 6.6 ? "bg-amber-400" : "bg-emerald-400");
     return (
       <div className="mx-auto w-full max-w-xs space-y-2">
-        <div className="text-[11px] uppercase tracking-wider text-teal-100/80">pH · faixa CONAMA 6 a 9</div>
+        <div className="text-[11px] uppercase tracking-wider text-teal-100/80">{t(["pH · faixa CONAMA 6 a 9", "pH · CONAMA range 6 to 9"])}</div>
         {linhas.map(([ponto, v], i) => (
           <motion.div
             key={ponto}
@@ -108,7 +138,9 @@ const Ilustracao = ({ etapa }: { etapa: number }) => {
             transition={{ delay: 0.1 + i * 0.12 }}
             className="flex items-center gap-3 rounded-lg bg-white/5 px-3 py-2 text-sm"
           >
-            <span className="w-16 text-slate-300">{ponto}</span>
+            <span className="w-16 text-slate-300">
+              {t(["Ponto", "Site"])} {ponto}
+            </span>
             <span className="h-2 flex-1 overflow-hidden rounded-full bg-white/10">
               <motion.span
                 className={`block h-full rounded-full ${cor(v)}`}
@@ -117,7 +149,7 @@ const Ilustracao = ({ etapa }: { etapa: number }) => {
                 transition={{ delay: 0.3 + i * 0.12, duration: 0.6 }}
               />
             </span>
-            <span className="w-8 text-right font-mono text-white">{v.toLocaleString("pt-BR")}</span>
+            <span className="w-8 text-right font-mono text-white">{formatar(v, l)}</span>
           </motion.div>
         ))}
       </div>
@@ -133,7 +165,10 @@ const Ilustracao = ({ etapa }: { etapa: number }) => {
       </div>
       <img
         src="/apresentacao/painel-ph.webp"
-        alt="Painel real: pH dos pontos do Rio Chamagunga e mapa de coleta"
+        alt={t([
+          "Painel real: pH dos pontos do Rio Chamagunga e mapa de coleta",
+          "Real dashboard: pH at the Chamagunga River sites and sampling map",
+        ])}
         className="block w-full"
         loading="lazy"
       />
@@ -156,7 +191,7 @@ const Trilha = ({ ativa, progresso }: { ativa: number; progresso: MotionValue<nu
       const on = i <= ativa;
       return (
         <div
-          key={e.titulo}
+          key={e.titulo[0]}
           className={`relative z-10 flex h-11 w-11 items-center justify-center rounded-full border transition-colors duration-500 sm:h-14 sm:w-14 ${
             on
               ? "border-cyan-300 bg-cyan-400/20 text-cyan-100 shadow-[0_0_24px_rgba(34,211,238,0.45)]"
@@ -170,34 +205,45 @@ const Trilha = ({ ativa, progresso }: { ativa: number; progresso: MotionValue<nu
   </div>
 );
 
-const TextoEtapa = ({ etapa }: { etapa: Etapa }) => (
+const TextoEtapa = ({ etapa }: { etapa: Etapa }) => {
+  const t = useT();
+  return (
   <>
-    <h3 className="text-xl font-semibold text-white sm:text-3xl">{etapa.titulo}</h3>
-    <p className="mt-2 text-[15px] text-slate-200 sm:mt-3 sm:text-lg">{etapa.simples}</p>
+    <h3 className="text-xl font-semibold text-white sm:text-3xl">{t(etapa.titulo)}</h3>
+    <p className="mt-2 text-[15px] text-slate-200 sm:mt-3 sm:text-lg">{t(etapa.simples)}</p>
     <p className="mt-2 inline-flex items-start gap-2 rounded-lg bg-white/5 px-3 py-2 text-left text-xs sm:mt-3 text-cyan-100/80 sm:text-sm">
       <span className="mt-0.5 shrink-0 rounded bg-cyan-300/20 px-1.5 text-[10px] font-semibold uppercase tracking-wider text-cyan-200">
-        Por dentro
+        {t(["Por dentro", "Under the hood"])}
       </span>
-      {etapa.tecnico}
+      {t(etapa.tecnico)}
     </p>
   </>
-);
+  );
+};
 
 /** Versão estática para quem pede menos movimento. */
-const FluxoEstatico = () => (
-  <section id="cena-4" className="mx-auto max-w-5xl px-6 py-24" aria-label="Como funciona">
-    <SceneLabel index={4}>Como funciona</SceneLabel>
-    <h2 className="mb-12 text-3xl font-semibold text-white sm:text-5xl">Do rio ao painel, em quatro passos.</h2>
-    <ol className="grid gap-10 md:grid-cols-2">
-      {ETAPAS.map((e, i) => (
-        <li key={e.titulo} className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-          <div className="mb-4 text-sm font-semibold text-cyan-300">Passo {i + 1}</div>
-          <TextoEtapa etapa={e} />
-        </li>
-      ))}
-    </ol>
-  </section>
-);
+const TITULO: Bi = ["Do rio ao painel, em quatro passos.", "From river to dashboard, in four steps."];
+const ROTULO: Bi = ["Como funciona", "How it works"];
+
+const FluxoEstatico = () => {
+  const t = useT();
+  return (
+    <section id="cena-4" className="mx-auto max-w-5xl px-6 py-24" aria-label={t(ROTULO)}>
+      <SceneLabel index={4}>{t(ROTULO)}</SceneLabel>
+      <h2 className="mb-12 text-3xl font-semibold text-white sm:text-5xl">{t(TITULO)}</h2>
+      <ol className="grid gap-10 md:grid-cols-2">
+        {ETAPAS.map((e, i) => (
+          <li key={e.titulo[0]} className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+            <div className="mb-4 text-sm font-semibold text-cyan-300">
+              {t(["Passo", "Step"])} {i + 1}
+            </div>
+            <TextoEtapa etapa={e} />
+          </li>
+        ))}
+      </ol>
+    </section>
+  );
+};
 
 /** Conteúdo da cena: título, trilha, texto e ilustração da etapa ativa. */
 const Conteudo = ({
@@ -208,11 +254,13 @@ const Conteudo = ({
   ativa: number;
   progresso: MotionValue<number>;
   tituloOpacity?: MotionValue<number>;
-}) => (
+}) => {
+  const t = useT();
+  return (
   <div className="mx-auto w-full max-w-5xl">
     <motion.div style={tituloOpacity ? { opacity: tituloOpacity } : undefined}>
-      <SceneLabel index={4}>Como funciona</SceneLabel>
-      <h2 className="mb-4 text-2xl font-semibold text-white sm:mb-12 sm:text-5xl">Do rio ao painel, em quatro passos.</h2>
+      <SceneLabel index={4}>{t(ROTULO)}</SceneLabel>
+      <h2 className="mb-4 text-2xl font-semibold text-white sm:mb-12 sm:text-5xl">{t(TITULO)}</h2>
     </motion.div>
 
     <Trilha ativa={ativa} progresso={progresso} />
@@ -220,7 +268,7 @@ const Conteudo = ({
     <div className="grid items-center gap-3 sm:gap-6 md:grid-cols-2 md:gap-12">
       <div className="order-2 min-h-[11rem] text-center sm:min-h-[13rem] md:order-1 md:text-left" aria-live="polite">
         <div className="mb-2 text-sm font-semibold text-cyan-300">
-          Passo {ativa + 1} de {ETAPAS.length}
+          {t([`Passo ${ativa + 1} de ${ETAPAS.length}`, `Step ${ativa + 1} of ${ETAPAS.length}`])}
         </div>
         <AnimatePresence mode="wait">
           <motion.div
@@ -250,20 +298,24 @@ const Conteudo = ({
       </div>
     </div>
   </div>
-);
+  );
+};
 
 /** Modo telas: cada seta avança um passo, e a trilha se enche até o passo atual. */
 const FluxoTela = ({ passo }: { passo: number }) => {
   const alvo = useMotionValue(0);
   const progresso = useSpring(alvo, { stiffness: 90, damping: 22 });
+  const t = useT();
   useEffect(() => {
     const t = window.setTimeout(() => alvo.set(passo / (ETAPAS.length - 1)), passo === 0 ? ATRASO_TELA * 1000 : 0);
     return () => window.clearTimeout(t);
   }, [passo, alvo]);
   return (
-    <section id="cena-4" className="relative flex min-h-[100svh] flex-col justify-center px-6 py-16" aria-label="Como funciona">
+    <section id="cena-4" className="relative flex min-h-[100svh] flex-col justify-center px-6 py-16" aria-label={t(ROTULO)}>
       <Conteudo ativa={passo} progresso={progresso} />
-      <p className="mt-6 text-center text-xs text-slate-500">Use → para avançar cada passo.</p>
+      <p className="mt-6 text-center text-xs text-slate-500">
+        {t(["Use → para avançar cada passo.", "Press → to go through each step."])}
+      </p>
     </section>
   );
 };
@@ -276,6 +328,7 @@ export const Fluxo = () => {
   const suave = useSpring(scrollYProgress, { stiffness: 120, damping: 30, mass: 0.3 });
   const tituloOpacity = useTransform(scrollYProgress, [0, 0.08], [0.4, 1]);
   const [ativa, setAtiva] = useState(0);
+  const t = useT();
 
   useMotionValueEvent(scrollYProgress, "change", (v) => {
     const i = Math.min(ETAPAS.length - 1, Math.max(0, Math.floor(v * ETAPAS.length)));
@@ -287,7 +340,7 @@ export const Fluxo = () => {
 
   return (
     // Seção alta + conteúdo "grudado": a rolagem vira a linha do tempo da animação.
-    <section ref={ref} id="cena-4" data-paradas={ETAPAS.length} className="relative h-[420vh]" aria-label="Como funciona">
+    <section ref={ref} id="cena-4" data-paradas={ETAPAS.length} className="relative h-[420vh]" aria-label={t(ROTULO)}>
       <div className="sticky top-0 flex h-[100svh] flex-col justify-center overflow-hidden px-6">
         <Conteudo ativa={ativa} progresso={suave} tituloOpacity={tituloOpacity} />
       </div>
