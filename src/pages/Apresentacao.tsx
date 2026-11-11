@@ -9,7 +9,7 @@ import { AoVivo, AppColeta } from "@/components/apresentacao/AoVivo";
 import { Reveal, SceneLabel, Transicao } from "@/components/apresentacao/primitives";
 import { Amostragem } from "@/components/apresentacao/Amostragem";
 import { Sonda3D } from "@/components/apresentacao/Sonda3D";
-import { Investimento } from "@/components/apresentacao/Investimento";
+import { Investimento, PASSOS_INVESTIMENTO } from "@/components/apresentacao/Investimento";
 import { useMenosMovimento } from "@/components/apresentacao/useMenosMovimento";
 import { AvisoMovimento, BotaoMovimento, Palco, useModoTelas, type Cena } from "@/components/apresentacao/Palco";
 
@@ -373,10 +373,10 @@ const Equipe = () => {
 };
 
 const RECURSOS = [
-  { titulo: "Instrumentação", texto: "Sondas e acessórios de medição" },
-  { titulo: "Materiais e calibração", texto: "Soluções, frascos e consumíveis" },
-  { titulo: "Campo e logística", texto: "Transporte e deslocamentos da equipe" },
-  { titulo: "Validação", texto: "Comparações e análises de referência" },
+  { titulo: "Sonda automática", texto: "Mede no rio, somada às sondas portáteis dos voluntários" },
+  { titulo: "Campo e logística", texto: "Estrutura, calibração, visitas e deslocamentos" },
+  { titulo: "Tecnologia e IA", texto: "Integração da sonda, plataforma e processamento de dados" },
+  { titulo: "Validação e voluntários", texto: "Análises de laboratório e formação da rede" },
 ];
 
 const ETAPAS_APOIO = [
@@ -395,10 +395,11 @@ const ProximosPassos = () => (
     <Reveal>
       <SceneLabel index={9}>A próxima etapa</SceneLabel>
       <h2 className="max-w-3xl text-3xl font-semibold leading-tight text-white sm:text-5xl">
-        A próxima etapa acontece no campo.
+        A próxima etapa: mais rios medidos, com mais tecnologia.
       </h2>
       <p className="mt-4 max-w-2xl text-slate-300 sm:text-lg">
-        A base computacional já existe. Falta ampliar a capacidade de medir, registrar e validar em contexto.
+        A plataforma e o app já funcionam. Agora é levar o monitoramento a mais pontos e rios, com uma sonda automática
+        ao lado das portáteis, e evoluir a tecnologia que transforma as medições em informação validada.
       </p>
     </Reveal>
 
@@ -408,7 +409,7 @@ const ProximosPassos = () => (
         {RECURSOS.map((r, i) => (
           <Reveal key={r.titulo} delay={0.08 * i}>
             <div className="flex h-full items-baseline justify-between gap-4 rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4">
-              <span className="font-semibold text-white">{r.titulo}</span>
+              <span className="shrink-0 font-semibold text-white">{r.titulo}</span>
               <span className="text-right text-sm text-slate-400">{r.texto}</span>
             </div>
           </Reveal>
@@ -466,7 +467,7 @@ const ComoApoiar = () => (
           </div>
           <div className="flex shrink-0 flex-col items-center gap-3">
             <div className="rounded-2xl bg-[#f4f2ea] px-4 py-2.5">
-              <img src="/apresentacao/logo-tikatu.webp" alt="Tikatu" className="h-8 w-auto" loading="lazy" />
+              <img src="/apresentacao/logo-tikatu.webp" alt="Tikatu" className="h-8 w-auto" />
             </div>
             <a
               href="https://www.tikatu.com.br"
@@ -493,16 +494,16 @@ const ComoApoiar = () => (
 
 const TELAS: Cena[] = [
   { nome: "Abertura", el: <Hero />, cheia: true },
-  { nome: "O problema", el: <Amostragem /> },
-  { nome: "A origem", el: <Origem /> },
-  { nome: "Como funciona", el: <Fluxo />, passos: PASSOS_FLUXO },
-  { nome: "Painel ao vivo", el: <AoVivo /> },
-  { nome: "App de coleta", el: <AppColeta /> },
-  { nome: "Para quem", el: <ParaQuem /> },
-  { nome: "Equipe", el: <Equipe /> },
-  { nome: "Próxima etapa", el: <ProximosPassos /> },
-  { nome: "O investimento", el: <Investimento /> },
-  { nome: "Como apoiar", el: <ComoApoiar /> },
+  { nome: "O problema", el: <Amostragem />, transicao: "mare" },
+  { nome: "A origem", el: <Origem />, transicao: "cortina" },
+  { nome: "Como funciona", el: <Fluxo />, passos: PASSOS_FLUXO, transicao: "deslizar" },
+  { nome: "Painel ao vivo", el: <AoVivo />, transicao: "mergulho" },
+  { nome: "App de coleta", el: <AppColeta />, transicao: "deslizar" },
+  { nome: "Para quem", el: <ParaQuem />, transicao: "iris" },
+  { nome: "Equipe", el: <Equipe />, transicao: "cortina" },
+  { nome: "Próxima etapa", el: <ProximosPassos />, transicao: "mare" },
+  { nome: "O investimento", el: <Investimento />, passos: PASSOS_INVESTIMENTO, transicao: "mergulho" },
+  { nome: "Como apoiar", el: <ComoApoiar />, transicao: "iris" },
 ];
 
 const Apresentacao = () => {

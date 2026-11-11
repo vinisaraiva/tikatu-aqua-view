@@ -11,6 +11,8 @@ export interface Cena {
   passos?: number;
   /** Cena de fundo cheio (abertura): ocupa a tela toda sem encolher; o excesso de baixo é cortado. */
   cheia?: boolean;
+  /** Como esta tela entra (padrão: deslizar). */
+  transicao?: TipoTransicao;
 }
 
 const CONSULTA = "(min-width: 900px) and (orientation: landscape)";
@@ -64,10 +66,43 @@ const Encaixe = ({ children, cheia = false }: { children: ReactNode; cheia?: boo
 };
 
 const EASE = [0.76, 0, 0.24, 1] as const;
+
+/**
+ * Transições entre telas. Cada tela tem a sua (definida em Cena.transicao), para não ficar repetitivo;
+ * ao voltar, usa-se a da tela que está saindo, ao contrário.
+ */
+export type TipoTransicao = "deslizar" | "mergulho" | "mare" | "iris" | "cortina";
+interface Rumo {
+  dir: number;
+  tipo: TipoTransicao;
+}
+const CHEIO = "inset(0% 0% 0% 0%)";
+const DURACAO: Record<TipoTransicao, number> = { deslizar: 0.95, mergulho: 0.9, mare: 1.05, iris: 1.15, cortina: 0.95 };
+const base = { x: "0%", y: "0%", scale: 1, opacity: 1, filter: "blur(0px)", clipPath: CHEIO };
+
 const VARIANTES: Variants = {
-  entra: (d: number) => ({ x: `${d * 100}%`, scale: 1, opacity: 1, zIndex: 2 }),
-  centro: { x: "0%", scale: 1, opacity: 1, zIndex: 1, transition: { duration: 0.95, ease: EASE } },
-  sai: (d: number) => ({ x: `${d * -28}%`, scale: 0.9, opacity: 0.25, zIndex: 0, transition: { duration: 0.95, ease: EASE } }),
+  entra: ({ dir: d, tipo }: Rumo) => {
+    const v = { ...base, zIndex: 2 };
+    if (tipo === "deslizar") return { ...v, x: `${d * 100}%` };
+    if (tipo === "mergulho") return { ...v, scale: d > 0 ? 0.82 : 1.18, opacity: 0, filter: "blur(12px)" };
+    if (tipo === "mare") return { ...v, y: `${d * 100}%` };
+    if (tipo === "iris") return { ...v, scale: 1.08, clipPath: "circle(0% at 50% 55%)" };
+    return { ...v, clipPath: d > 0 ? "inset(0% 0% 0% 100%)" : "inset(0% 100% 0% 0%)" };
+  },
+  centro: ({ tipo }: Rumo) => ({
+    ...base,
+    clipPath: tipo === "iris" ? "circle(80% at 50% 55%)" : CHEIO,
+    zIndex: 1,
+    transition: { duration: DURACAO[tipo], ease: EASE },
+  }),
+  sai: ({ dir: d, tipo }: Rumo) => {
+    const t = { duration: DURACAO[tipo], ease: EASE };
+    if (tipo === "deslizar") return { x: `${d * -28}%`, scale: 0.9, opacity: 0.25, zIndex: 0, transition: t };
+    if (tipo === "mergulho") return { scale: d > 0 ? 1.18 : 0.82, opacity: 0, filter: "blur(12px)", zIndex: 0, transition: t };
+    if (tipo === "mare") return { y: `${d * -22}%`, scale: 0.94, opacity: 0.3, zIndex: 0, transition: t };
+    if (tipo === "iris") return { scale: 0.94, opacity: 0.4, zIndex: 0, transition: t };
+    return { x: `${d * -12}%`, opacity: 0.35, zIndex: 0, transition: t };
+  },
 };
 const VARIANTES_SUAVES: Variants = {
   entra: { opacity: 0, zIndex: 2 },
@@ -123,7 +158,7 @@ const lerHash = (n: number) => {
 
 export const Palco = ({ cenas }: { cenas: Cena[] }) => {
   const reduce = useMenosMovimento();
-  const [estado, setEstado] = useState(() => ({ i: lerHash(cenas.length), passo: 0, dir: 1 }));
+  const [estado, setEstado] = useState(() => ({ i: lerHash(cenas.length), passo: 0, dir: 1, tipo: "deslizar" as TipoTransicao }));
   const travado = useRef(0);
 
   const ir = useCallback(
@@ -134,15 +169,18 @@ export const Palco = ({ cenas }: { cenas: Cena[] }) => {
         if (delta < 0 && s.passo > 0) return { ...s, passo: s.passo - 1 };
         const i = s.i + delta;
         if (i < 0 || i >= cenas.length) return s;
-        return { i, passo: delta > 0 ? 0 : (cenas[i].passos ?? 1) - 1, dir: delta };
+        const tipo = cenas[Math.max(i, s.i)].transicao ?? "deslizar";
+        return { i, passo: delta > 0 ? 0 : (cenas[i].passos ?? 1) - 1, dir: delta, tipo };
       });
     },
     [cenas],
   );
 
   const irPara = useCallback((i: number) => {
-    setEstado((s) => (i === s.i ? s : { i, passo: 0, dir: i > s.i ? 1 : -1 }));
-  }, []);
+    setEstado((s) =>
+      i === s.i ? s : { i, passo: 0, dir: i > s.i ? 1 : -1, tipo: cenas[Math.max(i, s.i)].transicao ?? "deslizar" },
+    );
+  }, [cenas]);
 
   // Endereço #cena-N acompanha a tela (dá para abrir direto numa cena e usar os links internos).
   useEffect(() => {
@@ -223,7 +261,8 @@ export const Palco = ({ cenas }: { cenas: Cena[] }) => {
     };
   }, [cenas.length, ir, irPara, reduce]);
 
-  const { i, passo, dir } = estado;
+  const { i, passo, dir, tipo } = estado;
+  const rumo: Rumo = { dir, tipo };
   const total = cenas.length;
   const passos = cenas[i].passos ?? 1;
   const progresso = (i + (passos > 1 ? passo / passos : 0)) / (total - 1);
@@ -234,10 +273,10 @@ export const Palco = ({ cenas }: { cenas: Cena[] }) => {
       className="fixed inset-0 overflow-hidden bg-[#021019] [&_section]:min-h-[calc(100svh-3.5rem)]"
       aria-roledescription="apresentação"
     >
-      <AnimatePresence initial={false} custom={dir}>
+      <AnimatePresence initial={false} custom={rumo}>
         <motion.div
           key={i}
-          custom={dir}
+          custom={rumo}
           variants={reduce ? VARIANTES_SUAVES : VARIANTES}
           initial="entra"
           animate="centro"
