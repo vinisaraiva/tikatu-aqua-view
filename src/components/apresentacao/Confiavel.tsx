@@ -57,10 +57,10 @@ const CADEIA: { icon: typeof Gauge; etapa: Bi; destaque: Bi; texto: Bi }[] = [
     icon: MessageSquareText,
     etapa: ["Explicação", "Explanation"],
     destaque: [
-      "“No Ponto 2, o pH ficou em 5,0, abaixo do mínimo de 6 do CONAMA.”",
-      "“At Site 2, pH was 5.0, below the CONAMA minimum of 6.”",
+      "“No Ponto 2, o pH ficou em 5,0, abaixo do mínimo de 6 do CONAMA. Água mais ácida pode afetar a vida aquática; vale acompanhar as próximas coletas.”",
+      "“At Site 2, pH was 5.0, below the CONAMA minimum of 6. More acidic water can affect aquatic life; the next samples are worth watching.”",
     ],
-    texto: ["Cada número da frase é conferido com o cálculo e a regra", "Every number in the sentence is checked against the calculation and the rule"],
+    texto: ["Os números são conferidos com o cálculo e a regra; a interpretação parte deles", "The numbers are checked against the calculation and the rule; the interpretation builds on them"],
   },
 ];
 
@@ -77,12 +77,12 @@ export const Confiavel = () => {
   return (
     <section
       id="cena-5"
-      className="mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-center px-6 py-16"
+      className="mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-center px-6 py-10"
       aria-label={t(["Informação confiável", "Reliable information"])}
     >
       <Reveal>
         <SceneLabel index={5}>{t(["Informação confiável", "Reliable information"])}</SceneLabel>
-        <h2 className="max-w-4xl text-3xl font-semibold leading-tight text-white sm:text-5xl">
+        <h2 className="text-3xl font-semibold leading-tight text-white sm:text-4xl">
           {t(["Da medição a uma explicação ", "From a measurement to an explanation "])}
           <span className="text-cyan-200">{t(["que pode ser conferida.", "that can be checked."])}</span>
         </h2>
@@ -120,7 +120,7 @@ export const Confiavel = () => {
         <div className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-300/80">
           {t(["Exemplo com uma leitura real", "Example with a real reading"])}
         </div>
-        <ol className="mt-3 grid gap-2 md:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1.5fr] md:items-stretch">
+        <ol className="mt-3 grid gap-2 md:grid-cols-[1fr_auto_1fr_auto_1fr_auto_2.3fr] md:items-stretch">
           {CADEIA.map((c, i) => {
             const Icon = c.icon;
             const aceso = i <= ate;
