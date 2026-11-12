@@ -464,12 +464,12 @@ const ComoApoiar = () => {
 // como chega ao campo e às pessoas → equipe → o que o financiamento permite.
 const TELAS: Cena[] = [
   { nome: ["Abertura", "Opening"], el: <Hero />, cheia: true },
-  { nome: ["O que já existe", "What already exists"], el: <AoVivo />, transicao: "mare" },
+  { nome: ["O que já existe", "What already exists"], el: <AoVivo />, paleta: "logo", transicao: "mare" },
   { nome: ["As perguntas", "The questions"], el: <Perguntas />, transicao: "cortina" },
   { nome: ["Com que frequência", "How often"], el: <Amostragem />, transicao: "deslizar" },
-  { nome: ["Informação confiável", "Reliable information"], el: <Confiavel />, passos: PASSOS_CONFIAVEL, transicao: "mergulho" },
+  { nome: ["Informação confiável", "Reliable information"], el: <Confiavel />, paleta: "logo", passos: PASSOS_CONFIAVEL, transicao: "mergulho" },
   { nome: ["Como funciona", "How it works"], el: <Fluxo />, passos: PASSOS_FLUXO, transicao: "deslizar" },
-  { nome: ["App de coleta", "Sampling app"], el: <AppColeta />, transicao: "mare" },
+  { nome: ["App de coleta", "Sampling app"], el: <AppColeta />, paleta: "logo", transicao: "mare" },
   { nome: ["Para quem", "Who it is for"], el: <ParaQuem />, transicao: "iris" },
   { nome: ["Equipe", "Team"], el: <Equipe />, transicao: "cortina" },
   { nome: ["Próxima etapa", "Next stage"], el: <Metas />, transicao: "mare" },

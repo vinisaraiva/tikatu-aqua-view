@@ -52,10 +52,12 @@ export const Reveal = ({
   );
 };
 
-export const SceneLabel = ({ index, children }: { index: number; children: ReactNode }) => (
-  <div className="mb-5 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.25em] text-cyan-300/80">
-    <span className="tabular-nums">{String(index).padStart(2, "0")}</span>
-    <span className="h-px w-8 bg-cyan-300/50" aria-hidden />
+export const SceneLabel = ({ index, children, logo = false }: { index: number; children: ReactNode; logo?: boolean }) => (
+  <div
+    className={`mb-5 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.25em] ${logo ? "text-tk-rio-claro" : "text-cyan-300/80"}`}
+  >
+    <span className={`tabular-nums ${logo ? "text-tk-terra-clara" : ""}`}>{String(index).padStart(2, "0")}</span>
+    <span className={logo ? "h-0.5 w-8 bg-tk-terra" : "h-px w-8 bg-cyan-300/50"} aria-hidden />
     <span>{children}</span>
   </div>
 );

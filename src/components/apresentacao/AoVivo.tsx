@@ -101,12 +101,12 @@ export const AoVivo = () => {
       aria-label={t(["O que já existe", "What already exists"])}
     >
       <Reveal>
-        <SceneLabel index={2}>{t(["O que já existe", "What already exists"])}</SceneLabel>
-        <h2 className="text-3xl font-semibold text-white sm:text-5xl">
+        <SceneLabel logo index={2}>{t(["O que já existe", "What already exists"])}</SceneLabel>
+        <h2 className="text-3xl font-semibold text-tk-creme sm:text-5xl">
           {t(["Dados reais.", "Real data."])}{" "}
-          <span className="block text-cyan-200">{t(["Painel no ar.", "Live dashboard."])}</span>
+          <span className="block text-tk-rio-claro">{t(["Painel no ar.", "Live dashboard."])}</span>
         </h2>
-        <p className="mt-4 text-slate-300">
+        <p className="mt-4 text-tk-nevoa">
           {t([
             "O Tikatu começou reunindo dados e tornando a qualidade da água acessível. Aqui, o pH dos pontos do Rio Chamagunga, em Porto Seguro, comparado à faixa do CONAMA.",
             "Tikatu began by bringing data together and making water quality accessible. Here, pH at the Chamagunga River sites in Porto Seguro, compared with the CONAMA range.",
@@ -116,7 +116,7 @@ export const AoVivo = () => {
           href="https://doi.org/10.1080/15715124.2025.2528958"
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-3 inline-flex items-center gap-1 text-xs text-slate-400 hover:text-cyan-200"
+          className="mt-3 inline-flex items-center gap-1 text-xs text-tk-nevoa/75 hover:text-tk-rio-claro"
         >
           {t([
             "Criada no mestrado e publicada no International Journal of River Basin Management (2025)",
@@ -130,9 +130,9 @@ export const AoVivo = () => {
               key={rotulo[0]}
               className="rounded-xl border border-white/10 bg-white/[0.04] p-3 lg:flex lg:items-center lg:gap-4 lg:px-4"
             >
-              <Icon className="mb-2 h-4 w-4 shrink-0 text-cyan-300 lg:mb-0 lg:h-5 lg:w-5" />
-              <span className="block text-lg font-semibold text-white sm:text-2xl lg:min-w-[6.5rem]">{valor}</span>
-              <span className="mt-0.5 block text-[11px] leading-tight text-slate-400 sm:text-sm">{t(rotulo)}</span>
+              <Icon className="mb-2 h-4 w-4 shrink-0 text-tk-rio-claro lg:mb-0 lg:h-5 lg:w-5" />
+              <span className="block text-lg font-semibold text-tk-creme sm:text-2xl lg:min-w-[6.5rem]">{valor}</span>
+              <span className="mt-0.5 block text-[11px] leading-tight text-tk-nevoa/75 sm:text-sm">{t(rotulo)}</span>
             </li>
           ))}
         </ul>
@@ -141,7 +141,7 @@ export const AoVivo = () => {
       <div className="relative pb-16 [perspective:1400px] sm:pb-24" onMouseMove={mover} onMouseLeave={sair}>
         <motion.figure
           style={{ rotateY: ry, rotateX: srx, scale: entrada, transformStyle: "preserve-3d" }}
-          className="origin-center overflow-hidden rounded-2xl bg-white shadow-[0_50px_120px_-30px_rgba(34,211,238,0.45)] ring-1 ring-white/10"
+          className="origin-center overflow-hidden rounded-2xl bg-white shadow-[0_50px_120px_-30px_rgba(27,127,192,0.45)] ring-1 ring-white/10"
         >
           <Navegador>
             <img
@@ -171,7 +171,7 @@ export const AoVivo = () => {
         </motion.figure>
       </div>
 
-      <p className="text-xs text-slate-500 lg:col-span-2">
+      <p className="text-xs text-tk-nevoa/60 lg:col-span-2">
         {t([
           "Captura do painel em produção em 10/11/2026 (Rio Chamagunga, pH, coleta de 25/08/2024). Cada leitura chega com ponto, data e hora, status em relação ao CONAMA e verificação de anomalia.",
           "Screenshot of the live dashboard on 10 Nov 2026 (Chamagunga River, pH, sampled on 25 Aug 2024). Each reading arrives with site, date and time, CONAMA status and an anomaly check. Interface in Portuguese.",
@@ -207,7 +207,7 @@ export const AppColeta = () => {
       <div className="order-2 flex justify-center [perspective:1200px] md:order-1" onMouseMove={mover} onMouseLeave={sair}>
         <motion.div style={{ rotateX: srx, rotateY: sry }}>
           <motion.div
-            className="relative w-[min(15rem,34svh)] rounded-[2.4rem] bg-[#0d1b24] p-2.5 shadow-[0_40px_80px_-30px_rgba(34,211,238,0.5)] ring-1 ring-white/15 sm:w-[min(17rem,38svh)]"
+            className="relative w-[min(15rem,34svh)] rounded-[2.4rem] bg-[#0d1b24] p-2.5 shadow-[0_40px_80px_-30px_rgba(27,127,192,0.5)] ring-1 ring-white/15 sm:w-[min(17rem,38svh)]"
             animate={reduce ? undefined : { y: [0, -12, 0], rotate: [-2, 1.5, -2] }}
             transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
           >
@@ -233,24 +233,24 @@ export const AppColeta = () => {
 
       <div className="order-1 md:order-2">
         <Reveal>
-          <SceneLabel index={7}>{t(["O app de coleta", "The sampling app"])}</SceneLabel>
-          <h2 className="text-3xl font-semibold text-white sm:text-5xl">
+          <SceneLabel logo index={7}>{t(["O app de coleta", "The sampling app"])}</SceneLabel>
+          <h2 className="text-3xl font-semibold text-tk-creme sm:text-5xl">
             {t(["No rio, o voluntário usa o ", "At the river, volunteers use the "])}
-            <span className="text-cyan-200">{t(["Tikatu Coleta.", "Tikatu Coleta app."])}</span>
+            <span className="text-tk-rio-claro">{t(["Tikatu Coleta.", "Tikatu Coleta app."])}</span>
           </h2>
-          <p className="mt-4 text-slate-300">
+          <p className="mt-4 text-tk-nevoa">
             {t([
               "Versão 1.6.2. O app envia as leituras para o mesmo banco de dados do painel.",
               "Version 1.6.2. The app sends readings to the same database as the dashboard.",
             ])}
           </p>
           <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3">
-            <div className="flex flex-wrap items-center gap-2 font-semibold text-white">
-              <Users className="h-4 w-4 text-cyan-300" aria-hidden />
+            <div className="flex flex-wrap items-center gap-2 font-semibold text-tk-creme">
+              <Users className="h-4 w-4 text-tk-rio-claro" aria-hidden />
               {t(["Ciência cidadã", "Citizen science"])}
               <Situacao tipo="andamento" />
             </div>
-            <p className="mt-1 text-sm text-slate-300">
+            <p className="mt-1 text-sm text-tk-nevoa">
               {t([
                 "O Tikatu Coleta e a participação dos voluntários são objeto de um estudo de ciência cidadã, que avança à medida que as coletas se acumulam.",
                 "Tikatu Coleta and volunteer participation are the subject of a citizen science study, which advances as samples accumulate.",
@@ -266,15 +266,15 @@ export const AppColeta = () => {
                 onClick={() => setI(k)}
                 aria-pressed={k === i}
                 className={`relative h-full w-full overflow-hidden rounded-xl border px-4 py-3 text-left transition-colors ${
-                  k === i ? "border-cyan-300/50 bg-cyan-300/10" : "border-white/10 bg-white/[0.02] hover:bg-white/[0.05]"
+                  k === i ? "border-tk-rio-claro/50 bg-tk-rio-claro/10" : "border-white/10 bg-white/[0.02] hover:bg-white/[0.05]"
                 }`}
               >
-                <span className={`block font-semibold ${k === i ? "text-white" : "text-slate-300"}`}>{t(tela.titulo)}</span>
-                <span className="mt-0.5 hidden text-sm text-slate-400 sm:block">{t(tela.legenda)}</span>
+                <span className={`block font-semibold ${k === i ? "text-tk-creme" : "text-tk-nevoa"}`}>{t(tela.titulo)}</span>
+                <span className="mt-0.5 hidden text-sm text-tk-nevoa/75 sm:block">{t(tela.legenda)}</span>
                 {k === i && !reduce && !pausa && visivel && (
                   <motion.span
                     key={`barra-${i}`}
-                    className="absolute bottom-0 left-0 h-0.5 bg-cyan-300"
+                    className="absolute bottom-0 left-0 h-0.5 bg-tk-terra-clara"
                     initial={{ width: "0%" }}
                     animate={{ width: "100%" }}
                     transition={{ duration: INTERVALO / 1000, ease: "linear" }}
@@ -285,7 +285,7 @@ export const AppColeta = () => {
             </li>
           ))}
         </ul>
-        <p className="mt-4 text-xs text-slate-500">
+        <p className="mt-4 text-xs text-tk-nevoa/60">
           {t([
             "Telas reais com usuário de teste; código do voluntário ocultado.",
             "Real screens with a test user; volunteer code hidden. App interface in Portuguese.",

@@ -81,10 +81,10 @@ export const Confiavel = () => {
       aria-label={t(["Informação confiável", "Reliable information"])}
     >
       <Reveal>
-        <SceneLabel index={5}>{t(["Informação confiável", "Reliable information"])}</SceneLabel>
-        <h2 className="text-3xl font-semibold leading-tight text-white sm:text-4xl">
+        <SceneLabel logo index={5}>{t(["Informação confiável", "Reliable information"])}</SceneLabel>
+        <h2 className="text-3xl font-semibold leading-tight text-tk-creme sm:text-4xl">
           {t(["Da medição a uma explicação ", "From a measurement to an explanation "])}
-          <span className="text-cyan-200">{t(["que pode ser conferida.", "that can be checked."])}</span>
+          <span className="text-tk-rio-claro">{t(["que pode ser conferida.", "that can be checked."])}</span>
         </h2>
       </Reveal>
 
@@ -93,23 +93,23 @@ export const Confiavel = () => {
           <Reveal key={q.pergunta[0]} delay={0.1 + i * 0.12}>
             <div className="h-full rounded-2xl border border-white/10 bg-white/[0.03] p-5">
               <div className="flex flex-wrap items-center gap-2">
-                <h3 className="text-lg font-semibold text-white sm:text-xl">{t(q.pergunta)}</h3>
+                <h3 className="text-lg font-semibold text-tk-creme sm:text-xl">{t(q.pergunta)}</h3>
                 <Situacao tipo={q.situacao} />
               </div>
-              <p className="mt-2 text-sm text-slate-300 sm:text-base">{t(q.resposta)}</p>
+              <p className="mt-2 text-sm text-tk-nevoa sm:text-base">{t(q.resposta)}</p>
               {q.fonte &&
                 (q.link ? (
                   <a
                     href={q.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-2 inline-flex items-center gap-1 text-xs text-slate-400 hover:text-cyan-200"
+                    className="mt-2 inline-flex items-center gap-1 text-xs text-tk-nevoa/75 hover:text-tk-rio-claro"
                   >
                     {t(q.fonte)}
                     <ArrowUpRight className="h-3.5 w-3.5" />
                   </a>
                 ) : (
-                  <p className="mt-2 text-xs text-slate-400">{t(q.fonte)}</p>
+                  <p className="mt-2 text-xs text-tk-nevoa/75">{t(q.fonte)}</p>
                 ))}
             </div>
           </Reveal>
@@ -117,7 +117,7 @@ export const Confiavel = () => {
       </div>
 
       <div ref={ref} className="mt-6">
-        <div className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-300/80">
+        <div className="text-xs font-semibold uppercase tracking-[0.2em] text-tk-rio-claro/80">
           {t(["Exemplo com uma leitura real", "Example with a real reading"])}
         </div>
         <ol className="mt-3 grid gap-2 md:grid-cols-[1fr_auto_1fr_auto_1fr_auto_2.3fr] md:items-stretch">
@@ -130,7 +130,7 @@ export const Confiavel = () => {
                 <motion.li
                   key={`seta-${i}`}
                   aria-hidden
-                  className="hidden items-center justify-center text-cyan-300 md:flex"
+                  className="hidden items-center justify-center text-tk-rio-claro md:flex"
                   initial={false}
                   animate={{ opacity: aceso ? 1 : 0.15, x: aceso || reduce ? 0 : -6 }}
                   transition={{ duration: 0.4, delay: reduce ? 0 : atraso }}
@@ -140,26 +140,26 @@ export const Confiavel = () => {
               ),
               <motion.li
                 key={c.etapa[0]}
-                className={`rounded-2xl border p-4 ${i === CADEIA.length - 1 ? "border-cyan-300/40 bg-cyan-300/[0.07]" : "border-white/10 bg-white/[0.04]"}`}
+                className={`rounded-2xl border p-4 ${i === CADEIA.length - 1 ? "border-tk-rio-claro/40 bg-tk-rio-claro/[0.07]" : "border-white/10 bg-white/[0.04]"}`}
                 initial={false}
                 animate={{ opacity: aceso ? 1 : 0.18, y: aceso || reduce ? 0 : 10 }}
                 transition={{ duration: 0.5, delay: reduce ? 0 : atraso, ease: [0.22, 1, 0.36, 1] }}
               >
-                <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-cyan-300/90">
+                <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-tk-rio-claro/90">
                   <Icon className="h-4 w-4" />
                   {t(c.etapa)}
                 </div>
                 <div
-                  className={`mt-2 font-semibold text-white ${i === CADEIA.length - 1 ? "text-base leading-snug sm:text-lg" : "font-mono text-xl sm:text-2xl"}`}
+                  className={`mt-2 font-semibold ${i === 2 ? "text-tk-terra-clara" : "text-tk-creme"} ${i === CADEIA.length - 1 ? "text-base leading-snug sm:text-lg" : "font-mono text-xl sm:text-2xl"}`}
                 >
                   {t(c.destaque)}
                 </div>
-                <div className="mt-1 text-xs leading-snug text-slate-400 sm:text-sm">{t(c.texto)}</div>
+                <div className="mt-1 text-xs leading-snug text-tk-nevoa/75 sm:text-sm">{t(c.texto)}</div>
               </motion.li>,
             ];
           })}
         </ol>
-        <p className="mt-3 text-xs text-slate-500">
+        <p className="mt-3 text-xs text-tk-nevoa/60">
           {palco.ativo && ate < CADEIA.length - 1 ? `${t(["Use → para seguir a cadeia.", "Press → to follow the chain."])} ` : ""}
           {t([
             "Medição e faixa reais; a frase final ilustra o método em pesquisa.",

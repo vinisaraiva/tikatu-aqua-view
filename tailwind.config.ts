@@ -70,7 +70,17 @@ export default {
 				'teal-accent': 'hsl(var(--teal-accent))',
 				'forest-green': 'hsl(var(--forest-green))',
 				'earth-brown': 'hsl(var(--earth-brown))',
-				'sky-blue': 'hsl(var(--sky-blue))'
+				'sky-blue': 'hsl(var(--sky-blue))',
+				// Paleta da logo (apresentação)
+				tk: {
+					marinho: '#0d3a5c',
+					rio: '#1b7fc0',
+					'rio-claro': '#8fd0f5',
+					terra: '#c4552b',
+					'terra-clara': '#f0a37a',
+					creme: '#f4f2ea',
+					nevoa: '#c9d9e6'
+				}
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

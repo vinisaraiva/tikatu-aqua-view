@@ -13,6 +13,8 @@ export interface Cena {
   passos?: number;
   /** Cena de fundo cheio (abertura): ocupa a tela toda sem encolher; o excesso de baixo é cortado. */
   cheia?: boolean;
+  /** Teste: fundo azul-marinho da logo no lugar do azul quase preto. */
+  paleta?: "logo";
   /** Como esta tela entra (padrão: deslizar). */
   transicao?: TipoTransicao;
 }
@@ -303,7 +305,15 @@ export const Palco = ({ cenas }: { cenas: Cena[] }) => {
           initial="entra"
           animate="centro"
           exit="sai"
-          className="absolute inset-0 overflow-hidden bg-gradient-to-b from-[#04202f] to-[#062a3d] shadow-[-40px_0_80px_rgba(0,0,0,0.55)]"
+          className={`absolute inset-0 overflow-hidden shadow-[-40px_0_80px_rgba(0,0,0,0.55)] ${cenas[i].paleta === "logo" ? "" : "bg-gradient-to-b from-[#04202f] to-[#062a3d]"}`}
+          style={
+            cenas[i].paleta === "logo"
+              ? {
+                  background:
+                    "radial-gradient(75% 60% at 88% 0%, rgba(27,127,192,0.32), transparent 62%), linear-gradient(180deg, #0a2f4c, #0d3a5c)",
+                }
+              : undefined
+          }
           aria-roledescription={t(["tela", "screen"])}
           aria-label={`${i + 1} / ${total}: ${t(cenas[i].nome)}`}
         >
