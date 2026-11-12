@@ -75,8 +75,14 @@ export const Sonda3D = () => {
           const w = el.clientWidth;
           const h = el.clientHeight;
           renderer.setSize(w, h, false);
-          renderer.domElement.style.width = "100%";
-          renderer.domElement.style.height = "100%";
+          // O canvas fica posicionado sobre a caixa: se entrasse no fluxo, aumentaria a própria caixa
+          // que mede, e o ResizeObserver entraria em ciclo (a cena encolhia sem parar).
+          const c = renderer.domElement.style;
+          c.position = "absolute";
+          c.inset = "0";
+          c.display = "block";
+          c.width = "100%";
+          c.height = "100%";
           camera.aspect = w / h;
           camera.updateProjectionMatrix();
         };
