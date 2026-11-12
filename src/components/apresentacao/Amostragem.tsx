@@ -124,12 +124,21 @@ const Cabecalho = () => {
 const Rodape = () => {
   const t = useT();
   return (
-    <p className="mt-4 text-xs text-slate-500">
-      {t([
-        "Exemplo didático, não é série real. O estudo do Rio Buranhém (Earth Science Informatics, 2026) analisa essa relação com cálculo exato de probabilidades.",
-        "Teaching example, not a real time series. The Buranhém River study (Earth Science Informatics, 2026) analyses this relationship with exact probability calculations.",
-      ])}
-    </p>
+    <>
+      <p className="mt-4 text-sm text-slate-300 sm:text-base">
+        <span className="font-semibold text-cyan-200">{t(["Na prática: ", "In practice: "])}</span>
+        {t([
+          "na comunidade do Acuípe de Baixo, entre Ilhéus e Una, as coletas são previstas três vezes por semana.",
+          "in the Acuípe de Baixo community, between Ilhéus and Una, sampling is planned three times a week.",
+        ])}
+      </p>
+      <p className="mt-2 text-xs text-slate-500">
+        {t([
+          "Exemplo didático, não é série real. O estudo do Rio Buranhém (Earth Science Informatics, 2026) analisa essa relação com cálculo exato de probabilidades.",
+          "Teaching example, not a real time series. The Buranhém River study (Earth Science Informatics, 2026) analyses this relationship with exact probability calculations.",
+        ])}
+      </p>
+    </>
   );
 };
 

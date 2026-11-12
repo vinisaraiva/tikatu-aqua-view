@@ -7,7 +7,7 @@ import {
   useSpring,
   useTransform,
 } from "framer-motion";
-import { ArrowUpRight, Gauge, MapPin, ShieldCheck } from "lucide-react";
+import { Gamepad2, ArrowUpRight, Gauge, MapPin, ShieldCheck } from "lucide-react";
 import { Reveal, SceneLabel, useProgressoCena } from "./primitives";
 import { useMenosMovimento } from "./useMenosMovimento";
 import { useT, type Bi } from "./idioma";
@@ -21,6 +21,7 @@ const FATOS: { icon: typeof MapPin; valor: string; rotulo: Bi }[] = [
   { icon: MapPin, valor: "6", rotulo: ["pontos de coleta no Rio Chamagunga", "sampling sites on the Chamagunga River"] },
   { icon: Gauge, valor: "13", rotulo: ["parâmetros disponíveis no painel", "parameters available in the dashboard"] },
   { icon: ShieldCheck, valor: "CONAMA", rotulo: ["referência legal em cada gráfico", "legal reference in every chart"] },
+  { icon: Gamepad2, valor: "3", rotulo: ["jogos educativos no Tikatu Educa", "educational games in Tikatu Educa"] },
 ];
 
 const TELAS: { src: string; titulo: Bi; legenda: Bi }[] = [
@@ -122,7 +123,7 @@ export const AoVivo = () => {
           ])}
           <ArrowUpRight className="h-3.5 w-3.5 shrink-0" />
         </a>
-        <ul className="mt-6 grid grid-cols-3 gap-2 lg:grid-cols-1 lg:gap-3">
+        <ul className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-1 lg:gap-3">
           {FATOS.map(({ icon: Icon, valor, rotulo }) => (
             <li
               key={rotulo[0]}

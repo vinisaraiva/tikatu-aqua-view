@@ -78,16 +78,16 @@ const ETAPAS: Etapa[] = [
   },
   {
     icon: MessageSquareText,
-    titulo: ["A Miãga interpreta", "Miãga interprets"],
+    titulo: ["A IA gera os relatórios", "AI writes the reports"],
     simples: [
-      "Uma assistente de IA explica os dados em linguagem simples e ajuda a gerar relatórios para a comunidade e para gestores.",
-      "An AI assistant explains the data in plain language and helps produce reports for the community and for decision-makers.",
+      "A plataforma gera automaticamente relatórios em linguagem simples, com um modelo de IA especializado em qualidade da água.",
+      "The platform automatically produces plain-language reports, using an AI model specialised in water quality.",
     ],
     tecnico: [
-      "As explicações passam pela pré-verificação: só chegam a quem lê se os números baterem com o cálculo.",
-      "Explanations go through the pre-check: they only reach readers if the numbers match the calculation.",
+      "Hoje integrado por API. Nosso próprio modelo, a Miãga, com pré-verificação dos números, está em desenvolvimento.",
+      "Integrated through an API today. Our own model, Miãga, with a pre-check of the numbers, is in development.",
     ],
-    situacao: "desenvolvimento",
+    situacao: "disponivel",
   },
 ];
 
@@ -183,7 +183,7 @@ const Ilustracao = ({ etapa }: { etapa: number }) => {
           transition={{ delay: 0.1 }}
           className="ml-auto w-fit max-w-[85%] rounded-2xl rounded-br-sm bg-white/10 px-4 py-2 text-sm text-slate-100"
         >
-          {t(["Como está a água no Ponto 2?", "How is the water at Site 2?"])}
+          {t(["Relatório do Ponto 2", "Report for Site 2"])}
         </motion.div>
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -195,10 +195,6 @@ const Ilustracao = ({ etapa }: { etapa: number }) => {
             "Na coleta de 25/08/2024, o pH ficou em 5,0, abaixo do mínimo de 6 do CONAMA.",
             "In the 25 Aug 2024 sample, pH was 5.0, below the CONAMA minimum of 6.",
           ])}
-          <span className="mt-2 flex items-center gap-1.5 text-[11px] text-emerald-200">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-300" aria-hidden />
-            {t(["Números conferidos com o cálculo", "Numbers checked against the calculation"])}
-          </span>
         </motion.div>
         <p className="text-center text-[11px] text-slate-500">{t(["Exemplo ilustrativo", "Illustrative example"])}</p>
       </div>
