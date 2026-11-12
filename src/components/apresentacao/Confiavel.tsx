@@ -15,8 +15,8 @@ const QUESTOES: { pergunta: Bi; resposta: Bi; situacao: TipoSituacao; fonte?: Bi
   {
     pergunta: ["Como conferir os cálculos?", "How do we check the calculations?"],
     resposta: [
-      "Pacote tikatuwq: rotinas abertas e reprodutíveis para índices e comparação com a legislação.",
-      "The tikatuwq package: open, reproducible routines for indices and comparison with regulations.",
+      "Pacote tikatuwq: rotinas abertas e reprodutíveis para índices e comparação com a legislação, com um resumo no estilo dos relatórios do R.",
+      "The tikatuwq package: open, reproducible routines for indices and comparison with regulations, with an R-style summary report.",
     ],
     situacao: "publicado",
     fonte: ["Artigo no IJRBM, 2026 · software no CRAN", "Paper in IJRBM, 2026 · software on CRAN"],
@@ -25,8 +25,8 @@ const QUESTOES: { pergunta: Bi; resposta: Bi; situacao: TipoSituacao; fonte?: Bi
   {
     pergunta: ["Como produzir interpretações verificáveis?", "How do we produce verifiable interpretations?"],
     resposta: [
-      "Modelos de linguagem (IA) com pré-verificação determinística: regras fixas conferem os fatos antes de a IA escrever relatórios para a comunidade e para gestores.",
-      "Language models (AI) with deterministic pre-checks: fixed rules verify the facts before the AI writes reports for the community and for decision-makers.",
+      "Miangá, nosso modelo de linguagem com pré-verificação determinística: regras fixas conferem os fatos antes de a IA escrever. Será disponibilizado de forma aberta.",
+      "Miangá, our language model with deterministic pre-checks: fixed rules verify the facts before the AI writes. It will be released openly.",
     ],
     situacao: "andamento",
   },
