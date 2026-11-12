@@ -71,8 +71,8 @@ const FRENTES: { curto: Bi; titulo: Bi; texto: Bi; entrega: Bi; valor: number; p
     curto: ["Comunidade", "Community"],
     titulo: ["Voluntários da comunidade", "Community volunteers"],
     texto: [
-      "Oficinas de formação e identificação para quem quiser participar das coletas.",
-      "Training workshops and identification for anyone who wants to take part in the sampling.",
+      "Oficinas de formação e identificação para quem quiser participar das coletas, com os jogos do Tikatu Educa sobre monitoramento da água.",
+      "Training workshops and identification for anyone who wants to take part in the sampling, using the Tikatu Educa games on water monitoring.",
     ],
     entrega: ["2 oficinas (16 h) abertas à comunidade.", "2 workshops (16 h) open to the community."],
     valor: 3960,
