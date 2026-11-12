@@ -160,12 +160,12 @@ export const Perguntas = () => {
   return (
     <section
       id="cena-3"
-      className="mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-center px-6 py-16"
+      className="mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-center px-6 py-10"
       aria-label={t(["As perguntas da pesquisa", "The research questions"])}
     >
       <Reveal>
         <SceneLabel index={3}>{t(["As perguntas da pesquisa", "The research questions"])}</SceneLabel>
-        <h2 className="max-w-3xl text-3xl font-semibold leading-tight text-white sm:text-5xl">
+        <h2 className="text-3xl font-semibold leading-tight text-white sm:text-4xl">
           {t(["Medir não basta. ", "Measuring is not enough. "])}
           <span className="text-cyan-200">{t(["Onde e quando medir decide o que se vê.", "Where and when you measure decides what you see."])}</span>
         </h2>
@@ -187,7 +187,7 @@ export const Perguntas = () => {
         </p>
       </Reveal>
 
-      <div ref={ref} className="mt-8 grid gap-5 md:grid-cols-2">
+      <div ref={ref} className="mt-6 grid gap-5 md:grid-cols-2">
         {PERGUNTAS.map((p, i) => {
           const Icon = p.icon;
           return (
@@ -200,15 +200,17 @@ export const Perguntas = () => {
                   <h3 className="text-2xl font-semibold text-white sm:text-3xl">{t(p.pergunta)}</h3>
                 </div>
                 <div className="mt-4 rounded-2xl bg-[#021019]/50 px-3 pt-3">
-                  <p.Visual on={on} reduce={reduce} atraso={atraso + i * 0.3} />
-                  <p className="pb-2 text-center text-[11px] text-slate-500">{t(p.legenda)}</p>
+                  <div className="mx-auto max-w-sm">
+                    <p.Visual on={on} reduce={reduce} atraso={atraso + i * 0.3} />
+                  </div>
+                  <p className="pb-2 text-center text-xs text-slate-400">{t(p.legenda)}</p>
                 </div>
                 <div className="mt-4 flex flex-wrap items-center gap-2">
                   <span className="font-semibold text-white">{t(p.estudo)}</span>
                   <Situacao tipo={p.situacao} />
                 </div>
-                <p className="mt-1 text-sm text-slate-300 sm:text-base">{t(p.texto)}</p>
-                {p.fonte && <p className="mt-2 text-xs text-slate-500">{t(p.fonte)}</p>}
+                <p className="mt-1 text-sm text-slate-200 sm:text-base">{t(p.texto)}</p>
+                {p.fonte && <p className="mt-2 text-sm text-slate-400">{t(p.fonte)}</p>}
               </article>
             </Reveal>
           );
