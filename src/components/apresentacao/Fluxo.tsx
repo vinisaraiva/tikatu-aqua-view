@@ -192,8 +192,8 @@ const Ilustracao = ({ etapa }: { etapa: number }) => {
           className="w-fit max-w-[90%] rounded-2xl rounded-bl-sm border border-cyan-300/30 bg-cyan-300/10 px-4 py-3 text-sm text-cyan-50"
         >
           {t([
-            "Na coleta de 25/08/2024, o pH ficou em 5,0, abaixo do mínimo de 6 do CONAMA.",
-            "In the 25 Aug 2024 sample, pH was 5.0, below the CONAMA minimum of 6.",
+            "Na coleta de 25/08/2024, o pH ficou em 5,0, abaixo do mínimo de 6 do CONAMA para rios de classe 2. A água mais ácida pode prejudicar peixes e outros organismos e aumentar a presença de metais dissolvidos. A causa pode ser natural, como a matéria orgânica, ou um despejo; vale acompanhar as próximas coletas.",
+            "In the 25 Aug 2024 sample, pH was 5.0, below the CONAMA minimum of 6 for class 2 rivers. More acidic water can harm fish and other organisms and increase dissolved metals. The cause may be natural, such as organic matter, or a discharge; the next samples are worth watching.",
           ])}
         </motion.div>
         <p className="text-center text-[11px] text-slate-500">{t(["Exemplo ilustrativo", "Illustrative example"])}</p>

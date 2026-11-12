@@ -8,7 +8,7 @@ import { useT } from "./idioma";
  * comprimido para ~480 KB). A three.js só é baixada quando a cena chega perto da tela.
  * Gira devagar sozinho; arrastar gira à mão. Com menos movimento, fica parado.
  */
-export const Sonda3D = () => {
+export const Sonda3D = ({ compacto = false }: { compacto?: boolean }) => {
   const caixa = useRef<HTMLDivElement>(null);
   const perto = useInView(caixa, { margin: "300px 0px", once: true });
   const visivel = useInView(caixa, { amount: 0.2 });
@@ -78,6 +78,10 @@ export const Sonda3D = () => {
           renderer.domElement.style.width = "100%";
           renderer.domElement.style.height = "100%";
           camera.aspect = w / h;
+          // Quadro estreito: a câmera recua para o conjunto não ser cortado nas laterais.
+          const recuo = Math.max(1, 0.95 / camera.aspect);
+          camera.position.set(0, raio * 0.15 * recuo, raio * 2.25 * recuo);
+          camera.lookAt(0, 0, 0);
           camera.updateProjectionMatrix();
         };
         ajustar();
@@ -149,7 +153,7 @@ export const Sonda3D = () => {
     <figure className="flex h-full flex-col">
       <div
         ref={caixa}
-        className="relative min-h-[18rem] flex-1 cursor-grab overflow-hidden rounded-3xl border border-white/10 bg-[radial-gradient(60%_55%_at_50%_45%,rgba(34,211,238,0.18),transparent_70%)] active:cursor-grabbing sm:min-h-[24rem]"
+        className={`relative flex-1 cursor-grab overflow-hidden rounded-3xl border border-white/10 bg-[radial-gradient(60%_55%_at_50%_45%,rgba(34,211,238,0.18),transparent_70%)] active:cursor-grabbing ${compacto ? "min-h-[16rem] sm:min-h-[18rem]" : "min-h-[18rem] sm:min-h-[24rem]"}`}
         role="img"
         aria-label={t([
           "Modelo 3D de um medidor de qualidade da água portátil, com aparelho de leitura e sonda",
