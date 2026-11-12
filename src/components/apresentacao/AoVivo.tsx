@@ -7,10 +7,11 @@ import {
   useSpring,
   useTransform,
 } from "framer-motion";
-import { Gamepad2, ArrowUpRight, Gauge, MapPin, ShieldCheck } from "lucide-react";
+import { Gamepad2, ArrowUpRight, Gauge, MapPin, ShieldCheck, Users } from "lucide-react";
 import { Reveal, SceneLabel, useProgressoCena } from "./primitives";
 import { useMenosMovimento } from "./useMenosMovimento";
 import { useT, type Bi } from "./idioma";
+import { Situacao } from "./Situacao";
 
 /**
  * Cenas 5 e 6. Capturas reais (10/11/2026): painel em produção com o pH do Rio Chamagunga
@@ -243,15 +244,28 @@ export const AppColeta = () => {
               "Version 1.6.2. The app sends readings to the same database as the dashboard.",
             ])}
           </p>
+          <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3">
+            <div className="flex flex-wrap items-center gap-2 font-semibold text-white">
+              <Users className="h-4 w-4 text-cyan-300" aria-hidden />
+              {t(["Ciência cidadã", "Citizen science"])}
+              <Situacao tipo="andamento" />
+            </div>
+            <p className="mt-1 text-sm text-slate-300">
+              {t([
+                "O Tikatu Coleta e a participação dos voluntários são objeto de um estudo de ciência cidadã, que avança à medida que as coletas se acumulam.",
+                "Tikatu Coleta and volunteer participation are the subject of a citizen science study, which advances as samples accumulate.",
+              ])}
+            </p>
+          </div>
         </Reveal>
-        <ul className="mt-6 space-y-2" onMouseEnter={() => setPausa(true)} onMouseLeave={() => setPausa(false)}>
+        <ul className="mt-5 grid gap-2 sm:grid-cols-2" onMouseEnter={() => setPausa(true)} onMouseLeave={() => setPausa(false)}>
           {TELAS.map((tela, k) => (
             <li key={tela.src}>
               <button
                 type="button"
                 onClick={() => setI(k)}
                 aria-pressed={k === i}
-                className={`relative w-full overflow-hidden rounded-xl border px-4 py-3 text-left transition-colors ${
+                className={`relative h-full w-full overflow-hidden rounded-xl border px-4 py-3 text-left transition-colors ${
                   k === i ? "border-cyan-300/50 bg-cyan-300/10" : "border-white/10 bg-white/[0.02] hover:bg-white/[0.05]"
                 }`}
               >
