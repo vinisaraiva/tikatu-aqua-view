@@ -4,6 +4,8 @@ import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 import { PalcoContext } from "./primitives";
 import { definirMovimento, useMenosMovimento, useSistemaReduzSemEscolha } from "./useMenosMovimento";
 import { RioFio } from "./RioFio";
+import { Gota3D, type GotaHandle } from "./Gota3D";
+import { GOTA_IMPACTO_MS, GOTA_PONTO } from "./gotaConfig";
 import { useT, type Bi } from "./idioma";
 import { BotaoIdioma } from "./BotaoIdioma";
 
@@ -74,13 +76,15 @@ const EASE = [0.76, 0, 0.24, 1] as const;
  * Transições entre telas. Cada tela tem a sua (definida em Cena.transicao), para não ficar repetitivo;
  * ao voltar, usa-se a da tela que está saindo, ao contrário.
  */
-export type TipoTransicao = "deslizar" | "mergulho" | "mare" | "iris" | "cortina";
+export type TipoTransicao = "deslizar" | "mergulho" | "mare" | "iris" | "cortina" | "gota";
 interface Rumo {
   dir: number;
   tipo: TipoTransicao;
 }
 const CHEIO = "inset(0% 0% 0% 0%)";
-const DURACAO: Record<TipoTransicao, number> = { deslizar: 0.95, mergulho: 0.9, mare: 1.05, iris: 1.15, cortina: 0.95 };
+const DURACAO: Record<TipoTransicao, number> = { deslizar: 0.95, mergulho: 0.9, mare: 1.05, iris: 1.15, cortina: 0.95, gota: 1.25 };
+// A tela se abre em círculo a partir do ponto em que a gota toca a superfície.
+const NA_GOTA = `${GOTA_PONTO.x * 100}% ${GOTA_PONTO.y * 100}%`;
 const base = { x: "0%", y: "0%", scale: 1, opacity: 1, filter: "blur(0px)", clipPath: CHEIO };
 
 const VARIANTES: Variants = {
@@ -90,11 +94,12 @@ const VARIANTES: Variants = {
     if (tipo === "mergulho") return { ...v, scale: d > 0 ? 0.82 : 1.18, opacity: 0, filter: "blur(12px)" };
     if (tipo === "mare") return { ...v, y: `${d * 100}%` };
     if (tipo === "iris") return { ...v, scale: 1.08, clipPath: "circle(0% at 50% 55%)" };
+    if (tipo === "gota") return { ...v, clipPath: `circle(0% at ${NA_GOTA})` };
     return { ...v, clipPath: d > 0 ? "inset(0% 0% 0% 100%)" : "inset(0% 100% 0% 0%)" };
   },
   centro: ({ tipo }: Rumo) => ({
     ...base,
-    clipPath: tipo === "iris" ? "circle(80% at 50% 55%)" : CHEIO,
+    clipPath: tipo === "iris" ? "circle(80% at 50% 55%)" : tipo === "gota" ? `circle(130% at ${NA_GOTA})` : CHEIO,
     zIndex: 1,
     transition: { duration: DURACAO[tipo], ease: EASE },
   }),
@@ -104,6 +109,7 @@ const VARIANTES: Variants = {
     if (tipo === "mergulho") return { scale: d > 0 ? 1.18 : 0.82, opacity: 0, filter: "blur(12px)", zIndex: 0, transition: t };
     if (tipo === "mare") return { y: `${d * -22}%`, scale: 0.94, opacity: 0.3, zIndex: 0, transition: t };
     if (tipo === "iris") return { scale: 0.94, opacity: 0.4, zIndex: 0, transition: t };
+    if (tipo === "gota") return { scale: 1.03, opacity: 0.6, zIndex: 0, transition: t };
     return { x: `${d * -12}%`, opacity: 0.35, zIndex: 0, transition: t };
   },
 };
@@ -166,6 +172,11 @@ export const Palco = ({ cenas }: { cenas: Cena[] }) => {
   const [estado, setEstado] = useState(() => ({ i: lerHash(cenas.length), passo: 0, dir: 1, tipo: "deslizar" as TipoTransicao }));
   const travado = useRef(0);
   const t = useT();
+  const gota = useRef<GotaHandle>(null);
+  const esperandoGota = useRef(0);
+  const atual = useRef(estado);
+  atual.current = estado;
+  useEffect(() => () => window.clearTimeout(esperandoGota.current), []);
 
   // Como num slide: em telas maiores que 1366×768 tudo cresce junto (o tamanho base do texto
   // acompanha a janela, até 24px). Abaixo disso, o Encaixe reduz a cena se precisar.
@@ -186,6 +197,17 @@ export const Palco = ({ cenas }: { cenas: Cena[] }) => {
 
   const ir = useCallback(
     (delta: 1 | -1) => {
+      if (esperandoGota.current) return; // a gota está caindo: a tela troca quando ela tocar a água
+      const s0 = atual.current;
+      const proxima = cenas[s0.i + 1];
+      const saindo = delta > 0 && s0.passo >= (cenas[s0.i].passos ?? 1) - 1;
+      if (saindo && proxima?.transicao === "gota" && !reduce && gota.current?.cair()) {
+        esperandoGota.current = window.setTimeout(() => {
+          esperandoGota.current = 0;
+          setEstado((s) => (s.i === s0.i ? { i: s.i + 1, passo: 0, dir: 1, tipo: "gota" } : s));
+        }, GOTA_IMPACTO_MS);
+        return;
+      }
       setEstado((s) => {
         const passos = cenas[s.i].passos ?? 1;
         if (delta > 0 && s.passo < passos - 1) return { ...s, passo: s.passo + 1 };
@@ -196,7 +218,7 @@ export const Palco = ({ cenas }: { cenas: Cena[] }) => {
         return { i, passo: delta > 0 ? 0 : (cenas[i].passos ?? 1) - 1, dir: delta, tipo };
       });
     },
-    [cenas],
+    [cenas, reduce],
   );
 
   const irPara = useCallback((i: number) => {
@@ -320,6 +342,9 @@ export const Palco = ({ cenas }: { cenas: Cena[] }) => {
           </PalcoContext.Provider>
         </motion.div>
       </AnimatePresence>
+
+      {/* A gota que abre a passagem da tela 1 para a 2 (só com animações ligadas) */}
+      {!reduce && <Gota3D ref={gota} />}
 
       {/* Progresso */}
       <motion.div

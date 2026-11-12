@@ -464,7 +464,7 @@ const ComoApoiar = () => {
 // como chega ao campo e às pessoas → equipe → o que o financiamento permite.
 const TELAS: Cena[] = [
   { nome: ["Abertura", "Opening"], el: <Hero />, cheia: true },
-  { nome: ["O que já existe", "What already exists"], el: <AoVivo />, transicao: "mare" },
+  { nome: ["O que já existe", "What already exists"], el: <AoVivo />, transicao: "gota" },
   { nome: ["As perguntas", "The questions"], el: <Perguntas />, transicao: "cortina" },
   { nome: ["Com que frequência", "How often"], el: <Amostragem />, transicao: "deslizar" },
   { nome: ["Informação confiável", "Reliable information"], el: <Confiavel />, passos: PASSOS_CONFIAVEL, transicao: "mergulho" },
