@@ -84,8 +84,8 @@ const ETAPAS: Etapa[] = [
       "The platform automatically produces plain-language reports, using an AI model specialised in water quality.",
     ],
     tecnico: [
-      "Hoje integrado por API. Nosso próprio modelo, a Miangá, com pré-verificação dos números, está em desenvolvimento.",
-      "Integrated through an API today. Our own model, Miangá, with a pre-check of the numbers, is in development.",
+      "Hoje integrado por API. Nosso próprio modelo, a Miãga, com pré-verificação dos números, está em desenvolvimento.",
+      "Integrated through an API today. Our own model, Miãga, with a pre-check of the numbers, is in development.",
     ],
     situacao: "disponivel",
   },

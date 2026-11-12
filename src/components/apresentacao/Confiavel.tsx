@@ -25,8 +25,8 @@ const QUESTOES: { pergunta: Bi; resposta: Bi; situacao: TipoSituacao; fonte?: Bi
   {
     pergunta: ["Como produzir interpretações verificáveis?", "How do we produce verifiable interpretations?"],
     resposta: [
-      "Miangá, nosso modelo de linguagem com pré-verificação determinística: regras fixas conferem os fatos antes de a IA escrever. Será disponibilizado de forma aberta.",
-      "Miangá, our language model with deterministic pre-checks: fixed rules verify the facts before the AI writes. It will be released openly.",
+      "Miãga, nosso modelo de linguagem com pré-verificação determinística: regras fixas conferem os fatos antes de a IA escrever. Será disponibilizado de forma aberta.",
+      "Miãga, our language model with deterministic pre-checks: fixed rules verify the facts before the AI writes. It will be released openly.",
     ],
     situacao: "andamento",
   },
