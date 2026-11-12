@@ -90,7 +90,7 @@ export const Confiavel = () => {
 
       <div className="mt-7 grid gap-4 md:grid-cols-2">
         {QUESTOES.map((q, i) => (
-          <Reveal key={q.pergunta[0]} delay={0.1 + i * 0.12}>
+          <Reveal flutua key={q.pergunta[0]} delay={0.1 + i * 0.12}>
             <div className="h-full rounded-2xl border border-white/10 bg-white/[0.03] p-5">
               <div className="flex flex-wrap items-center gap-2">
                 <h3 className="text-lg font-semibold text-tk-creme sm:text-xl">{t(q.pergunta)}</h3>

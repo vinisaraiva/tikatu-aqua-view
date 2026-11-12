@@ -18,32 +18,46 @@ export const Reveal = ({
   delay = 0,
   y = 28,
   className,
+  flutua = false,
 }: {
   children: ReactNode;
   delay?: number;
   y?: number;
   className?: string;
+  /** Para cartões: chegam inclinados, vindos de baixo, e assentam com uma mola, acima do fundo. */
+  flutua?: boolean;
 }) => {
   const reduce = useMenosMovimento();
   const palco = usePalco();
-  const transition = { duration: 0.8, delay: delay + (palco.ativo ? ATRASO_TELA : 0), ease: [0.22, 1, 0.36, 1] };
+  const atraso = delay + (palco.ativo ? ATRASO_TELA : 0);
+  const transition = flutua
+    ? {
+        type: "spring" as const,
+        stiffness: 120,
+        damping: 15,
+        mass: 0.9,
+        delay: atraso,
+        opacity: { duration: 0.45, delay: atraso },
+      }
+    : { duration: 0.8, delay: atraso, ease: [0.22, 1, 0.36, 1] };
+  const de = flutua ? { opacity: 0, y: 46, scale: 0.94, rotateX: 12 } : { opacity: 0, y };
+  const para = flutua ? { opacity: 1, y: 0, scale: 1, rotateX: 0 } : { opacity: 1, y: 0 };
+  // A sombra é fixa (não anima): é ela que mantém o cartão "acima" do rio depois de assentar.
+  const classe = flutua ? `${className ?? ""} [&>*]:shadow-[0_28px_60px_-34px_rgba(0,0,0,0.8)]` : className;
+  const style = flutua ? { transformPerspective: 900 } : undefined;
   if (palco.ativo) {
     return (
-      <motion.div
-        className={className}
-        initial={reduce ? false : { opacity: 0, y }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={transition}
-      >
+      <motion.div className={classe} style={style} initial={reduce ? false : de} animate={para} transition={transition}>
         {children}
       </motion.div>
     );
   }
   return (
     <motion.div
-      className={className}
-      initial={reduce ? false : { opacity: 0, y }}
-      whileInView={{ opacity: 1, y: 0 }}
+      className={classe}
+      style={style}
+      initial={reduce ? false : de}
+      whileInView={para}
       viewport={{ once: true, margin: "-10% 0px" }}
       transition={transition}
     >
