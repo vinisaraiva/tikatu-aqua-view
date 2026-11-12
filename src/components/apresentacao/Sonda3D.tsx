@@ -159,7 +159,7 @@ export const Sonda3D = ({ compacto = false }: { compacto?: boolean }) => {
     <figure className="flex h-full flex-col">
       <div
         ref={caixa}
-        className={`relative flex-1 cursor-grab overflow-hidden rounded-3xl border border-white/10 bg-[radial-gradient(60%_55%_at_50%_45%,rgba(34,211,238,0.18),transparent_70%)] active:cursor-grabbing ${compacto ? "min-h-[16rem] sm:min-h-[18rem]" : "min-h-[18rem] sm:min-h-[24rem]"}`}
+        className={`relative flex-1 cursor-grab overflow-hidden rounded-3xl border border-white/10 bg-[radial-gradient(60%_55%_at_50%_45%,rgba(27,127,192,0.18),transparent_70%)] active:cursor-grabbing ${compacto ? "min-h-[16rem] sm:min-h-[18rem]" : "min-h-[18rem] sm:min-h-[24rem]"}`}
         role="img"
         aria-label={t([
           "Modelo 3D de um medidor de qualidade da água portátil, com aparelho de leitura e sonda",
@@ -167,14 +167,14 @@ export const Sonda3D = ({ compacto = false }: { compacto?: boolean }) => {
         ])}
       >
         {estado !== "pronto" && (
-          <div className="absolute inset-0 flex items-center justify-center text-sm text-slate-400">
+          <div className="absolute inset-0 flex items-center justify-center text-sm text-tk-nevoa/75">
             {estado === "erro"
               ? t(["Não foi possível carregar o modelo 3D.", "Could not load the 3D model."])
               : t(["Carregando modelo 3D…", "Loading 3D model…"])}
           </div>
         )}
       </div>
-      <figcaption className="mt-3 text-xs text-slate-500">
+      <figcaption className="mt-3 text-xs text-tk-nevoa/60">
         {t([
           "Ilustração de um medidor portátil (modelo genérico, não o equipamento a ser adquirido). Arraste para girar. Modelo “Water Quality Meter”, de",
           "Illustration of a portable meter (generic model, not the equipment to be purchased). Drag to rotate. “Water Quality Meter” model by",
@@ -183,7 +183,7 @@ export const Sonda3D = ({ compacto = false }: { compacto?: boolean }) => {
           href="https://sketchfab.com/3d-models/water-quality-meter-aa2fd13dda004eeca52ac1634dd07a60"
           target="_blank"
           rel="noopener noreferrer"
-          className="underline underline-offset-2 hover:text-slate-300"
+          className="underline underline-offset-2 hover:text-tk-nevoa"
         >
           Dreamsoft Innovations
         </a>
@@ -192,7 +192,7 @@ export const Sonda3D = ({ compacto = false }: { compacto?: boolean }) => {
           href="https://creativecommons.org/licenses/by/4.0/"
           target="_blank"
           rel="noopener noreferrer"
-          className="underline underline-offset-2 hover:text-slate-300"
+          className="underline underline-offset-2 hover:text-tk-nevoa"
         >
           CC BY 4.0
         </a>

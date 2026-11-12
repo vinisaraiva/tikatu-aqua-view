@@ -81,7 +81,7 @@ export const Confiavel = () => {
       aria-label={t(["Informação confiável", "Reliable information"])}
     >
       <Reveal>
-        <SceneLabel logo index={5}>{t(["Informação confiável", "Reliable information"])}</SceneLabel>
+        <SceneLabel index={5}>{t(["Informação confiável", "Reliable information"])}</SceneLabel>
         <h2 className="text-3xl font-semibold leading-tight text-tk-creme sm:text-4xl">
           {t(["Da medição a uma explicação ", "From a measurement to an explanation "])}
           <span className="text-tk-rio-claro">{t(["que pode ser conferida.", "that can be checked."])}</span>

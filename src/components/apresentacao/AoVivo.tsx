@@ -101,7 +101,7 @@ export const AoVivo = () => {
       aria-label={t(["O que já existe", "What already exists"])}
     >
       <Reveal>
-        <SceneLabel logo index={2}>{t(["O que já existe", "What already exists"])}</SceneLabel>
+        <SceneLabel index={2}>{t(["O que já existe", "What already exists"])}</SceneLabel>
         <h2 className="text-3xl font-semibold text-tk-creme sm:text-5xl">
           {t(["Dados reais.", "Real data."])}{" "}
           <span className="block text-tk-rio-claro">{t(["Painel no ar.", "Live dashboard."])}</span>
@@ -233,7 +233,7 @@ export const AppColeta = () => {
 
       <div className="order-1 md:order-2">
         <Reveal>
-          <SceneLabel logo index={7}>{t(["O app de coleta", "The sampling app"])}</SceneLabel>
+          <SceneLabel index={7}>{t(["O app de coleta", "The sampling app"])}</SceneLabel>
           <h2 className="text-3xl font-semibold text-tk-creme sm:text-5xl">
             {t(["No rio, o voluntário usa o ", "At the river, volunteers use the "])}
             <span className="text-tk-rio-claro">{t(["Tikatu Coleta.", "Tikatu Coleta app."])}</span>

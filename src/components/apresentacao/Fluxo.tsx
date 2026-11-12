@@ -99,7 +99,7 @@ const Ilustracao = ({ etapa }: { etapa: number }) => {
   const l = useIdioma();
   if (etapa === 0) {
     return (
-      <div className="mx-auto w-24 rounded-[1.4rem] bg-[#0d1b24] p-1.5 shadow-2xl shadow-cyan-500/20 ring-1 ring-white/15 sm:w-56 sm:rounded-[2rem] sm:p-2">
+      <div className="mx-auto w-24 rounded-[1.4rem] bg-[#0d1b24] p-1.5 shadow-2xl shadow-tk-rio/30 ring-1 ring-white/15 sm:w-56 sm:rounded-[2rem] sm:p-2">
         <div className="overflow-hidden rounded-[1.6rem] bg-[#f6f7f9]">
           <img
             src="/apresentacao/coleta-importar.webp"
@@ -120,19 +120,19 @@ const Ilustracao = ({ etapa }: { etapa: number }) => {
         {[0, 1, 2].map((i) => (
           <motion.span
             key={i}
-            className="absolute rounded-full border border-cyan-300/30"
+            className="absolute rounded-full border border-tk-rio-claro/30"
             initial={{ width: 40, height: 40, opacity: 0.8 }}
             animate={{ width: 220, height: 220, opacity: 0 }}
             transition={{ duration: 2.4, delay: i * 0.8, repeat: Infinity, ease: "easeOut" }}
           />
         ))}
-        <div className="relative flex h-20 w-20 items-center justify-center rounded-2xl bg-cyan-400/15 ring-1 ring-cyan-300/40">
-          <CloudUpload className="h-9 w-9 text-cyan-200" />
+        <div className="relative flex h-20 w-20 items-center justify-center rounded-2xl bg-tk-rio-claro/15 ring-1 ring-tk-rio-claro/40">
+          <CloudUpload className="h-9 w-9 text-tk-rio-claro" />
         </div>
         {[0, 1, 2, 3].map((i) => (
           <motion.span
             key={`d${i}`}
-            className="absolute h-2 w-2 rounded-full bg-cyan-200"
+            className="absolute h-2 w-2 rounded-full bg-tk-rio-claro"
             initial={{ y: 90, opacity: 0 }}
             animate={{ y: 0, opacity: [0, 1, 0] }}
             transition={{ duration: 1.4, delay: i * 0.35, repeat: Infinity }}
@@ -148,7 +148,7 @@ const Ilustracao = ({ etapa }: { etapa: number }) => {
     const cor = (v: number) => (v < 5.5 ? "bg-red-400" : v < 6.6 ? "bg-amber-400" : "bg-emerald-400");
     return (
       <div className="mx-auto w-full max-w-xs space-y-2">
-        <div className="text-[11px] uppercase tracking-wider text-teal-100/80">{t(["pH · faixa CONAMA 6 a 9", "pH · CONAMA range 6 to 9"])}</div>
+        <div className="text-[11px] uppercase tracking-wider text-tk-nevoa/80">{t(["pH · faixa CONAMA 6 a 9", "pH · CONAMA range 6 to 9"])}</div>
         {linhas.map(([ponto, v], i) => (
           <motion.div
             key={ponto}
@@ -157,7 +157,7 @@ const Ilustracao = ({ etapa }: { etapa: number }) => {
             transition={{ delay: 0.1 + i * 0.12 }}
             className="flex items-center gap-3 rounded-lg bg-white/5 px-3 py-2 text-sm"
           >
-            <span className="w-16 text-slate-300">
+            <span className="w-16 text-tk-nevoa">
               {t(["Ponto", "Site"])} {ponto}
             </span>
             <span className="h-2 flex-1 overflow-hidden rounded-full bg-white/10">
@@ -168,7 +168,7 @@ const Ilustracao = ({ etapa }: { etapa: number }) => {
                 transition={{ delay: 0.3 + i * 0.12, duration: 0.6 }}
               />
             </span>
-            <span className="w-8 text-right font-mono text-white">{formatar(v, l)}</span>
+            <span className="w-8 text-right font-mono text-tk-creme">{formatar(v, l)}</span>
           </motion.div>
         ))}
       </div>
@@ -181,7 +181,7 @@ const Ilustracao = ({ etapa }: { etapa: number }) => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="ml-auto w-fit max-w-[85%] rounded-2xl rounded-br-sm bg-white/10 px-4 py-2 text-sm text-slate-100"
+          className="ml-auto w-fit max-w-[85%] rounded-2xl rounded-br-sm bg-white/10 px-4 py-2 text-sm text-tk-creme"
         >
           {t(["Relatório do Ponto 2", "Report for Site 2"])}
         </motion.div>
@@ -189,19 +189,19 @@ const Ilustracao = ({ etapa }: { etapa: number }) => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
-          className="w-fit max-w-[90%] rounded-2xl rounded-bl-sm border border-cyan-300/30 bg-cyan-300/10 px-4 py-3 text-sm text-cyan-50"
+          className="w-fit max-w-[90%] rounded-2xl rounded-bl-sm border border-tk-rio-claro/30 bg-tk-rio-claro/10 px-4 py-3 text-sm text-tk-creme"
         >
           {t([
             "Na coleta de 25/08/2024, o pH ficou em 5,0, abaixo do mínimo de 6 do CONAMA para rios de classe 2. A água mais ácida pode prejudicar peixes e outros organismos e aumentar a presença de metais dissolvidos. A causa pode ser natural, como a matéria orgânica, ou um despejo; vale acompanhar as próximas coletas.",
             "In the 25 Aug 2024 sample, pH was 5.0, below the CONAMA minimum of 6 for class 2 rivers. More acidic water can harm fish and other organisms and increase dissolved metals. The cause may be natural, such as organic matter, or a discharge; the next samples are worth watching.",
           ])}
         </motion.div>
-        <p className="text-center text-[11px] text-slate-500">{t(["Exemplo ilustrativo", "Illustrative example"])}</p>
+        <p className="text-center text-[11px] text-tk-nevoa/60">{t(["Exemplo ilustrativo", "Illustrative example"])}</p>
       </div>
     );
   }
   return (
-    <div className="mx-auto w-full max-w-[15rem] overflow-hidden rounded-xl bg-white sm:max-w-sm shadow-2xl shadow-cyan-500/20 ring-1 ring-white/15">
+    <div className="mx-auto w-full max-w-[15rem] overflow-hidden rounded-xl bg-white sm:max-w-sm shadow-2xl shadow-tk-rio/30 ring-1 ring-white/15">
       <div className="flex items-center gap-1.5 bg-slate-200 px-3 py-2">
         <span className="h-2 w-2 rounded-full bg-slate-400" />
         <span className="h-2 w-2 rounded-full bg-slate-400" />
@@ -226,7 +226,7 @@ const Trilha = ({ ativa, progresso }: { ativa: number; progresso: MotionValue<nu
     <div className="absolute inset-x-6 top-1/2 h-0.5 -translate-y-1/2 bg-white/10" aria-hidden />
     {progresso && (
       <motion.div
-        className="absolute left-6 right-6 top-1/2 h-0.5 -translate-y-1/2 bg-gradient-to-r from-cyan-300 to-teal-300"
+        className="absolute left-6 right-6 top-1/2 h-0.5 -translate-y-1/2 bg-gradient-to-r from-tk-rio to-tk-rio-claro"
         style={{ scaleX: progresso, originX: 0 }}
         aria-hidden
       />
@@ -239,8 +239,8 @@ const Trilha = ({ ativa, progresso }: { ativa: number; progresso: MotionValue<nu
           key={e.titulo[0]}
           className={`relative z-10 flex h-11 w-11 items-center justify-center rounded-full border transition-colors duration-500 sm:h-14 sm:w-14 ${
             on
-              ? "border-cyan-300 bg-cyan-400/20 text-cyan-100 shadow-[0_0_24px_rgba(34,211,238,0.45)]"
-              : "border-white/15 bg-[#062a3d] text-slate-500"
+              ? "border-tk-rio-claro bg-tk-rio-claro/20 text-tk-nevoa shadow-[0_0_24px_rgba(27,127,192,0.45)]"
+              : "border-white/15 bg-[#0d3a5c] text-tk-nevoa/60"
           }`}
         >
           <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
@@ -255,12 +255,12 @@ const TextoEtapa = ({ etapa }: { etapa: Etapa }) => {
   return (
   <>
     <div className="flex flex-wrap items-center justify-center gap-2 md:justify-start">
-      <h3 className="text-xl font-semibold text-white sm:text-3xl">{t(etapa.titulo)}</h3>
+      <h3 className="text-xl font-semibold text-tk-creme sm:text-3xl">{t(etapa.titulo)}</h3>
       <Situacao tipo={etapa.situacao} />
     </div>
-    <p className="mt-2 text-[15px] text-slate-200 sm:mt-3 sm:text-lg">{t(etapa.simples)}</p>
-    <p className="mt-2 inline-flex items-start gap-2 rounded-lg bg-white/5 px-3 py-2 text-left text-xs sm:mt-3 text-cyan-100/80 sm:text-sm">
-      <span className="mt-0.5 shrink-0 rounded bg-cyan-300/20 px-1.5 text-[10px] font-semibold uppercase tracking-wider text-cyan-200">
+    <p className="mt-2 text-[15px] text-tk-creme/90 sm:mt-3 sm:text-lg">{t(etapa.simples)}</p>
+    <p className="mt-2 inline-flex items-start gap-2 rounded-lg bg-white/5 px-3 py-2 text-left text-xs sm:mt-3 text-tk-nevoa/80 sm:text-sm">
+      <span className="mt-0.5 shrink-0 rounded bg-tk-rio-claro/20 px-1.5 text-[10px] font-semibold uppercase tracking-wider text-tk-rio-claro">
         {t(["Por dentro", "Under the hood"])}
       </span>
       {t(etapa.tecnico)}
@@ -278,11 +278,11 @@ const FluxoEstatico = () => {
   return (
     <section id="cena-6" className="mx-auto max-w-5xl px-6 py-24" aria-label={t(ROTULO)}>
       <SceneLabel index={6}>{t(ROTULO)}</SceneLabel>
-      <h2 className="mb-12 text-3xl font-semibold text-white sm:text-5xl">{t(TITULO)}</h2>
+      <h2 className="mb-12 text-3xl font-semibold text-tk-creme sm:text-5xl">{t(TITULO)}</h2>
       <ol className="grid gap-10 md:grid-cols-2">
         {ETAPAS.map((e, i) => (
           <li key={e.titulo[0]} className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-            <div className="mb-4 text-sm font-semibold text-cyan-300">
+            <div className="mb-4 text-sm font-semibold text-tk-rio-claro">
               {t(["Passo", "Step"])} {i + 1}
             </div>
             <TextoEtapa etapa={e} />
@@ -308,14 +308,14 @@ const Conteudo = ({
   <div className="mx-auto w-full max-w-5xl">
     <motion.div style={tituloOpacity ? { opacity: tituloOpacity } : undefined}>
       <SceneLabel index={6}>{t(ROTULO)}</SceneLabel>
-      <h2 className="mb-4 text-2xl font-semibold text-white sm:mb-12 sm:text-5xl">{t(TITULO)}</h2>
+      <h2 className="mb-4 text-2xl font-semibold text-tk-creme sm:mb-12 sm:text-5xl">{t(TITULO)}</h2>
     </motion.div>
 
     <Trilha ativa={ativa} progresso={progresso} />
 
     <div className="grid items-center gap-3 sm:gap-6 md:grid-cols-2 md:gap-12">
       <div className="order-2 min-h-[11rem] text-center sm:min-h-[13rem] md:order-1 md:text-left" aria-live="polite">
-        <div className="mb-2 text-sm font-semibold text-cyan-300">
+        <div className="mb-2 text-sm font-semibold text-tk-rio-claro">
           {t([`Passo ${ativa + 1} de ${ETAPAS.length}`, `Step ${ativa + 1} of ${ETAPAS.length}`])}
         </div>
         <AnimatePresence mode="wait">
@@ -361,7 +361,7 @@ const FluxoTela = ({ passo }: { passo: number }) => {
   return (
     <section id="cena-6" className="relative flex min-h-[100svh] flex-col justify-center px-6 py-16" aria-label={t(ROTULO)}>
       <Conteudo ativa={passo} progresso={progresso} />
-      <p className="mt-6 text-center text-xs text-slate-500">
+      <p className="mt-6 text-center text-xs text-tk-nevoa/60">
         {t(["Use → para avançar cada passo.", "Press → to go through each step."])}
       </p>
     </section>

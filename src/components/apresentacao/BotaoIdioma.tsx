@@ -24,11 +24,11 @@ export const BotaoIdioma = ({ claro = false, className = "" }: { claro?: boolean
             className={`rounded-full px-3 py-1 transition-colors ${
               on
                 ? claro
-                  ? "bg-[#0d3a5c] text-white"
-                  : "bg-cyan-300 text-slate-950"
+                  ? "bg-[#0d3a5c] text-tk-creme"
+                  : "bg-tk-rio-claro text-tk-marinho"
                 : claro
                   ? "text-[#0d3a5c]/70 hover:text-[#0d3a5c]"
-                  : "text-slate-400 hover:text-white"
+                  : "text-tk-nevoa/75 hover:text-tk-creme"
             }`}
           >
             {x === "pt" ? "PT-BR" : "EN"}

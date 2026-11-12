@@ -49,7 +49,7 @@ const Rede = ({ on, reduce, atraso }: { on: boolean; reduce: boolean; atraso: nu
           cx={x}
           cy={y}
           r={existe ? 20 : 16}
-          fill={existe ? "rgba(103,232,249,0.12)" : "rgba(239,176,140,0.10)"}
+          fill={existe ? "rgba(143,208,245,0.12)" : "rgba(239,176,140,0.10)"}
           initial={reduce ? false : { scale: 0, opacity: 0 }}
           animate={{ scale: on || reduce ? 1 : 0, opacity: on || reduce ? 1 : 0 }}
           transition={{ duration: 0.6, delay: atraso + 1 + i * 0.12 }}
@@ -59,8 +59,8 @@ const Rede = ({ on, reduce, atraso }: { on: boolean; reduce: boolean; atraso: nu
           cx={x}
           cy={y}
           r={5}
-          fill="#062a3d"
-          stroke={existe ? "#67e8f9" : "#efb08c"}
+          fill="#0d3a5c"
+          stroke={existe ? "#8fd0f5" : "#efb08c"}
           strokeWidth={2.5}
           strokeDasharray={existe ? undefined : "3 2.5"}
           initial={reduce ? false : { scale: 0 }}
@@ -98,7 +98,7 @@ const Tempo = ({ on, reduce, atraso }: { on: boolean; reduce: boolean; atraso: n
           x2={x}
           y1={tres ? 120 : 126}
           y2={tres ? 144 : 138}
-          stroke={tres ? "#67e8f9" : "#efb08c"}
+          stroke={tres ? "#8fd0f5" : "#efb08c"}
           strokeWidth={tres ? 3.5 : 2.5}
           strokeLinecap="round"
           initial={reduce ? false : { opacity: 0 }}
@@ -165,24 +165,24 @@ export const Perguntas = () => {
     >
       <Reveal>
         <SceneLabel index={3}>{t(["As perguntas da pesquisa", "The research questions"])}</SceneLabel>
-        <h2 className="text-3xl font-semibold leading-tight text-white sm:text-4xl">
+        <h2 className="text-3xl font-semibold leading-tight text-tk-creme sm:text-4xl">
           {t(["Medir não basta. ", "Measuring is not enough. "])}
-          <span className="text-cyan-200">{t(["Onde e quando medir decide o que se vê.", "Where and when you measure decides what you see."])}</span>
+          <span className="text-tk-rio-claro">{t(["Onde e quando medir decide o que se vê.", "Where and when you measure decides what you see."])}</span>
         </h2>
-        <p className="mt-4 max-w-4xl text-slate-300 sm:text-lg">
+        <p className="mt-4 max-w-4xl text-tk-nevoa sm:text-lg">
           {t(["Cinco perguntas guiam a pesquisa: ", "Five questions guide the research: "])}
-          <strong className="font-semibold text-white">{t(["onde", "where"])}</strong>
+          <strong className="font-semibold text-tk-creme">{t(["onde", "where"])}</strong>
           {t([" medir, ", " to measure, "])}
-          <strong className="font-semibold text-white">{t(["com que frequência", "how often"])}</strong>
+          <strong className="font-semibold text-tk-creme">{t(["com que frequência", "how often"])}</strong>
           {", "}
-          <strong className="font-semibold text-white">{t(["como conferir os cálculos", "how to check the calculations"])}</strong>
+          <strong className="font-semibold text-tk-creme">{t(["como conferir os cálculos", "how to check the calculations"])}</strong>
           {", "}
-          <strong className="font-semibold text-white">{t(["como comunicar", "how to communicate"])}</strong>
+          <strong className="font-semibold text-tk-creme">{t(["como comunicar", "how to communicate"])}</strong>
           {t([
             " de forma verificável e acessível, e ",
             " in a verifiable and accessible way, and ",
           ])}
-          <strong className="font-semibold text-white">{t(["como envolver a comunidade", "how to involve the community"])}</strong>
+          <strong className="font-semibold text-tk-creme">{t(["como envolver a comunidade", "how to involve the community"])}</strong>
           {t([". Aqui, as duas primeiras.", ". Here, the first two."])}
         </p>
       </Reveal>
@@ -194,23 +194,23 @@ export const Perguntas = () => {
             <Reveal key={p.pergunta[0]} delay={0.15 + i * 0.2}>
               <article className="flex h-full flex-col rounded-3xl border border-white/10 bg-white/[0.03] p-6">
                 <div className="flex items-center gap-3">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-400/15 text-cyan-200">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-tk-rio-claro/15 text-tk-rio-claro">
                     <Icon className="h-5 w-5" />
                   </span>
-                  <h3 className="text-2xl font-semibold text-white sm:text-3xl">{t(p.pergunta)}</h3>
+                  <h3 className="text-2xl font-semibold text-tk-creme sm:text-3xl">{t(p.pergunta)}</h3>
                 </div>
-                <div className="mt-4 rounded-2xl bg-[#021019]/50 px-3 pt-3">
+                <div className="mt-4 rounded-2xl bg-[#072740]/50 px-3 pt-3">
                   <div className="mx-auto max-w-sm">
                     <p.Visual on={on} reduce={reduce} atraso={atraso + i * 0.3} />
                   </div>
-                  <p className="pb-2 text-center text-xs text-slate-400">{t(p.legenda)}</p>
+                  <p className="pb-2 text-center text-xs text-tk-nevoa/75">{t(p.legenda)}</p>
                 </div>
                 <div className="mt-4 flex flex-wrap items-center gap-2">
-                  <span className="font-semibold text-white">{t(p.estudo)}</span>
+                  <span className="font-semibold text-tk-creme">{t(p.estudo)}</span>
                   <Situacao tipo={p.situacao} />
                 </div>
-                <p className="mt-1 text-sm text-slate-200 sm:text-base">{t(p.texto)}</p>
-                {p.fonte && <p className="mt-2 text-sm text-slate-400">{t(p.fonte)}</p>}
+                <p className="mt-1 text-sm text-tk-creme/90 sm:text-base">{t(p.texto)}</p>
+                {p.fonte && <p className="mt-2 text-sm text-tk-nevoa/75">{t(p.fonte)}</p>}
               </article>
             </Reveal>
           );

@@ -23,7 +23,7 @@ const FRENTES: { curto: Bi; titulo: Bi; texto: Bi; entrega: Bi; valor: number; p
     ],
     valor: 57450,
     pct: 46,
-    cor: "#67e8f9",
+    cor: "#8fd0f5",
   },
   {
     curto: ["Tecnologia", "Technology"],
@@ -38,7 +38,7 @@ const FRENTES: { curto: Bi; titulo: Bi; texto: Bi; entrega: Bi; valor: number; p
     ],
     valor: 29428.2,
     pct: 24,
-    cor: "#38bdf8",
+    cor: "#3d9bd9",
   },
   {
     curto: ["Laboratório", "Laboratory"],
@@ -50,7 +50,7 @@ const FRENTES: { curto: Bi; titulo: Bi; texto: Bi; entrega: Bi; valor: number; p
     entrega: ["Até 36 amostras: 32 principais e 4 de controle de qualidade.", "Up to 36 samples: 32 main and 4 for quality control."],
     valor: 18000,
     pct: 14,
-    cor: "#efb08c",
+    cor: "#f0a37a",
   },
   {
     curto: ["Bolsistas", "Fellows"],
@@ -65,7 +65,7 @@ const FRENTES: { curto: Bi; titulo: Bi; texto: Bi; entrega: Bi; valor: number; p
     ],
     valor: 16800,
     pct: 13,
-    cor: "#c4b5fd",
+    cor: "#f4f2ea",
   },
   {
     curto: ["Comunidade", "Community"],
@@ -77,7 +77,7 @@ const FRENTES: { curto: Bi; titulo: Bi; texto: Bi; entrega: Bi; valor: number; p
     entrega: ["2 oficinas (16 h) abertas à comunidade.", "2 workshops (16 h) open to the community."],
     valor: 3960,
     pct: 3,
-    cor: "#5eead4",
+    cor: "#d9683a",
   },
 ];
 // Percentuais inteiros que somam 100 (maiores restos).
@@ -138,14 +138,14 @@ const Anel = ({ ativo, desenhado, sel, reduce }: { ativo: boolean; desenhado: bo
         })}
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-        <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-cyan-300/80">
+        <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-tk-rio-claro/80">
           {t(["Total a captar", "Total to raise"])}
         </div>
-        <div className="mt-1 font-mono text-2xl font-semibold tabular-nums text-white sm:text-3xl">
-          <span className="text-base text-slate-300 sm:text-lg">R$ </span>
+        <div className="mt-1 font-mono text-2xl font-semibold tabular-nums text-tk-creme sm:text-3xl">
+          <span className="text-base text-tk-nevoa sm:text-lg">R$ </span>
           {formatar(total, l, 2)}
         </div>
-        <div className="mt-1 text-xs text-slate-400">{t(["valor estimado", "estimated amount"])}</div>
+        <div className="mt-1 text-xs text-tk-nevoa/75">{t(["valor estimado", "estimated amount"])}</div>
       </div>
     </div>
   );
@@ -186,10 +186,10 @@ export const Investimento = () => {
     >
       <Reveal>
         <SceneLabel index={11}>{t(["O investimento", "The investment"])}</SceneLabel>
-        <h2 className="max-w-3xl text-3xl font-semibold leading-tight text-white sm:text-5xl">
+        <h2 className="max-w-3xl text-3xl font-semibold leading-tight text-tk-creme sm:text-5xl">
           {t(["Para onde vai o apoio.", "Where the support goes."])}
         </h2>
-        <p className="mt-4 max-w-3xl text-slate-300 sm:text-lg">
+        <p className="mt-4 max-w-3xl text-tk-nevoa sm:text-lg">
           {t([
             "Cada parte do apoio vira dado: medido no rio com sondas calibradas, complementado em laboratório e transformado em informação para a comunidade e para quem decide.",
             "Every part of the support becomes data: measured in the river with calibrated probes, complemented in the laboratory and turned into information for the community and for decision-makers.",
@@ -226,11 +226,11 @@ export const Investimento = () => {
                   <span className="font-mono text-6xl font-semibold tabular-nums sm:text-7xl" style={{ color: f.cor }}>
                     {f.pct}%
                   </span>
-                  <span className="text-sm text-slate-400">{t(["do total", "of the total"])}</span>
+                  <span className="text-sm text-tk-nevoa/75">{t(["do total", "of the total"])}</span>
                 </div>
-                <h3 className="mt-4 text-2xl font-semibold text-white sm:text-3xl">{t(f.titulo)}</h3>
-                <p className="mt-3 text-base text-slate-300 sm:text-lg">{t(f.texto)}</p>
-                <p className="mt-4 flex items-baseline gap-2 border-t border-white/10 pt-3 text-base text-white sm:text-lg">
+                <h3 className="mt-4 text-2xl font-semibold text-tk-creme sm:text-3xl">{t(f.titulo)}</h3>
+                <p className="mt-3 text-base text-tk-nevoa sm:text-lg">{t(f.texto)}</p>
+                <p className="mt-4 flex items-baseline gap-2 border-t border-white/10 pt-3 text-base text-tk-creme sm:text-lg">
                   <span className="shrink-0 text-[11px] font-semibold uppercase tracking-wider" style={{ color: f.cor }}>
                     {t(["Entrega", "Delivers"])}
                   </span>
@@ -258,22 +258,22 @@ export const Investimento = () => {
                   k === sel ? "border-white/30 bg-white/10" : "border-white/10 bg-white/[0.02] hover:bg-white/[0.06]"
                 }`}
               >
-                <span className="flex min-w-0 items-center gap-1.5 text-sm font-semibold text-white">
+                <span className="flex min-w-0 items-center gap-1.5 text-sm font-semibold text-tk-creme">
                   <span className="block h-2 w-2 shrink-0 rounded-full" style={{ background: x.cor }} aria-hidden />
                   {t(x.curto)}
                 </span>
-                <span className="font-mono text-xs tabular-nums text-slate-400">{x.pct}%</span>
+                <span className="font-mono text-xs tabular-nums text-tk-nevoa/75">{x.pct}%</span>
               </button>
             ))}
           </div>
           {palco.ativo && (
-            <p className="mt-3 text-xs text-slate-500">
+            <p className="mt-3 text-xs text-tk-nevoa/60">
               {t(["Use → para ver a próxima frente.", "Press → to see the next area."])}
             </p>
           )}
         </div>
       </div>
-      <p className="mt-6 text-xs text-slate-500">
+      <p className="mt-6 text-xs text-tk-nevoa/60">
         {t([
           "Valores estimados, sujeitos a cotações e ao plano de aplicação aprovado. Detalhamento por item disponível sob solicitação.",
           "Estimated amounts, subject to quotes and to the approved spending plan. Item-level breakdown available on request.",

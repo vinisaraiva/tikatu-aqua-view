@@ -165,8 +165,8 @@ export const Hero = () => {
       <motion.div style={{ y: waterY }} className="absolute inset-x-0 bottom-0 h-[22vh]" aria-hidden>
         <Wave d={WAVE_A} fill="rgba(27,127,192,0.22)" duration={22} className="bottom-6" reduce={reduce} />
         <Wave d={WAVE_B} fill="rgba(27,127,192,0.45)" duration={16} className="bottom-2" reduce={reduce} />
-        <Wave d={WAVE_C} fill="#062a3d" duration={11} className="bottom-0" reduce={reduce} />
-        <div className="absolute inset-x-0 -bottom-[60vh] h-[60vh] bg-[#062a3d]" />
+        <Wave d={WAVE_C} fill="#0a2f4c" duration={11} className="bottom-0" reduce={reduce} />
+        <div className="absolute inset-x-0 -bottom-[60vh] h-[60vh] bg-[#0a2f4c]" />
       </motion.div>
 
       <motion.a
