@@ -169,11 +169,21 @@ export const Perguntas = () => {
           {t(["Medir não basta. ", "Measuring is not enough. "])}
           <span className="text-cyan-200">{t(["Onde e quando medir decide o que se vê.", "Where and when you measure decides what you see."])}</span>
         </h2>
-        <p className="mt-4 max-w-2xl text-slate-300 sm:text-lg">
+        <p className="mt-4 max-w-4xl text-slate-300 sm:text-lg">
+          {t(["Cinco perguntas guiam a pesquisa: ", "Five questions guide the research: "])}
+          <strong className="font-semibold text-white">{t(["onde", "where"])}</strong>
+          {t([" medir, ", " to measure, "])}
+          <strong className="font-semibold text-white">{t(["com que frequência", "how often"])}</strong>
+          {", "}
+          <strong className="font-semibold text-white">{t(["como conferir os cálculos", "how to check the calculations"])}</strong>
+          {", "}
+          <strong className="font-semibold text-white">{t(["como comunicar", "how to communicate"])}</strong>
           {t([
-            "A pesquisa avançou para as perguntas que determinam a utilidade do monitoramento.",
-            "The research moved on to the questions that decide how useful monitoring can be.",
+            " de forma verificável e acessível, e ",
+            " in a verifiable and accessible way, and ",
           ])}
+          <strong className="font-semibold text-white">{t(["como envolver a comunidade", "how to involve the community"])}</strong>
+          {t([". Aqui, as duas primeiras.", ". Here, the first two."])}
         </p>
       </Reveal>
 
