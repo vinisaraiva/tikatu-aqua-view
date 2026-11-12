@@ -372,7 +372,7 @@ const ComoApoiar = () => {
   return (
     <section
       id="cena-12"
-      className="relative flex min-h-[100svh] flex-col justify-center overflow-hidden py-16"
+      className="relative flex min-h-[100svh] flex-col justify-center overflow-hidden py-8"
       aria-label={t(["Como apoiar", "How to support"])}
     >
       <div
@@ -380,35 +380,29 @@ const ComoApoiar = () => {
         style={{ background: "radial-gradient(70% 50% at 50% 100%, rgba(34,211,238,0.18), transparent 70%)" }}
         aria-hidden
       />
-      <div className="relative mx-auto w-full max-w-6xl px-6">
+      <div className="relative mx-auto w-full max-w-7xl px-6">
         <Reveal>
           <SceneLabel index={12}>{t(["Como apoiar", "How to support"])}</SceneLabel>
-          <h2 className="max-w-3xl text-3xl font-semibold leading-tight text-white sm:text-4xl">
+          <h2 className="text-3xl font-semibold leading-tight text-white sm:text-4xl">
             {t(["Um plano de 12 meses, com etapas que podem ser conferidas.", "A 12-month plan, with stages you can verify."])}
           </h2>
         </Reveal>
-        <ol className="mt-6 grid gap-3 sm:grid-cols-2 md:grid-cols-4 md:gap-4">
+        <ol className="mt-5 grid gap-3 sm:grid-cols-2 md:grid-cols-4 md:gap-4">
           {ETAPAS_APOIO.map((e, i) => (
             <Reveal key={e.n[0]} delay={0.1 * i}>
               <li className="h-full rounded-2xl border border-white/10 bg-white/[0.03] p-4 sm:p-5">
                 <div className="font-mono text-sm text-cyan-300">{t(e.n)}</div>
                 <div className="mt-1 text-lg font-semibold text-white">{t(e.titulo)}</div>
-                <p className="mt-1 text-sm text-slate-300">{t(e.texto)}</p>
-                <div className="mt-3 text-[11px] font-semibold uppercase tracking-wider text-[#efb08c]">
+                <p className="mt-1 text-sm text-slate-200 sm:text-base">{t(e.texto)}</p>
+                <div className="mt-3 text-xs font-semibold uppercase tracking-wider text-[#efb08c]">
                   {t(["Evidência", "Evidence"])}
                 </div>
-                <div className="text-sm text-white">{t(e.evidencia)}</div>
+                <div className="text-sm text-white sm:text-base">{t(e.evidencia)}</div>
               </li>
             </Reveal>
           ))}
         </ol>
-        <p className="mt-3 text-xs text-slate-500">
-          {t([
-            "Metas propostas; formalização conforme os procedimentos institucionais. Resultados científicos e impacto não são garantidos.",
-            "Proposed targets; formal arrangements follow institutional procedures. Scientific results and impact are not guaranteed.",
-          ])}
-        </p>
-        <p className="mt-4 max-w-4xl text-sm text-slate-300 sm:text-base">
+        <p className="mt-4 text-sm text-slate-200 sm:text-base">
           <span className="font-semibold text-white">{t(["Depois dos 12 meses, ", "After the 12 months, "])}</span>
           {t([
             "a plataforma, o app, a API e a biblioteca tikatuwq continuam gratuitos e no ar, e os dados seguem disponíveis. O apoio amplia o que já existe.",
@@ -417,18 +411,18 @@ const ComoApoiar = () => {
         </p>
 
         <Reveal delay={0.1}>
-          <div className="mt-8 flex flex-col items-center gap-6 rounded-3xl border border-cyan-300/30 bg-gradient-to-br from-cyan-400/15 via-teal-400/10 to-transparent px-6 py-8 text-center md:flex-row md:justify-between md:px-10 md:text-left">
+          <div className="mt-5 flex flex-col items-center gap-6 rounded-3xl border border-cyan-300/30 bg-gradient-to-br from-cyan-400/15 via-teal-400/10 to-transparent px-6 py-5 text-center md:flex-row md:justify-between md:px-10 md:text-left">
             <div>
-              <h3 className="text-2xl font-semibold text-white sm:text-4xl">
+              <h3 className="text-2xl font-semibold text-white sm:text-3xl">
                 {t(["Vamos viabilizar a próxima etapa?", "Shall we make the next stage happen?"])}
               </h3>
-              <p className="mt-3 max-w-xl text-slate-300">
+              <p className="mt-2 max-w-3xl text-slate-200 sm:text-lg">
                 {t([
                   `Buscamos R$ ${total} para 12 meses de pesquisa no território.`,
                   `We are seeking R$ ${total} for 12 months of research in the region.`,
                 ])}
               </p>
-              <p className="mt-2 max-w-xl font-medium text-cyan-100">
+              <p className="mt-2 max-w-3xl font-medium text-cyan-100">
                 {t([
                   "O valor é uma referência. Se o apoio possível for menor, adaptamos o plano de campo para aproveitar ao máximo cada recurso; se for maior, ampliamos, por exemplo com um terceiro rio ou mais bolsistas. Em qualquer cenário, a plataforma segue completa e aberta.",
                   "The amount is a reference. If the support available is smaller, we adapt the field plan to make the most of every resource; if it is larger, we expand, for example with a third river or more fellows. In any scenario, the platform remains complete and open.",
@@ -455,10 +449,10 @@ const ComoApoiar = () => {
           </div>
         </Reveal>
 
-        <p className="mt-6 text-center text-xs text-slate-500">
+        <p className="mt-4 text-center text-xs text-slate-400">
           {t([
-            "Proposta de financiamento de pesquisa aplicada. Não representa oferta de serviço contratado.",
-            "Funding proposal for applied research. Not an offer of contracted services.",
+            "Metas propostas; formalização conforme os procedimentos institucionais. Resultados científicos e impacto não são garantidos. Proposta de financiamento de pesquisa aplicada; não representa oferta de serviço contratado.",
+            "Proposed targets; formal arrangements follow institutional procedures. Scientific results and impact are not guaranteed. Funding proposal for applied research; not an offer of contracted services.",
           ])}
         </p>
       </div>
