@@ -3,6 +3,7 @@ import { AnimatePresence, motion, type Variants } from "framer-motion";
 import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 import { PalcoContext } from "./primitives";
 import { definirMovimento, useMenosMovimento, useSistemaReduzSemEscolha } from "./useMenosMovimento";
+import { RioFio } from "./RioFio";
 import { useT, type Bi } from "./idioma";
 import { BotaoIdioma } from "./BotaoIdioma";
 
@@ -312,6 +313,8 @@ export const Palco = ({ cenas }: { cenas: Cena[] }) => {
           aria-roledescription={t(["tela", "screen"])}
           aria-label={`${i + 1} / ${total}: ${t(cenas[i].nome)}`}
         >
+          {/* O rio nasce no vídeo da abertura e atravessa as demais telas. */}
+          {!cenas[i].cheia && <RioFio indice={i - 1} />}
           <PalcoContext.Provider value={{ ativo: true, passo }}>
             <Encaixe cheia={cenas[i].cheia}>{cenas[i].el}</Encaixe>
           </PalcoContext.Provider>
