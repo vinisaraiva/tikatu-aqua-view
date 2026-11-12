@@ -90,7 +90,7 @@ export const Metas = () => {
             {FORMAS.map((f, i) => {
               const Icon = f.icon;
               return (
-                <Reveal key={f.titulo[0]} delay={0.1 + i * 0.12}>
+                <Reveal flutua key={f.titulo[0]} delay={0.1 + i * 0.12}>
                   <div className="h-full rounded-2xl border border-white/10 bg-white/[0.04] p-4">
                     <div className="flex flex-wrap items-center gap-2 font-semibold text-tk-creme">
                       <Icon className="h-4 w-4 text-tk-rio-claro" />
@@ -109,7 +109,7 @@ export const Metas = () => {
           </div>
           <dl ref={ref} className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
             {METAS.map((m, i) => (
-              <Reveal key={m.rotulo[0]} delay={0.3 + i * 0.07}>
+              <Reveal flutua key={m.rotulo[0]} delay={0.3 + i * 0.07}>
                 <div className="h-full rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-3">
                   <dd className="font-mono text-3xl font-semibold tabular-nums text-tk-rio-claro sm:text-4xl">
                     <Contador valor={m.valor} ativo={ativo} atraso={base + i * 0.1} />

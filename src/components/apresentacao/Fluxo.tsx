@@ -162,10 +162,11 @@ const Ilustracao = ({ etapa }: { etapa: number }) => {
             </span>
             <span className="h-2 flex-1 overflow-hidden rounded-full bg-white/10">
               <motion.span
-                className={`block h-full rounded-full ${cor(v)}`}
-                initial={{ width: 0 }}
-                animate={{ width: `${(v / 9) * 100}%` }}
-                transition={{ delay: 0.3 + i * 0.12, duration: 0.6 }}
+                className={`block h-full origin-left rounded-full ${cor(v)}`}
+                style={{ width: `${(v / 9) * 100}%` }}
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: 1 }}
+                transition={{ type: "spring", stiffness: 140, damping: 14, delay: 0.3 + i * 0.12 }}
               />
             </span>
             <span className="w-8 text-right font-mono text-tk-creme">{formatar(v, l)}</span>

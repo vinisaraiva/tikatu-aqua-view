@@ -191,7 +191,7 @@ export const Perguntas = () => {
         {PERGUNTAS.map((p, i) => {
           const Icon = p.icon;
           return (
-            <Reveal key={p.pergunta[0]} delay={0.15 + i * 0.2}>
+            <Reveal flutua key={p.pergunta[0]} delay={0.15 + i * 0.2}>
               <article className="flex h-full flex-col rounded-3xl border border-white/10 bg-white/[0.03] p-6">
                 <div className="flex items-center gap-3">
                   <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-tk-rio-claro/15 text-tk-rio-claro">

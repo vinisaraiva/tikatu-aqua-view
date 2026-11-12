@@ -196,7 +196,7 @@ const ParaQuem = () => {
       </Reveal>
       <div className="mt-8 grid gap-4 sm:grid-cols-2">
         {PUBLICOS.map(({ icon: Icon, titulo, texto, link, linkTexto }, i) => (
-          <Reveal key={link} delay={0.08 * i}>
+          <Reveal flutua key={link} delay={0.08 * i}>
             <div className="group flex h-full flex-col rounded-2xl border border-white/10 bg-white/[0.03] p-5 transition-colors hover:border-tk-rio-claro/40 hover:bg-white/[0.06]">
               <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-tk-rio-claro/15 text-tk-rio-claro">
                 <Icon className="h-5 w-5" />
@@ -266,7 +266,7 @@ const Equipe = () => {
       </Reveal>
       <div className="mt-8 grid gap-6 md:grid-cols-2">
         {EQUIPE.map((p, i) => (
-          <Reveal key={p.nome} delay={0.1 * i}>
+          <Reveal flutua key={p.nome} delay={0.1 * i}>
             <div className="h-full rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
               <div className="text-xs font-semibold uppercase tracking-[0.2em] text-tk-rio-claro/80">{t(p.papel)}</div>
               <div className="mt-3 text-2xl font-semibold text-tk-creme">{p.nome}</div>
@@ -389,7 +389,7 @@ const ComoApoiar = () => {
         </Reveal>
         <ol className="mt-5 grid gap-3 sm:grid-cols-2 md:grid-cols-4 md:gap-4">
           {ETAPAS_APOIO.map((e, i) => (
-            <Reveal key={e.n[0]} delay={0.1 * i}>
+            <Reveal flutua key={e.n[0]} delay={0.1 * i}>
               <li className="h-full rounded-2xl border border-white/10 bg-white/[0.03] p-4 sm:p-5">
                 <div className="font-mono text-sm text-tk-rio-claro">{t(e.n)}</div>
                 <div className="mt-1 text-lg font-semibold text-tk-creme">{t(e.titulo)}</div>
@@ -410,7 +410,7 @@ const ComoApoiar = () => {
           ])}
         </p>
 
-        <Reveal delay={0.1}>
+        <Reveal flutua delay={0.35}>
           <div className="mt-5 flex flex-col items-center gap-6 rounded-3xl border border-tk-terra-clara/40 bg-gradient-to-br from-tk-terra/25 via-tk-rio/10 to-transparent px-6 py-5 text-center md:flex-row md:justify-between md:px-10 md:text-left">
             <div>
               <h3 className="text-2xl font-semibold text-tk-creme sm:text-3xl">

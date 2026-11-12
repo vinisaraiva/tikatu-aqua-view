@@ -102,7 +102,14 @@ const Anel = ({ ativo, desenhado, sel, reduce }: { ativo: boolean; desenhado: bo
   let acumulado = 0;
   return (
     <div className="relative mx-auto aspect-square w-full max-w-[24rem]">
-      <svg viewBox="0 0 200 200" className="h-full w-full -rotate-90 overflow-visible" aria-hidden>
+      <motion.svg
+        viewBox="0 0 200 200"
+        className="h-full w-full overflow-visible"
+        aria-hidden
+        initial={false}
+        animate={{ rotate: ativo || reduce ? -90 : -150, scale: ativo || reduce ? 1 : 0.86 }}
+        transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 60, damping: 13, delay: 0.3 }}
+      >
         <circle cx="100" cy="100" r={R} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="22" />
         {FRENTES.map((f, i) => {
           const comp = (f.valor / TOTAL) * C;
@@ -136,7 +143,7 @@ const Anel = ({ ativo, desenhado, sel, reduce }: { ativo: boolean; desenhado: bo
             />
           );
         })}
-      </svg>
+      </motion.svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
         <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-tk-rio-claro/80">
           {t(["Total a captar", "Total to raise"])}
