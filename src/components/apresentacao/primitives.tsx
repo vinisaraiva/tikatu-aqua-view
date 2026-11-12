@@ -53,9 +53,9 @@ export const Reveal = ({
 };
 
 export const SceneLabel = ({ index, children }: { index: number; children: ReactNode }) => (
-  <div className="mb-5 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.25em] text-cyan-300/80">
-    <span className="tabular-nums">{String(index).padStart(2, "0")}</span>
-    <span className="h-px w-8 bg-cyan-300/50" aria-hidden />
+  <div className="mb-5 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.25em] text-tk-rio-claro">
+    <span className="tabular-nums text-tk-terra-clara">{String(index).padStart(2, "0")}</span>
+    <span className="h-0.5 w-8 bg-tk-terra" aria-hidden />
     <span>{children}</span>
   </div>
 );

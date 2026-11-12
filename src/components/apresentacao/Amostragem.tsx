@@ -70,7 +70,7 @@ const Grafico = ({
           cx={pt.x}
           cy={pt.y}
           r="9"
-          fill="#062a3d"
+          fill="#0d3a5c"
           stroke={pt.acima ? "#efb08c" : "#f4f5eb"}
           strokeWidth="3.5"
           initial={{ opacity: 0, scale: 0.4 }}
@@ -90,10 +90,10 @@ const Grafico = ({
 
 const Status = ({ coletas }: { coletas: 0 | 3 | 12 }) => {
   const t = useT();
-  if (!coletas) return <p className="text-lg text-slate-400">{t(["O rio muda o tempo todo…", "The river changes all the time…"])}</p>;
+  if (!coletas) return <p className="text-lg text-tk-nevoa/75">{t(["O rio muda o tempo todo…", "The river changes all the time…"])}</p>;
   const acima = pontos(coletas).filter((p) => p.acima).length;
   return coletas === 3 ? (
-    <p className="text-lg font-semibold text-white sm:text-xl">
+    <p className="text-lg font-semibold text-tk-creme sm:text-xl">
       {t(["3 coletas: a mudança passou sem registro.", "3 samples: the change went unrecorded."])}
     </p>
   ) : (
@@ -108,10 +108,10 @@ const Cabecalho = () => {
   return (
     <>
       <SceneLabel index={4}>{t(["Com que frequência?", "How often?"])}</SceneLabel>
-      <h2 className="max-w-3xl text-3xl font-semibold leading-tight text-white sm:text-5xl">
+      <h2 className="max-w-3xl text-3xl font-semibold leading-tight text-tk-creme sm:text-5xl">
         {t(["Entre duas coletas, algo pode mudar.", "Between two samples, things can change."])}
       </h2>
-      <p className="mt-4 max-w-2xl text-slate-300 sm:text-lg">
+      <p className="mt-4 max-w-2xl text-tk-nevoa sm:text-lg">
         {t([
           "Uma medição registra um momento. A frequência de coleta decide o que fica registrado.",
           "A measurement captures a single moment. Sampling frequency decides what gets recorded.",
@@ -125,14 +125,14 @@ const Rodape = () => {
   const t = useT();
   return (
     <>
-      <p className="mt-4 text-sm text-slate-300 sm:text-base">
-        <span className="font-semibold text-cyan-200">{t(["Na prática: ", "In practice: "])}</span>
+      <p className="mt-4 text-sm text-tk-nevoa sm:text-base">
+        <span className="font-semibold text-tk-rio-claro">{t(["Na prática: ", "In practice: "])}</span>
         {t([
           "na comunidade do Acuípe de Baixo, entre Ilhéus e Una, as coletas são previstas três vezes por semana.",
           "in the Acuípe de Baixo community, between Ilhéus and Una, sampling is planned three times a week.",
         ])}
       </p>
-      <p className="mt-2 text-xs text-slate-500">
+      <p className="mt-2 text-xs text-tk-nevoa/60">
         {t([
           "Exemplo didático, não é série real. O estudo do Rio Buranhém (Earth Science Informatics, 2026) analisa essa relação com cálculo exato de probabilidades.",
           "Teaching example, not a real time series. The Buranhém River study (Earth Science Informatics, 2026) analyses this relationship with exact probability calculations.",
@@ -162,7 +162,7 @@ const Controles = ({
         onClick={() => escolher(n)}
         aria-pressed={coletas === n}
         className={`rounded-full border px-5 py-2.5 text-sm font-semibold transition-colors ${
-          coletas === n ? "border-cyan-300 bg-cyan-300 text-slate-950" : "border-cyan-300/60 text-cyan-200"
+          coletas === n ? "border-tk-rio-claro bg-tk-rio-claro text-tk-marinho" : "border-tk-rio-claro/60 text-tk-rio-claro"
         }`}
       >
         {n} {t(["coletas", "samples"])}
@@ -172,7 +172,7 @@ const Controles = ({
       <button
         type="button"
         onClick={rever}
-        className="rounded-full px-4 py-2.5 text-sm text-cyan-100/80 underline-offset-4 hover:underline"
+        className="rounded-full px-4 py-2.5 text-sm text-tk-nevoa/80 underline-offset-4 hover:underline"
       >
         {t(["Rever animação", "Replay animation"])}
       </button>

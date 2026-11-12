@@ -118,16 +118,16 @@ export const AvisoMovimento = () => {
   const t = useT();
   if (!mostrar) return null;
   return (
-    <div className="fixed left-1/2 top-4 z-[60] flex w-[min(92vw,34rem)] -translate-x-1/2 flex-wrap items-center justify-center gap-3 rounded-2xl border border-cyan-300/30 bg-[#04202f]/95 px-5 py-3 text-sm text-slate-200 shadow-2xl backdrop-blur">
+    <div className="fixed left-1/2 top-4 z-[60] flex w-[min(92vw,34rem)] -translate-x-1/2 flex-wrap items-center justify-center gap-3 rounded-2xl border border-tk-rio-claro/30 bg-[#0a2f4c]/95 px-5 py-3 text-sm text-tk-creme/90 shadow-2xl backdrop-blur">
       <span>{t(["Este computador está com as animações reduzidas.", "Animations are reduced on this computer."])}</span>
       <button
         type="button"
         onClick={() => definirMovimento("completo")}
-        className="rounded-full bg-cyan-300 px-4 py-1.5 font-semibold text-slate-950 hover:bg-cyan-200"
+        className="rounded-full bg-tk-rio-claro px-4 py-1.5 font-semibold text-tk-marinho hover:bg-white"
       >
         {t(["Ativar animações", "Turn on animations"])}
       </button>
-      <button type="button" onClick={() => definirMovimento("reduzido")} className="text-slate-400 hover:text-white">
+      <button type="button" onClick={() => definirMovimento("reduzido")} className="text-tk-nevoa/75 hover:text-tk-creme">
         {t(["Manter", "Keep"])}
       </button>
     </div>
@@ -145,7 +145,7 @@ export const BotaoMovimento = ({ className = "" }: { className?: string }) => {
       aria-pressed={!reduce}
       title={reduce ? t(["Ativar animações", "Turn on animations"]) : t(["Reduzir animações", "Reduce animations"])}
       className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs transition-colors ${
-        reduce ? "text-slate-400 hover:text-white" : "text-cyan-200 hover:text-white"
+        reduce ? "text-tk-nevoa/75 hover:text-tk-creme" : "text-tk-rio-claro hover:text-tk-creme"
       } ${className}`}
     >
       <Sparkles className="h-3.5 w-3.5" />
@@ -292,7 +292,7 @@ export const Palco = ({ cenas }: { cenas: Cena[] }) => {
   return (
     // As cenas pedem 100svh de altura; aqui descontamos a barra de controles para elas caberem sem encolher.
     <div
-      className="fixed inset-0 overflow-hidden bg-[#021019] [&_section]:min-h-[calc(100svh-3.5rem)]"
+      className="fixed inset-0 overflow-hidden bg-[#072740] [&_section]:min-h-[calc(100svh-3.5rem)]"
       aria-roledescription={t(["apresentação", "presentation"])}
     >
       <AnimatePresence initial={false} custom={rumo}>
@@ -303,7 +303,12 @@ export const Palco = ({ cenas }: { cenas: Cena[] }) => {
           initial="entra"
           animate="centro"
           exit="sai"
-          className="absolute inset-0 overflow-hidden bg-gradient-to-b from-[#04202f] to-[#062a3d] shadow-[-40px_0_80px_rgba(0,0,0,0.55)]"
+          className="absolute inset-0 overflow-hidden shadow-[-40px_0_80px_rgba(0,0,0,0.55)]"
+          // Azul-marinho da logo, com uma luz do azul do rio no canto.
+          style={{
+            background:
+              "radial-gradient(75% 60% at 88% 0%, rgba(27,127,192,0.32), transparent 62%), linear-gradient(180deg, #0a2f4c, #0d3a5c)",
+          }}
           aria-roledescription={t(["tela", "screen"])}
           aria-label={`${i + 1} / ${total}: ${t(cenas[i].nome)}`}
         >
@@ -315,7 +320,7 @@ export const Palco = ({ cenas }: { cenas: Cena[] }) => {
 
       {/* Progresso */}
       <motion.div
-        className="fixed inset-x-0 top-0 z-50 h-0.5 origin-left bg-gradient-to-r from-cyan-300 via-teal-300 to-sky-400"
+        className="fixed inset-x-0 top-0 z-50 h-0.5 origin-left bg-gradient-to-r from-tk-rio via-tk-rio-claro to-tk-terra-clara"
         animate={{ scaleX: Math.max(progresso, 0.002) }}
         transition={{ duration: reduce ? 0 : 0.8, ease: [0.22, 1, 0.36, 1] }}
         aria-hidden
@@ -323,14 +328,14 @@ export const Palco = ({ cenas }: { cenas: Cena[] }) => {
 
       {/* Controles */}
       <nav
-        className="fixed bottom-4 left-1/2 z-50 flex -translate-x-1/2 items-center gap-1 rounded-full border border-white/10 bg-[#021019]/70 px-2 py-1.5 shadow-xl backdrop-blur"
+        className="fixed bottom-4 left-1/2 z-50 flex -translate-x-1/2 items-center gap-1 rounded-full border border-white/10 bg-[#072740]/70 px-2 py-1.5 shadow-xl backdrop-blur"
         aria-label={t(["Telas da apresentação", "Presentation screens"])}
       >
         <button
           type="button"
           onClick={() => ir(-1)}
           disabled={i === 0 && passo === 0}
-          className="rounded-full p-1.5 text-slate-300 hover:bg-white/10 hover:text-white disabled:opacity-30"
+          className="rounded-full p-1.5 text-tk-nevoa hover:bg-white/10 hover:text-tk-creme disabled:opacity-30"
           aria-label={t(["Anterior", "Previous"])}
         >
           <ChevronLeft className="h-4 w-4" />
@@ -348,20 +353,20 @@ export const Palco = ({ cenas }: { cenas: Cena[] }) => {
             >
               <span
                 className={`block h-1.5 rounded-full transition-all duration-500 ${
-                  k === i ? "w-6 bg-cyan-300" : "w-1.5 bg-white/30 group-hover:bg-white/70"
+                  k === i ? "w-6 bg-tk-rio-claro" : "w-1.5 bg-white/30 group-hover:bg-white/70"
                 }`}
               />
             </button>
           ))}
         </div>
-        <span className="min-w-[3.25rem] text-center font-mono text-[11px] tabular-nums text-slate-400">
+        <span className="min-w-[3.25rem] text-center font-mono text-[11px] tabular-nums text-tk-nevoa/75">
           {String(i + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
         </span>
         <button
           type="button"
           onClick={() => ir(1)}
           disabled={i === total - 1 && passo === passos - 1}
-          className="rounded-full p-1.5 text-slate-300 hover:bg-white/10 hover:text-white disabled:opacity-30"
+          className="rounded-full p-1.5 text-tk-nevoa hover:bg-white/10 hover:text-tk-creme disabled:opacity-30"
           aria-label={t(["Próxima", "Next"])}
         >
           <ChevronRight className="h-4 w-4" />
