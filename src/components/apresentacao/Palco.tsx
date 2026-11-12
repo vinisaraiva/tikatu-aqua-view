@@ -4,7 +4,8 @@ import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 import { PalcoContext } from "./primitives";
 import { definirMovimento, useMenosMovimento, useSistemaReduzSemEscolha } from "./useMenosMovimento";
 import { RioFio } from "./RioFio";
-import { Gota3D, GOTA_IMPACTO_MS, GOTA_PONTO, type GotaHandle } from "./Gota3D";
+import { Gota3D, type GotaHandle } from "./Gota3D";
+import { GOTA_IMPACTO_MS, GOTA_PONTO } from "./gotaConfig";
 import { useT, type Bi } from "./idioma";
 import { BotaoIdioma } from "./BotaoIdioma";
 

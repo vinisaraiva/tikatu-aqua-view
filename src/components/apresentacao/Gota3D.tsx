@@ -1,5 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { motion } from "framer-motion";
+import { GOTA_IMPACTO_MS, GOTA_PONTO } from "./gotaConfig";
 
 /**
  * A gota que abre a apresentação: ao sair da tela 1, uma gota d'água em 3D se forma no alto, cai e,
@@ -7,9 +8,6 @@ import { motion } from "framer-motion";
  * A three.js é carregada com antecedência, em segundo plano; se ainda não estiver pronta (ou se o
  * navegador não tiver WebGL), `cair()` devolve false e a troca de tela acontece sem a gota.
  */
-export const GOTA_IMPACTO_MS = 780;
-/** Ponto de impacto na tela (fração da largura e da altura); a tela seguinte se abre daqui. */
-export const GOTA_PONTO = { x: 0.5, y: 0.58 };
 
 const FORMAR = 220;
 const SOLTAR = 330;
