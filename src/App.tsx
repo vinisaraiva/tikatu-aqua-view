@@ -35,6 +35,8 @@ import ForumEconomiaDoMar from "./pages/ForumEconomiaDoMar";
 
 // Apresentação para investidores: carregada sob demanda para não pesar o resto do site.
 const Apresentacao = lazy(() => import("./pages/Apresentacao"));
+// Tikatu Territórios: explicação para comunidades, também sob demanda.
+const Territorios = lazy(() => import("./pages/Territorios"));
 
 const PageTracker = () => {
   usePageTracking();
@@ -70,6 +72,16 @@ const App = () => (
             element={
               <Suspense fallback={<div className="min-h-screen bg-[#021019]" />}>
                 <Apresentacao />
+              </Suspense>
+            }
+          />
+
+          {/* Tikatu Territórios (comunidades) — fora dos menus, noindex, sem portão de acesso */}
+          <Route
+            path="/territorios"
+            element={
+              <Suspense fallback={<div className="min-h-screen bg-[#071f33]" />}>
+                <Territorios />
               </Suspense>
             }
           />
